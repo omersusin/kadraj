@@ -187,7 +187,7 @@ fun ExportSheet(
                         label = size.label,
                         detail = "${exportDimensions(layout.aspect, size.longSide).first} px",
                         selected = viewModel.exportSize == size,
-                        onClick = { viewModel.setExportSize(size) },
+                        onClick = { viewModel.updateExportSize(size) },
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -211,7 +211,7 @@ fun ExportSheet(
                         label = format.label,
                         detail = if (format == ExportFormat.PNG) "kayıpsız" else "hafif",
                         selected = viewModel.exportFormat == format,
-                        onClick = { viewModel.setExportFormat(format) },
+                        onClick = { viewModel.updateExportFormat(format) },
                         modifier = Modifier.weight(1f),
                     )
                 }

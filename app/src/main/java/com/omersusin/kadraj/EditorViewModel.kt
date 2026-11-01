@@ -168,7 +168,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun setTemplate(value: Template) {
+    fun updateTemplate(value: Template) {
         template = value
         if (value == Template.FLOW && aspect != AspectPreset.AUTO) {
             aspect = AspectPreset.AUTO
@@ -176,7 +176,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun setAspect(value: AspectPreset) {
+    fun updateAspect(value: AspectPreset) {
         aspect = value
         if (value != AspectPreset.AUTO && template == Template.FLOW) {
             template = Template.GRID
@@ -215,11 +215,11 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         style = style.copy(texture = !style.texture)
     }
 
-    fun setExportSize(value: ExportSize) {
+    fun updateExportSize(value: ExportSize) {
         exportSize = value
     }
 
-    fun setExportFormat(value: ExportFormat) {
+    fun updateExportFormat(value: ExportFormat) {
         exportFormat = value
     }
 

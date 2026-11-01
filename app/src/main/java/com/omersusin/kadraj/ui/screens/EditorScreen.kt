@@ -351,7 +351,7 @@ private fun LayoutControls(viewModel: EditorViewModel) {
                 TemplateChip(
                     template = template,
                     selected = viewModel.template == template,
-                    onClick = { viewModel.setTemplate(template) },
+                    onClick = { viewModel.updateTemplate(template) },
                 )
             }
         }
@@ -387,7 +387,7 @@ private fun LayoutControls(viewModel: EditorViewModel) {
                 ChoiceChip(
                     label = aspectLabel(aspect),
                     selected = viewModel.aspect == aspect,
-                    onClick = { viewModel.setAspect(aspect) },
+                    onClick = { viewModel.updateAspect(aspect) },
                 )
             }
         }
