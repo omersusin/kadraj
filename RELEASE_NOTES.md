@@ -19,5 +19,5 @@ Ekran görüntüleri ve fotoğraflar için editoryal kolaj stüdyosu.
 2. Android ayarlarından bu kaynağa uygulama yükleme izni ver.
 3. APK'yı aç ve kur.
 
-Android 10 ve üzeri gerekir. Paket adı `com.omersusin.kadraj`; APK aynı
-sürümlerde kullanılan release anahtarıyla imzalanmıştır.
+Android 10 ve üzeri gerekir. Paket adı `com.omersusin.kadraj`; bu ve sonraki
+sürümler aynı release anahtarıyla imzalanır.

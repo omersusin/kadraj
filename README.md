@@ -7,7 +7,7 @@ ekran görüntülerini ve karışık seçkileri ayrı ayrı anlar. Düzeni, boş
 ve kadrajı buna göre kurar. Her şey cihazda kalır.
 
 [**Android APK'yı indir**](https://github.com/omersusin/kadraj/releases/latest) ·
-Android 10 ve üzeri · Yaklaşık 1 MB
+Android 10 ve üzeri · Yaklaşık 2 MB
 
 ## Neden Kadraj?
 
