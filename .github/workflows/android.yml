@@ -71,4 +71,4 @@ jobs:
           cp "$SIGNED" "kadraj-${GITHUB_REF_NAME}.apk"
           gh release create "$GITHUB_REF_NAME" "kadraj-${GITHUB_REF_NAME}.apk" \
             --title "Kadraj $GITHUB_REF_NAME" \
-            --notes "Kadraj $GITHUB_REF_NAME — ekran görüntüleri ve fotoğraflar için akıllı, editoryal kolaj stüdyosu."
+            --notes-file RELEASE_NOTES.md
