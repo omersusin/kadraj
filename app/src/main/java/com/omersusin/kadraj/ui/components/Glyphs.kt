@@ -85,7 +85,7 @@ private fun DrawScope.drawGlyph(glyph: Glyph, color: Color, strokeWidth: Float) 
         drawLine(color, point(x1, y1), point(x2, y2), strokeWidth, StrokeCap.Round)
     }
 
-    fun path(build: Path.() -> Unit, fill: Boolean = false) {
+    fun path(fill: Boolean = false, build: Path.() -> Unit) {
         val path = Path().apply(build)
         drawPath(
             path = path,
@@ -199,17 +199,14 @@ private fun DrawScope.drawGlyph(glyph: Glyph, color: Color, strokeWidth: Float) 
             roundRect(12f, 9f, 8f, 8f, 1.2f)
         }
         Glyph.Sparkle -> {
-            path(
-                {
-                    moveTo(x(12f), y(2.8f))
-                    quadraticBezierTo(x(12.8f), y(9.8f), x(20.2f), y(12f))
-                    quadraticBezierTo(x(12.8f), y(14.2f), x(12f), y(21.2f))
-                    quadraticBezierTo(x(11.2f), y(14.2f), x(3.8f), y(12f))
-                    quadraticBezierTo(x(11.2f), y(9.8f), x(12f), y(2.8f))
-                    close()
-                },
-                fill = true,
-            )
+            path(fill = true) {
+                moveTo(x(12f), y(2.8f))
+                quadraticBezierTo(x(12.8f), y(9.8f), x(20.2f), y(12f))
+                quadraticBezierTo(x(12.8f), y(14.2f), x(12f), y(21.2f))
+                quadraticBezierTo(x(11.2f), y(14.2f), x(3.8f), y(12f))
+                quadraticBezierTo(x(11.2f), y(9.8f), x(12f), y(2.8f))
+                close()
+            }
             drawCircle(color, 1.1f * scale, point(19.2f, 5f))
         }
         Glyph.Image -> {

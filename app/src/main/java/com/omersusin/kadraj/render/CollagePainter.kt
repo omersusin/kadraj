@@ -154,7 +154,8 @@ object CollagePainter {
             )
         }
 
-        val inner = rect.inset(mat, mat)
+        val inner = RectF(rect)
+        inner.inset(mat, mat)
         if (inner.width() > 0.5f && inner.height() > 0.5f) {
             val innerRadius = (radius - mat * 0.72f).coerceAtLeast(0f)
             canvas.save()
@@ -171,7 +172,7 @@ object CollagePainter {
             canvas.restore()
 
             val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                style = Paint.Style.STROKE
+                this.style = Paint.Style.STROKE
                 strokeWidth = max(1f, minimum * 0.0009f)
                 color = if (palette.dark) {
                     Color.argb(28, 255, 255, 255)
@@ -186,12 +187,12 @@ object CollagePainter {
 
         if (selected) {
             val under = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                style = Paint.Style.STROKE
+                this.style = Paint.Style.STROKE
                 strokeWidth = max(3f, minimum * 0.005f)
                 color = Color.argb(150, 0, 0, 0)
             }
             val accent = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                style = Paint.Style.STROKE
+                this.style = Paint.Style.STROKE
                 strokeWidth = max(1.5f, minimum * 0.0024f)
                 color = selectionColor
             }
@@ -278,10 +279,11 @@ object CollagePainter {
 
     private fun drawPlaceholder(canvas: Canvas, rect: RectF, palette: Palette) {
         canvas.drawRect(rect, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = palette.surface })
-        val marker = rect.inset(rect.width() * 0.2f, rect.height() * 0.2f)
+        val marker = RectF(rect)
+        marker.inset(rect.width() * 0.2f, rect.height() * 0.2f)
         val shade = if (palette.dark) 255 else 0
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
+            this.style = Paint.Style.STROKE
             strokeWidth = max(1f, min(rect.width(), rect.height()) * 0.006f)
             color = Color.argb(54, shade, shade, shade)
         }

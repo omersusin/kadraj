@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.omersusin.kadraj.CollageImage
 import com.omersusin.kadraj.collage.CollageCell
 import com.omersusin.kadraj.collage.CollageStyle
@@ -57,7 +58,7 @@ fun CollageStage(
     modifier: Modifier = Modifier,
 ) {
     val previews = rememberPreviewLoadStates(loader, images)
-    val revision = previews.revision.intValue
+    val revision = previews.revision.value
     val loading = previews.loading.value
     val haptics = LocalHapticFeedback.current
 
@@ -277,7 +278,7 @@ fun CollagePreview(
     modifier: Modifier = Modifier,
 ) {
     val previews = rememberPreviewLoadStates(loader, images)
-    val revision = previews.revision.intValue
+    val revision = previews.revision.value
     val imageKey = remember(images) { images.map { it.id to it.uri } }
     val uriById = remember(imageKey) { imageKey.toMap() }
     val imageStates = remember(images) {
