@@ -103,7 +103,7 @@ class CollageExporter(
             val uri = uriById[imageId] ?: return@ImageProvider null
             val state = imageStates[imageId]
             val zoom = state?.zoom ?: 1f
-            val needed = (max(targetWidth, targetHeight) * max(1f, zoom) * 1.1f)
+            val needed = (max(targetWidth, targetHeight) * max(1f, zoom) * 1.45f)
                 .roundToInt()
                 .coerceIn(96, 4096)
             loader.decodeForExport(uri, needed)?.let { decoded ->

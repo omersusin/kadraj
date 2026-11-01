@@ -412,7 +412,7 @@ object CollagePainter {
 
     private fun captionColor(tone: CaptionTone, palette: Palette): Int = when (tone) {
         CaptionTone.AUTO -> if (palette.dark) palette.matte else 0xFF241C15.toInt()
-        CaptionTone.PAPER -> if (palette.dark) palette.matte else palette.surface
+        CaptionTone.PAPER -> if (palette.dark) palette.matte else 0xFF4A3327.toInt()
         CaptionTone.ACCENT -> palette.accent
     }
 

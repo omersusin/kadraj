@@ -700,12 +700,14 @@ private fun PhotoControls(
                             )
                         }
                     }
-                    KadrajSlider(
-                        label = "Strength",
-                        value = selectedImage.lookAmount,
-                        valueRange = 0f..1f,
-                        onValueChange = { viewModel.setLookAmount(selectedImage.id, it) },
-                    )
+                    if (selectedImage.look != PhotoLook.ORIGINAL) {
+                        KadrajSlider(
+                            label = "Strength",
+                            value = selectedImage.lookAmount,
+                            valueRange = 0f..1f,
+                            onValueChange = { viewModel.setLookAmount(selectedImage.id, it) },
+                        )
+                    }
                 }
                 PhotoPanel.Frame -> {
                     KadrajSlider(

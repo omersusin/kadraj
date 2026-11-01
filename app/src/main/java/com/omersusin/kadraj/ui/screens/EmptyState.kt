@@ -183,31 +183,33 @@ fun EmptyState(
                     ),
                 )
             }
-            Spacer(Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                if (canUndo) {
-                    HistoryAction(
-                        glyph = Glyph.Undo,
-                        label = "UNDO",
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onUndo()
-                        },
-                    )
-                }
-                if (canRedo) {
-                    HistoryAction(
-                        glyph = Glyph.Redo,
-                        label = "REDO",
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onRedo()
-                        },
-                    )
+            if (canUndo || canRedo) {
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (canUndo) {
+                        HistoryAction(
+                            glyph = Glyph.Undo,
+                            label = "UNDO",
+                            onClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onUndo()
+                            },
+                        )
+                    }
+                    if (canRedo) {
+                        HistoryAction(
+                            glyph = Glyph.Redo,
+                            label = "REDO",
+                            onClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onRedo()
+                            },
+                        )
+                    }
                 }
             }
 

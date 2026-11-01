@@ -133,10 +133,14 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun removeImage(id: Long) {
-        if (images.none { it.id == id }) return
+        val index = images.indexOfFirst { it.id == id }
+        if (index < 0) return
         recordHistory()
-        images = images.filterNot { it.id == id }
-        if (selectedId == id) selectedId = null
+        val remaining = images.filterNot { it.id == id }
+        images = remaining
+        if (selectedId == id) {
+            selectedId = remaining.getOrNull(index.coerceAtMost(remaining.lastIndex))?.id
+        }
     }
 
     fun duplicateImage(id: Long) {
@@ -207,8 +211,9 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun setLook(id: Long, look: PhotoLook) {
-        if (images.none { it.id == id }) return
-        recordHistory("look-$id")
+        val image = images.firstOrNull { it.id == id } ?: return
+        if (image.look == look) return
+        recordHistory()
         images = images.map { if (it.id == id) it.copy(look = look) else it }
     }
 
@@ -289,7 +294,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
 
     fun setPalette(value: Palette) {
         if (style.palette.id == value.id) return
-        recordHistory("palette")
+        recordHistory()
         style = style.copy(palette = value)
     }
 
@@ -355,19 +360,19 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun setCaptionFont(value: CaptionFont) {
-        updateCaption("caption-font") { it.copy(font = value) }
+        updateCaption { it.copy(font = value) }
     }
 
     fun setCaptionPlacement(value: CaptionPlacement) {
-        updateCaption("caption-placement") { it.copy(placement = value) }
+        updateCaption { it.copy(placement = value) }
     }
 
     fun setCaptionAlignment(value: CaptionAlignment) {
-        updateCaption("caption-alignment") { it.copy(alignment = value) }
+        updateCaption { it.copy(alignment = value) }
     }
 
     fun setCaptionTone(value: CaptionTone) {
-        updateCaption("caption-tone") { it.copy(tone = value) }
+        updateCaption { it.copy(tone = value) }
     }
 
     fun setCaptionSize(value: Float) {
@@ -375,10 +380,13 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun toggleCaptionPlate() {
-        updateCaption("caption-plate") { it.copy(plate = !it.plate) }
+        updateCaption { it.copy(plate = !it.plate) }
     }
 
-    private fun updateCaption(key: String, transform: (CaptionStyle) -> CaptionStyle) {
+    private fun updateCaption(
+        key: String? = null,
+        transform: (CaptionStyle) -> CaptionStyle,
+    ) {
         recordHistory(key)
         style = style.copy(caption = transform(style.caption))
     }
