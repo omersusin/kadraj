@@ -95,7 +95,7 @@ fun ImageThumb(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    label: String = "Görsel",
+    label: String = "Photo",
 ) {
     val haptics = LocalHapticFeedback.current
     val bitmap = rememberThumbnail(loader, image.uri).value
@@ -159,7 +159,7 @@ fun AddImageTile(
     Column(
         modifier = modifier
             .size(52.dp)
-            .semantics { contentDescription = "Görsel ekle" }
+            .semantics { contentDescription = "Add photos" }
             .clip(shape)
             .background(Color.Transparent)
             .border(1.dp, Kadraj.LineStrong, shape)

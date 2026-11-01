@@ -8,6 +8,7 @@ data class CollageStyle(
     val mat: Float = 0f,
     val shadow: Boolean = true,
     val texture: Boolean = true,
+    val caption: CaptionStyle = CaptionStyle(),
 ) {
     fun toConfig(template: Template, aspect: AspectPreset): CollageConfig =
         CollageConfig(

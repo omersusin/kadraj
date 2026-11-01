@@ -47,15 +47,19 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.omersusin.kadraj.BuildConfig
 import com.omersusin.kadraj.EditorViewModel
 import com.omersusin.kadraj.ui.components.CircleIconButton
 import com.omersusin.kadraj.ui.components.Glyph
 import com.omersusin.kadraj.ui.components.GlyphIcon
 import com.omersusin.kadraj.ui.components.KadrajButton
 import com.omersusin.kadraj.ui.components.Wordmark
+import com.omersusin.kadraj.ui.components.pressable
 import com.omersusin.kadraj.ui.theme.Kadraj
 import kotlin.math.min
 
@@ -64,7 +68,12 @@ fun EmptyState(
     onPickImages: () -> Unit,
     onInfo: () -> Unit,
     modifier: Modifier = Modifier,
+    canUndo: Boolean = false,
+    canRedo: Boolean = false,
+    onUndo: () -> Unit = {},
+    onRedo: () -> Unit = {},
 ) {
+    val haptics = LocalHapticFeedback.current
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
@@ -87,7 +96,7 @@ fun EmptyState(
                 Wordmark()
                 Spacer(Modifier.weight(1f))
                 BasicText(
-                    text = "SAYI 01",
+                    text = "ISSUE 01",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
                         letterSpacing = 1.8.sp,
@@ -101,7 +110,7 @@ fun EmptyState(
                     tint = Kadraj.Muted,
                     background = Color.Transparent,
                     border = Kadraj.Line,
-                    contentDescription = "Kadraj hakkında",
+                    contentDescription = "About Kadraj",
                 )
             }
 
@@ -114,7 +123,7 @@ fun EmptyState(
             Spacer(Modifier.height(if (compact) 12.dp else 20.dp))
 
             BasicText(
-                text = "AKILLI KOLAJ STÜDYOSU",
+                text = "SMART COLLAGE STUDIO",
                 style = Kadraj.Type.Label.copy(
                     color = Kadraj.TerracottaSoft,
                     letterSpacing = 2.1.sp,
@@ -122,7 +131,7 @@ fun EmptyState(
             )
             Spacer(Modifier.height(12.dp))
             BasicText(
-                text = "Kareleriniz,",
+                text = "Your frames,",
                 style = Kadraj.Type.Hero.copy(
                     color = Kadraj.Paper,
                     fontSize = heroSize,
@@ -130,7 +139,7 @@ fun EmptyState(
                 ),
             )
             BasicText(
-                text = "aynı kadrajda.",
+                text = "in one frame.",
                 style = Kadraj.Type.HeroItalic.copy(
                     color = Kadraj.TerracottaSoft,
                     fontSize = heroSize,
@@ -139,15 +148,15 @@ fun EmptyState(
             )
             Spacer(Modifier.height(13.dp))
             BasicText(
-                text = "Telefon ve masaüstü görüntülerini seçin. Kadraj, her karenin " +
-                    "oranına göre kompozisyonu kendi kurar; siz yalnızca dokunuşunuzu ekleyin.",
+                text = "Choose phone and desktop captures. Kadraj reads every frame's ratio " +
+                    "and builds the composition around it; you add the final touch.",
                 modifier = Modifier.fillMaxWidth(0.96f),
                 style = Kadraj.Type.Body.copy(color = Kadraj.Muted),
             )
             Spacer(Modifier.height(22.dp))
 
             KadrajButton(
-                label = "Görsel seç",
+                label = "Choose photos",
                 onClick = onPickImages,
                 modifier = Modifier.fillMaxWidth(),
                 leadingGlyph = Glyph.Image,
@@ -167,12 +176,39 @@ fun EmptyState(
                 )
                 Spacer(Modifier.width(6.dp))
                 BasicText(
-                    text = "Cihazda işlenir  ·  En fazla ${EditorViewModel.MAX_IMAGES} görsel",
+                    text = "Processed on device  ·  Up to ${EditorViewModel.MAX_IMAGES} photos",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
                         letterSpacing = 0.8.sp,
                     ),
                 )
+            }
+            Spacer(Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (canUndo) {
+                    HistoryAction(
+                        glyph = Glyph.Undo,
+                        label = "UNDO",
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onUndo()
+                        },
+                    )
+                }
+                if (canRedo) {
+                    HistoryAction(
+                        glyph = Glyph.Redo,
+                        label = "REDO",
+                        onClick = {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onRedo()
+                        },
+                    )
+                }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -182,20 +218,20 @@ fun EmptyState(
             ) {
                 Feature(
                     glyph = Glyph.Phone,
-                    title = "ORANA",
-                    detail = "duyarlı",
+                    title = "RATIO",
+                    detail = "aware",
                     modifier = Modifier.weight(1f),
                 )
                 Feature(
                     glyph = Glyph.Sparkle,
-                    title = "DOKULU",
-                    detail = "estetik",
+                    title = "TEXTURED",
+                    detail = "aesthetic",
                     modifier = Modifier.weight(1f),
                 )
                 Feature(
                     glyph = Glyph.Download,
                     title = "4K",
-                    detail = "çıktı",
+                    detail = "export",
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -208,7 +244,7 @@ fun EmptyState(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BasicText(
-                    text = "KADRAJ 1.0",
+                    text = "KADRAJ ${BuildConfig.VERSION_NAME}",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
                         letterSpacing = 1.5.sp,
@@ -216,7 +252,7 @@ fun EmptyState(
                 )
                 Spacer(Modifier.weight(1f))
                 BasicText(
-                    text = "TÜRKÇE  ·  YEREL",
+                    text = "ENGLISH  ·  ON-DEVICE",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
                         letterSpacing = 1.5.sp,
@@ -225,6 +261,36 @@ fun EmptyState(
             }
             Spacer(Modifier.height(18.dp))
         }
+    }
+}
+
+@Composable
+private fun HistoryAction(
+    glyph: Glyph,
+    label: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .pressable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        GlyphIcon(
+            glyph = glyph,
+            modifier = Modifier.size(12.dp),
+            tint = Kadraj.Muted,
+            strokeWidth = 1.6.dp,
+        )
+        BasicText(
+            text = label,
+            style = Kadraj.Type.LabelSmall.copy(
+                color = Kadraj.Muted,
+                letterSpacing = 1.1.sp,
+            ),
+        )
     }
 }
 
@@ -348,7 +414,7 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
         }
 
         BasicText(
-            text = "01 / TELEFON",
+            text = "01 / PHONE",
             modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 18.dp),
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,
@@ -356,7 +422,7 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
             ),
         )
         BasicText(
-            text = "02 / MASAÜSTÜ",
+            text = "02 / DESKTOP",
             modifier = Modifier.align(Alignment.BottomEnd).padding(end = 4.dp, bottom = 14.dp),
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -39,6 +40,7 @@ import com.omersusin.kadraj.collage.CollageCell
 import com.omersusin.kadraj.collage.CollageStyle
 import com.omersusin.kadraj.collage.LayoutResult
 import com.omersusin.kadraj.image.ImageLoader
+import com.omersusin.kadraj.render.CaptionTypefaces
 import com.omersusin.kadraj.render.CollagePainter
 import com.omersusin.kadraj.render.ImageProvider
 import com.omersusin.kadraj.render.ImageRenderState
@@ -61,6 +63,10 @@ fun CollageStage(
     val revision = previews.revision.value
     val loading = previews.loading.value
     val haptics = LocalHapticFeedback.current
+    val context = LocalContext.current
+    val captionTypeface = remember(context, style.caption.font) {
+        CaptionTypefaces.load(context, style.caption.font)
+    }
 
     val currentLayout by rememberUpdatedState(layout)
     val currentImages by rememberUpdatedState(images)
@@ -78,6 +84,12 @@ fun CollageStage(
                 fit = it.fit,
                 focusX = it.focusX,
                 focusY = it.focusY,
+                look = it.look,
+                lookAmount = it.lookAmount,
+                zoom = it.zoom,
+                tilt = it.tilt,
+                flipX = it.flipX,
+                flipY = it.flipY,
             )
         }
     }
@@ -134,7 +146,7 @@ fun CollageStage(
                     .clip(shape)
                     .background(Color.Black)
                     .border(1.dp, Kadraj.Line, shape)
-                    .semantics { contentDescription = "Kolaj önizlemesi" },
+                    .semantics { contentDescription = "Collage preview" },
             ) {
                 Canvas(
                     modifier = Modifier
@@ -237,6 +249,7 @@ fun CollageStage(
                             imageStates = imageStates,
                             selectedId = selectedId,
                             selectionColor = 0xFFD17252.toInt(),
+                            captionTypeface = captionTypeface,
                         )
                     }
                 }
@@ -255,7 +268,7 @@ fun CollageStage(
                     ) {
                         KadrajSpinner(diameter = 13.dp)
                         BasicText(
-                            text = "GÖRSELLER HAZIRLANIYOR",
+                            text = "PREPARING PHOTOS",
                             style = Kadraj.Type.LabelSmall.copy(
                                 color = Kadraj.PaperDim,
                                 fontSize = 8.sp,
@@ -281,12 +294,22 @@ fun CollagePreview(
     val revision = previews.revision.value
     val imageKey = remember(images) { images.map { it.id to it.uri } }
     val uriById = remember(imageKey) { imageKey.toMap() }
+    val context = LocalContext.current
+    val captionTypeface = remember(context, style.caption.font) {
+        CaptionTypefaces.load(context, style.caption.font)
+    }
     val imageStates = remember(images) {
         images.associate {
             it.id to ImageRenderState(
                 fit = it.fit,
                 focusX = it.focusX,
                 focusY = it.focusY,
+                look = it.look,
+                lookAmount = it.lookAmount,
+                zoom = it.zoom,
+                tilt = it.tilt,
+                flipX = it.flipX,
+                flipY = it.flipY,
             )
         }
     }
@@ -329,6 +352,7 @@ fun CollagePreview(
                         style = style,
                         provider = provider,
                         imageStates = imageStates,
+                        captionTypeface = captionTypeface,
                     )
                 }
             }

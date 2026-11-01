@@ -81,7 +81,7 @@ fun ExportSheet(
     ) {
         Column {
             BasicText(
-                text = "DIŞA AKTAR",
+                text = "EXPORT",
                 style = Kadraj.Type.Label.copy(
                     color = Kadraj.TerracottaSoft,
                     letterSpacing = 2.0.sp,
@@ -90,8 +90,8 @@ fun ExportSheet(
             Spacer(Modifier.height(8.dp))
             BasicText(
                 text = when (viewModel.exportState) {
-                    is EditorViewModel.ExportState.Saved -> "Kadraj hazır."
-                    else -> "Kadrajı hazırla."
+                    is EditorViewModel.ExportState.Saved -> "Your Kadraj is ready."
+                    else -> "Make your Kadraj."
                 },
                 style = Kadraj.Type.Display.copy(
                     color = Kadraj.Paper,
@@ -108,7 +108,7 @@ fun ExportSheet(
             tint = Kadraj.Muted,
             background = Color.Transparent,
             border = Kadraj.Line,
-            contentDescription = "Kapat",
+            contentDescription = "Close",
         )
     }
 
@@ -123,14 +123,14 @@ fun ExportSheet(
         else -> {
             Spacer(Modifier.height(10.dp))
             BasicText(
-                text = "Kompozisyon cihazında, tam çözünürlükte hazırlanır ve " +
-                    "galerinde Kadraj albümüne kaydedilir.",
+                text = "Your composition is rendered on-device at full resolution and " +
+                    "saved to the Kadraj album in Photos.",
                 style = Kadraj.Type.Body.copy(color = Kadraj.Muted),
             )
             Spacer(Modifier.height(18.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 BasicText(
-                    text = "ÖNİZLEME",
+                    text = "PREVIEW",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
                         letterSpacing = 1.5.sp,
@@ -139,7 +139,7 @@ fun ExportSheet(
                 Spacer(Modifier.weight(1f))
                 BasicText(
                     text = if (viewModel.template == Template.FLOW) {
-                        "SERBEST"
+                        "FREE"
                     } else {
                         ratioLabel(layout.aspect)
                     },
@@ -171,7 +171,7 @@ fun ExportSheet(
             Spacer(Modifier.height(17.dp))
 
             BasicText(
-                text = "BOYUT",
+                text = "SIZE",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     letterSpacing = 1.5.sp,
@@ -209,7 +209,7 @@ fun ExportSheet(
                 ExportFormat.entries.forEach { format ->
                     ExportOption(
                         label = format.label,
-                        detail = if (format == ExportFormat.PNG) "kayıpsız" else "hafif",
+                        detail = if (format == ExportFormat.PNG) "lossless" else "compact",
                         selected = viewModel.exportFormat == format,
                         onClick = { viewModel.updateExportFormat(format) },
                         modifier = Modifier.weight(1f),
@@ -219,7 +219,7 @@ fun ExportSheet(
             Spacer(Modifier.height(13.dp))
             BasicText(
                 text = "${dimensions.first} × ${dimensions.second} px  ·  " +
-                    "${viewModel.exportFormat.label}  ·  Cihazda işlendi",
+                    "${viewModel.exportFormat.label}  ·  Processed on device",
                 style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 10.5.sp,
@@ -249,7 +249,7 @@ fun ExportSheet(
                     KadrajSpinner(diameter = 17.dp)
                     Spacer(Modifier.width(10.dp))
                     BasicText(
-                        text = "HAZIRLANIYOR",
+                        text = "RENDERING",
                         style = Kadraj.Type.Button.copy(
                             color = Kadraj.PaperDim,
                             letterSpacing = 1.3.sp,
@@ -258,7 +258,7 @@ fun ExportSheet(
                 }
             } else {
                 KadrajButton(
-                    label = "Galeriye kaydet",
+                    label = "Save to Photos",
                     onClick = viewModel::export,
                     modifier = Modifier.fillMaxWidth(),
                     leadingGlyph = Glyph.Download,
@@ -354,7 +354,7 @@ private fun ExportSuccess(
         }
         Spacer(Modifier.height(16.dp))
         BasicText(
-            text = "Galeriye kaydedildi.",
+            text = "Saved to Photos.",
             style = Kadraj.Type.DisplaySmall.copy(
                 color = Kadraj.Paper,
                 textAlign = TextAlign.Center,
@@ -380,7 +380,7 @@ private fun ExportSuccess(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             KadrajButton(
-                label = "Paylaş",
+                label = "Share",
                 onClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     val intent = Intent(Intent.ACTION_SEND).apply {
@@ -389,14 +389,14 @@ private fun ExportSuccess(
                         clipData = ClipData.newRawUri("Kadraj", result.uri)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-                    context.startActivity(Intent.createChooser(intent, "Kadrajı paylaş"))
+                    context.startActivity(Intent.createChooser(intent, "Share Kadraj"))
                 },
                 modifier = Modifier.weight(1f),
                 tone = com.omersusin.kadraj.ui.components.ButtonTone.Paper,
                 leadingGlyph = Glyph.Share,
             )
             KadrajButton(
-                label = "Kapat",
+                label = "Close",
                 onClick = onClose,
                 modifier = Modifier.weight(1f),
                 tone = com.omersusin.kadraj.ui.components.ButtonTone.Quiet,
@@ -421,7 +421,7 @@ private fun ExportSuccess(
                 strokeWidth = 1.6.dp,
             )
             BasicText(
-                text = "YENİ KOLAJ",
+                text = "NEW COLLAGE",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.Muted,
                     letterSpacing = 1.3.sp,

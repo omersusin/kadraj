@@ -65,7 +65,7 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
 
     val openExport: () -> Unit = {
         if (images.isEmpty()) {
-            viewModel.showNotice("Önce birkaç görsel ekleyin.")
+            viewModel.showNotice("Add a few photos first.")
         } else {
             if (viewModel.exportState !is EditorViewModel.ExportState.Rendering) {
                 viewModel.resetExport()
@@ -106,6 +106,10 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
                 onPickImages = pickImages,
                 onInfo = { showInfo = true },
                 modifier = Modifier.fillMaxSize(),
+                canUndo = viewModel.canUndo,
+                canRedo = viewModel.canRedo,
+                onUndo = viewModel::undo,
+                onRedo = viewModel::redo,
             )
         } else {
             EditorScreen(

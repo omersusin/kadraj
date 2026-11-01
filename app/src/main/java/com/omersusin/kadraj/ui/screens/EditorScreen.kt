@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -22,6 +23,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,17 +38,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omersusin.kadraj.CollageImage
 import com.omersusin.kadraj.EditorViewModel
 import com.omersusin.kadraj.collage.AspectPreset
+import com.omersusin.kadraj.collage.CaptionAlignment
+import com.omersusin.kadraj.collage.CaptionFont
+import com.omersusin.kadraj.collage.CaptionPlacement
+import com.omersusin.kadraj.collage.CaptionTone
 import com.omersusin.kadraj.collage.FitMode
 import com.omersusin.kadraj.collage.Palette
 import com.omersusin.kadraj.collage.Palettes
+import com.omersusin.kadraj.collage.PhotoLook
 import com.omersusin.kadraj.collage.Template
 import com.omersusin.kadraj.ui.components.AddImageTile
 import com.omersusin.kadraj.ui.components.ChoiceChip
@@ -65,11 +77,18 @@ import com.omersusin.kadraj.ui.components.ratioLabel
 import com.omersusin.kadraj.ui.components.templateLabel
 import com.omersusin.kadraj.ui.theme.Kadraj
 import java.util.Locale
+import kotlin.math.roundToInt
 
 private enum class EditorTab {
     Layout,
     Style,
-    Images,
+    Photo,
+    Text,
+}
+
+private enum class PhotoPanel {
+    Look,
+    Frame,
 }
 
 @Composable
@@ -83,7 +102,7 @@ fun EditorScreen(
     var tab by rememberSaveable { mutableStateOf(EditorTab.Layout) }
 
     val images = viewModel.images
-    val selectedImage = images.firstOrNull { it.id == viewModel.selectedId }
+    val selectedImage = viewModel.selectedImage
     val layoutKey = remember(images) { images.map { it.id to it.aspect } }
     val layout = remember(
         layoutKey,
@@ -102,7 +121,10 @@ fun EditorScreen(
     ) {
         EditorTopBar(
             imageCount = images.size,
-            template = viewModel.template,
+            canUndo = viewModel.canUndo,
+            canRedo = viewModel.canRedo,
+            onUndo = viewModel::undo,
+            onRedo = viewModel::redo,
             onExport = onExport,
             onInfo = onInfo,
         )
@@ -111,11 +133,11 @@ fun EditorScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 22.dp)
-                .padding(top = 6.dp, bottom = 7.dp),
+                .padding(top = 5.dp, bottom = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             BasicText(
-                text = "KOMPOZİSYON",
+                text = "COMPOSITION",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     letterSpacing = 1.5.sp,
@@ -126,7 +148,7 @@ fun EditorScreen(
             Spacer(Modifier.width(9.dp))
             BasicText(
                 text = if (viewModel.template == Template.FLOW) {
-                    "SERBEST"
+                    "FREE"
                 } else {
                     ratioLabel(layout.aspect)
                 },
@@ -153,7 +175,7 @@ fun EditorScreen(
             loader = viewModel.imageLoader,
             onSelect = { id ->
                 viewModel.selectImage(id)
-                if (id != null) tab = EditorTab.Images
+                if (id != null) tab = EditorTab.Photo
             },
             onFocus = viewModel::updateFocus,
             onToggleFit = viewModel::toggleFit,
@@ -177,22 +199,25 @@ fun EditorScreen(
 @Composable
 private fun EditorTopBar(
     imageCount: Int,
-    template: Template,
+    canUndo: Boolean,
+    canRedo: Boolean,
+    onUndo: () -> Unit,
+    onRedo: () -> Unit,
     onExport: () -> Unit,
     onInfo: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(62.dp)
-            .padding(horizontal = 20.dp),
+            .height(60.dp)
+            .padding(horizontal = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             Wordmark()
             Spacer(Modifier.height(2.dp))
             BasicText(
-                text = "$imageCount GÖRSEL  ·  ${templateLabel(template)}",
+                text = "$imageCount ${if (imageCount == 1) "PHOTO" else "PHOTOS"}",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 8.sp,
@@ -202,15 +227,37 @@ private fun EditorTopBar(
         }
         Spacer(Modifier.weight(1f))
         CircleIconButton(
+            glyph = Glyph.Undo,
+            onClick = onUndo,
+            size = 30.dp,
+            tint = if (canUndo) Kadraj.Muted else Kadraj.MutedDim,
+            background = Color.Transparent,
+            border = Kadraj.Line,
+            enabled = canUndo,
+            contentDescription = "Undo",
+        )
+        Spacer(Modifier.width(5.dp))
+        CircleIconButton(
+            glyph = Glyph.Redo,
+            onClick = onRedo,
+            size = 30.dp,
+            tint = if (canRedo) Kadraj.Muted else Kadraj.MutedDim,
+            background = Color.Transparent,
+            border = Kadraj.Line,
+            enabled = canRedo,
+            contentDescription = "Redo",
+        )
+        Spacer(Modifier.width(6.dp))
+        CircleIconButton(
             glyph = Glyph.Info,
             onClick = onInfo,
-            size = 38.dp,
+            size = 34.dp,
             tint = Kadraj.Muted,
             background = Color.Transparent,
             border = Kadraj.Line,
-            contentDescription = "Kadraj hakkında",
+            contentDescription = "About Kadraj",
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         ExportPill(onClick = onExport)
     }
 }
@@ -220,7 +267,7 @@ private fun ExportPill(onClick: () -> Unit) {
     val haptics = LocalHapticFeedback.current
     Row(
         modifier = Modifier
-            .height(38.dp)
+            .height(36.dp)
             .clip(RoundedCornerShape(50))
             .background(
                 Brush.horizontalGradient(
@@ -231,22 +278,22 @@ private fun ExportPill(onClick: () -> Unit) {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             }
-            .padding(horizontal = 14.dp),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         GlyphIcon(
             glyph = Glyph.Export,
-            modifier = Modifier.size(14.dp),
+            modifier = Modifier.size(13.dp),
             tint = Kadraj.Ink,
             strokeWidth = 1.8.dp,
         )
         BasicText(
-            text = "DIŞA",
+            text = "EXPORT",
             style = Kadraj.Type.Button.copy(
                 color = Kadraj.Ink,
-                fontSize = 10.5.sp,
-                letterSpacing = 1.3.sp,
+                fontSize = 9.5.sp,
+                letterSpacing = 1.1.sp,
             ),
         )
     }
@@ -279,28 +326,35 @@ private fun EditorDock(
             .animateContentSize(),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             DockTab(
                 glyph = Glyph.Grid,
-                label = "DÜZEN",
+                label = "LAYOUT",
                 selected = tab == EditorTab.Layout,
                 onClick = { onTabChange(EditorTab.Layout) },
                 modifier = Modifier.weight(1f),
             )
             DockTab(
                 glyph = Glyph.Sliders,
-                label = "STİL",
+                label = "STYLE",
                 selected = tab == EditorTab.Style,
                 onClick = { onTabChange(EditorTab.Style) },
                 modifier = Modifier.weight(1f),
             )
             DockTab(
                 glyph = Glyph.Image,
-                label = "GÖRSEL",
-                selected = tab == EditorTab.Images,
-                onClick = { onTabChange(EditorTab.Images) },
+                label = "PHOTO",
+                selected = tab == EditorTab.Photo,
+                onClick = { onTabChange(EditorTab.Photo) },
+                modifier = Modifier.weight(1f),
+            )
+            DockTab(
+                glyph = Glyph.Text,
+                label = "TEXT",
+                selected = tab == EditorTab.Text,
+                onClick = { onTabChange(EditorTab.Text) },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -308,21 +362,22 @@ private fun EditorDock(
         when (tab) {
             EditorTab.Layout -> LayoutControls(viewModel)
             EditorTab.Style -> StyleControls(viewModel)
-            EditorTab.Images -> ImageControls(
+            EditorTab.Photo -> PhotoControls(
                 viewModel = viewModel,
                 selectedImage = selectedImage,
                 onPickImages = onPickImages,
             )
+            EditorTab.Text -> TextControls(viewModel)
         }
     }
 }
 
 @Composable
 private fun LayoutControls(viewModel: EditorViewModel) {
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 10.dp, bottom = 12.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicText(
-                text = "ŞABLON",
+                text = "TEMPLATE",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     letterSpacing = 1.5.sp,
@@ -337,10 +392,10 @@ private fun LayoutControls(viewModel: EditorViewModel) {
                 background = Color.Transparent,
                 border = Kadraj.Line,
                 enabled = viewModel.images.size > 1,
-                contentDescription = "Görselleri karıştır",
+                contentDescription = "Shuffle photos",
             )
         }
-        Spacer(Modifier.height(7.dp))
+        Spacer(Modifier.height(6.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -355,10 +410,10 @@ private fun LayoutControls(viewModel: EditorViewModel) {
                 )
             }
         }
-        Spacer(Modifier.height(11.dp))
+        Spacer(Modifier.height(10.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicText(
-                text = "ORAN",
+                text = "RATIO",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     letterSpacing = 1.5.sp,
@@ -367,11 +422,11 @@ private fun LayoutControls(viewModel: EditorViewModel) {
             Spacer(Modifier.weight(1f))
             if (viewModel.template == Template.FLOW) {
                 BasicText(
-                    text = "KENDİ ORANINI KURAR",
+                    text = "FLOW SETS ITS OWN RATIO",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.TerracottaSoft,
                         fontSize = 8.sp,
-                        letterSpacing = 1.0.sp,
+                        letterSpacing = 0.9.sp,
                     ),
                 )
             }
@@ -396,25 +451,45 @@ private fun LayoutControls(viewModel: EditorViewModel) {
 
 @Composable
 private fun StyleControls(viewModel: EditorViewModel) {
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 10.dp, bottom = 12.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicText(
-                text = "PALET",
+                text = "PALETTE",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     letterSpacing = 1.5.sp,
                 ),
             )
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.width(7.dp))
             BasicText(
-                text = viewModel.style.palette.name.uppercase(Locale.forLanguageTag("tr")),
+                text = viewModel.style.palette.name.uppercase(Locale.ENGLISH),
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.TerracottaSoft,
-                    letterSpacing = 1.2.sp,
+                    letterSpacing = 1.1.sp,
                 ),
             )
+            Spacer(Modifier.weight(1f))
+            CircleIconButton(
+                glyph = Glyph.Sparkle,
+                onClick = viewModel::randomizeStyle,
+                size = 26.dp,
+                tint = Kadraj.TerracottaSoft,
+                background = Color.Transparent,
+                border = Kadraj.Line,
+                contentDescription = "Surprise me",
+            )
+            Spacer(Modifier.width(5.dp))
+            CircleIconButton(
+                glyph = Glyph.Reset,
+                onClick = viewModel::resetStyle,
+                size = 26.dp,
+                tint = Kadraj.Muted,
+                background = Color.Transparent,
+                border = Kadraj.Line,
+                contentDescription = "Reset style",
+            )
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(7.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -429,39 +504,39 @@ private fun StyleControls(viewModel: EditorViewModel) {
                 )
             }
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(7.dp))
         KadrajSlider(
-            label = "Aralık",
+            label = "Spacing",
             value = viewModel.style.gap,
             valueRange = 0f..0.06f,
             onValueChange = viewModel::setGap,
         )
         KadrajSlider(
-            label = "Kenar",
+            label = "Margin",
             value = viewModel.style.margin,
             valueRange = 0f..0.12f,
             onValueChange = viewModel::setMargin,
         )
         KadrajSlider(
-            label = "Köşe",
+            label = "Corners",
             value = viewModel.style.radius,
             valueRange = 0f..0.1f,
             onValueChange = viewModel::setRadius,
         )
-        Spacer(Modifier.height(5.dp))
+        Spacer(Modifier.height(4.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             ToggleChip(
-                label = "Paspartu",
+                label = "Mat",
                 selected = viewModel.style.mat > 0.002f,
                 onClick = viewModel::toggleMat,
             )
             ToggleChip(
-                label = "Gölge",
+                label = "Shadow",
                 selected = viewModel.style.shadow,
                 onClick = viewModel::toggleShadow,
             )
             ToggleChip(
-                label = "Doku",
+                label = "Grain",
                 selected = viewModel.style.texture,
                 onClick = viewModel::toggleTexture,
             )
@@ -470,7 +545,7 @@ private fun StyleControls(viewModel: EditorViewModel) {
 }
 
 @Composable
-private fun ImageControls(
+private fun PhotoControls(
     viewModel: EditorViewModel,
     selectedImage: CollageImage?,
     onPickImages: () -> Unit,
@@ -478,11 +553,12 @@ private fun ImageControls(
     val haptics = LocalHapticFeedback.current
     val images = viewModel.images
     val index = selectedImage?.let { images.indexOfFirst { item -> item.id == it.id } } ?: -1
+    var panel by rememberSaveable { mutableStateOf(PhotoPanel.Look) }
 
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 10.dp, bottom = 12.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicText(
-                text = "GÖRSELLER",
+                text = "PHOTOS",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     letterSpacing = 1.5.sp,
@@ -518,7 +594,7 @@ private fun ImageControls(
                     strokeWidth = 1.8.dp,
                 )
                 BasicText(
-                    text = "EKLE",
+                    text = "ADD",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.PaperDim,
                         fontSize = 8.sp,
@@ -527,7 +603,7 @@ private fun ImageControls(
                 )
             }
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(7.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -541,7 +617,7 @@ private fun ImageControls(
                     loader = viewModel.imageLoader,
                     selected = image.id == viewModel.selectedId,
                     onClick = { viewModel.selectImage(image.id) },
-                    label = "Görsel ${imageIndex + 1}",
+                    label = "Photo ${imageIndex + 1}",
                 )
             }
             AddImageTile(
@@ -549,12 +625,12 @@ private fun ImageControls(
                 enabled = images.size < EditorViewModel.MAX_IMAGES,
             )
         }
-        Spacer(Modifier.height(9.dp))
+        Spacer(Modifier.height(8.dp))
         if (selectedImage != null) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 FitSwitch(
                     fit = selectedImage.fit,
@@ -564,36 +640,136 @@ private fun ImageControls(
                 CircleIconButton(
                     glyph = Glyph.ChevronLeft,
                     onClick = { viewModel.moveImage(selectedImage.id, -1) },
-                    size = 34.dp,
+                    size = 32.dp,
                     tint = if (index > 0) Kadraj.Paper else Kadraj.MutedDim,
                     background = Kadraj.InkSoft,
                     border = Kadraj.Line,
                     enabled = index > 0,
-                    contentDescription = "Sırada öne al",
+                    contentDescription = "Move earlier",
                 )
                 CircleIconButton(
                     glyph = Glyph.ChevronRight,
                     onClick = { viewModel.moveImage(selectedImage.id, 1) },
-                    size = 34.dp,
+                    size = 32.dp,
                     tint = if (index in 0 until images.lastIndex) Kadraj.Paper else Kadraj.MutedDim,
                     background = Kadraj.InkSoft,
                     border = Kadraj.Line,
                     enabled = index in 0 until images.lastIndex,
-                    contentDescription = "Sırada geriye al",
+                    contentDescription = "Move later",
                 )
                 CircleIconButton(
                     glyph = Glyph.Trash,
                     onClick = { viewModel.removeImage(selectedImage.id) },
-                    size = 34.dp,
+                    size = 32.dp,
                     tint = Kadraj.TerracottaSoft,
                     background = Kadraj.InkSoft,
                     border = Kadraj.Line,
-                    contentDescription = "Görseli kaldır",
+                    contentDescription = "Remove photo",
+                )
+            }
+            Spacer(Modifier.height(7.dp))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(7.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                ChoiceChip(
+                    label = "Look",
+                    selected = panel == PhotoPanel.Look,
+                    onClick = { panel = PhotoPanel.Look },
+                )
+                ChoiceChip(
+                    label = "Frame",
+                    selected = panel == PhotoPanel.Frame,
+                    onClick = { panel = PhotoPanel.Frame },
                 )
             }
             Spacer(Modifier.height(5.dp))
+            when (panel) {
+                PhotoPanel.Look -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(7.dp),
+                    ) {
+                        PhotoLook.entries.forEach { look ->
+                            ChoiceChip(
+                                label = lookLabel(look),
+                                selected = selectedImage.look == look,
+                                onClick = { viewModel.setLook(selectedImage.id, look) },
+                            )
+                        }
+                    }
+                    KadrajSlider(
+                        label = "Strength",
+                        value = selectedImage.lookAmount,
+                        valueRange = 0f..1f,
+                        onValueChange = { viewModel.setLookAmount(selectedImage.id, it) },
+                    )
+                }
+                PhotoPanel.Frame -> {
+                    KadrajSlider(
+                        label = "Zoom",
+                        value = selectedImage.zoom,
+                        valueRange = 1f..3f,
+                        onValueChange = { viewModel.setZoom(selectedImage.id, it) },
+                        valueLabel = "${(selectedImage.zoom * 100f).roundToInt()}%",
+                    )
+                    KadrajSlider(
+                        label = "Tilt",
+                        value = selectedImage.tilt,
+                        valueRange = -12f..12f,
+                        onValueChange = { viewModel.setTilt(selectedImage.id, it) },
+                        valueLabel = "${selectedImage.tilt.roundToInt()}\u00B0",
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(7.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircleIconButton(
+                            glyph = Glyph.FlipHorizontal,
+                            onClick = { viewModel.toggleFlipHorizontal(selectedImage.id) },
+                            size = 32.dp,
+                            tint = Kadraj.Paper,
+                            background = Kadraj.InkSoft,
+                            border = Kadraj.Line,
+                            contentDescription = "Flip horizontally",
+                        )
+                        CircleIconButton(
+                            glyph = Glyph.FlipVertical,
+                            onClick = { viewModel.toggleFlipVertical(selectedImage.id) },
+                            size = 32.dp,
+                            tint = Kadraj.Paper,
+                            background = Kadraj.InkSoft,
+                            border = Kadraj.Line,
+                            contentDescription = "Flip vertically",
+                        )
+                        CircleIconButton(
+                            glyph = Glyph.Copy,
+                            onClick = { viewModel.duplicateImage(selectedImage.id) },
+                            size = 32.dp,
+                            tint = Kadraj.Paper,
+                            background = Kadraj.InkSoft,
+                            border = Kadraj.Line,
+                            enabled = images.size < EditorViewModel.MAX_IMAGES,
+                            contentDescription = "Duplicate photo",
+                        )
+                        CircleIconButton(
+                            glyph = Glyph.Reset,
+                            onClick = { viewModel.resetPhoto(selectedImage.id) },
+                            size = 32.dp,
+                            tint = Kadraj.TerracottaSoft,
+                            background = Kadraj.InkSoft,
+                            border = Kadraj.Line,
+                            contentDescription = "Reset photo",
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(5.dp))
             BasicText(
-                text = "Sürükle: kadrajı kaydır  ·  Çift dokun: doldur / sığdır",
+                text = "Drag the canvas to shift the crop. Double-tap to fill or fit.",
                 style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 10.sp,
@@ -601,7 +777,7 @@ private fun ImageControls(
             )
         } else {
             BasicText(
-                text = "Sahneden bir görsel seçin; kadrajı ve sırasını buradan yönetin.",
+                text = "Select a photo on the canvas to adjust its crop, look, and order.",
                 style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 10.5.sp,
@@ -609,6 +785,184 @@ private fun ImageControls(
             )
         }
     }
+}
+
+@Composable
+private fun TextControls(viewModel: EditorViewModel) {
+    val caption = viewModel.style.caption
+    val focusManager = LocalFocusManager.current
+
+    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            BasicText(
+                text = "CAPTION",
+                style = Kadraj.Type.LabelSmall.copy(
+                    color = Kadraj.MutedDim,
+                    letterSpacing = 1.5.sp,
+                ),
+            )
+            Spacer(Modifier.weight(1f))
+            BasicText(
+                text = "${caption.text.length}/120",
+                style = Kadraj.Type.Numeric.copy(
+                    color = Kadraj.MutedDim,
+                    fontSize = 8.5.sp,
+                ),
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        BasicTextField(
+            value = caption.text,
+            onValueChange = viewModel::setCaptionText,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 44.dp, max = 68.dp)
+                .clip(RoundedCornerShape(13.dp))
+                .background(Kadraj.InkSoft)
+                .border(1.dp, Kadraj.Line, RoundedCornerShape(13.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            textStyle = Kadraj.Type.Body.copy(
+                color = Kadraj.Paper,
+                fontSize = 13.sp,
+            ),
+            cursorBrush = SolidColor(Kadraj.TerracottaSoft),
+            maxLines = 2,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            decorationBox = { innerTextField ->
+                Box {
+                    if (caption.text.isEmpty()) {
+                        BasicText(
+                            text = "Write a short caption...",
+                            style = Kadraj.Type.BodySmall.copy(
+                                color = Kadraj.MutedDim,
+                                fontSize = 12.sp,
+                            ),
+                        )
+                    }
+                    innerTextField()
+                }
+            },
+        )
+        Spacer(Modifier.height(7.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            ChoiceChip(
+                label = "Serif",
+                selected = caption.font == CaptionFont.SERIF,
+                onClick = { viewModel.setCaptionFont(CaptionFont.SERIF) },
+            )
+            ChoiceChip(
+                label = "Sans",
+                selected = caption.font == CaptionFont.SANS,
+                onClick = { viewModel.setCaptionFont(CaptionFont.SANS) },
+            )
+            Spacer(Modifier.weight(1f))
+            CaptionAlignButton(
+                glyph = Glyph.AlignLeft,
+                selected = caption.alignment == CaptionAlignment.START,
+                description = "Align caption left",
+                onClick = { viewModel.setCaptionAlignment(CaptionAlignment.START) },
+            )
+            CaptionAlignButton(
+                glyph = Glyph.AlignCenter,
+                selected = caption.alignment == CaptionAlignment.CENTER,
+                description = "Align caption center",
+                onClick = { viewModel.setCaptionAlignment(CaptionAlignment.CENTER) },
+            )
+            CaptionAlignButton(
+                glyph = Glyph.AlignRight,
+                selected = caption.alignment == CaptionAlignment.END,
+                description = "Align caption right",
+                onClick = { viewModel.setCaptionAlignment(CaptionAlignment.END) },
+            )
+        }
+        KadrajSlider(
+            label = "Size",
+            value = caption.size,
+            valueRange = 0.025f..0.075f,
+            onValueChange = viewModel::setCaptionSize,
+            valueLabel = String.format(Locale.US, "%.1f%%", caption.size * 100f),
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            ChoiceChip(
+                label = "Top",
+                selected = caption.placement == CaptionPlacement.TOP,
+                onClick = { viewModel.setCaptionPlacement(CaptionPlacement.TOP) },
+            )
+            ChoiceChip(
+                label = "Middle",
+                selected = caption.placement == CaptionPlacement.CENTER,
+                onClick = { viewModel.setCaptionPlacement(CaptionPlacement.CENTER) },
+            )
+            ChoiceChip(
+                label = "Bottom",
+                selected = caption.placement == CaptionPlacement.BOTTOM,
+                onClick = { viewModel.setCaptionPlacement(CaptionPlacement.BOTTOM) },
+            )
+            Spacer(Modifier.weight(1f))
+            ToggleChip(
+                label = "Plate",
+                selected = caption.plate,
+                onClick = viewModel::toggleCaptionPlate,
+            )
+        }
+        Spacer(Modifier.height(5.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            BasicText(
+                text = "TONE",
+                modifier = Modifier.width(38.dp),
+                style = Kadraj.Type.LabelSmall.copy(
+                    color = Kadraj.MutedDim,
+                    letterSpacing = 1.2.sp,
+                ),
+            )
+            ChoiceChip(
+                label = "Auto",
+                selected = caption.tone == CaptionTone.AUTO,
+                onClick = { viewModel.setCaptionTone(CaptionTone.AUTO) },
+            )
+            ChoiceChip(
+                label = "Paper",
+                selected = caption.tone == CaptionTone.PAPER,
+                onClick = { viewModel.setCaptionTone(CaptionTone.PAPER) },
+            )
+            ChoiceChip(
+                label = "Accent",
+                selected = caption.tone == CaptionTone.ACCENT,
+                onClick = { viewModel.setCaptionTone(CaptionTone.ACCENT) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun CaptionAlignButton(
+    glyph: Glyph,
+    selected: Boolean,
+    description: String,
+    onClick: () -> Unit,
+) {
+    CircleIconButton(
+        glyph = glyph,
+        onClick = onClick,
+        size = 30.dp,
+        tint = if (selected) Kadraj.Ink else Kadraj.Muted,
+        background = if (selected) Kadraj.Paper else Color.Transparent,
+        border = if (selected) Color.Transparent else Kadraj.Line,
+        contentDescription = description,
+    )
 }
 
 @Composable
@@ -625,12 +979,12 @@ private fun FitSwitch(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         FitOption(
-            label = "Doldur",
+            label = "Fill",
             selected = fit == FitMode.COVER,
             onClick = { onSelect(FitMode.COVER) },
         )
         FitOption(
-            label = "Sığdır",
+            label = "Fit",
             selected = fit == FitMode.FIT,
             onClick = { onSelect(FitMode.FIT) },
         )
@@ -699,4 +1053,14 @@ private fun PaletteSwatch(
                 ),
         )
     }
+}
+
+private fun lookLabel(look: PhotoLook): String = when (look) {
+    PhotoLook.ORIGINAL -> "Original"
+    PhotoLook.WARM -> "Warm"
+    PhotoLook.COOL -> "Cool"
+    PhotoLook.MONO -> "Mono"
+    PhotoLook.FADE -> "Fade"
+    PhotoLook.VIVID -> "Vivid"
+    PhotoLook.FILM -> "Film"
 }

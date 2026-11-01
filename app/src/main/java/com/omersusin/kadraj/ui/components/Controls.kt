@@ -161,7 +161,7 @@ fun KadrajButton(
                 )
             }
             BasicText(
-                text = label.uppercase(Locale.forLanguageTag("tr")),
+                text = label.uppercase(Locale.ENGLISH),
                 style = Kadraj.Type.Button.copy(color = contentColor),
             )
             if (trailingGlyph != null) {
@@ -626,22 +626,25 @@ fun ModalSheet(
 }
 
 fun templateLabel(template: Template): String = when (template) {
-    Template.AUTO -> "OTOMATİK"
-    Template.GRID -> "IZGARA"
-    Template.FLOW -> "AKIŞ"
-    Template.HERO -> "VİTRİN"
-    Template.STRIP -> "ŞERİT"
-    Template.PILE -> "YIĞIN"
+    Template.AUTO -> "AUTO"
+    Template.GRID -> "GRID"
+    Template.FLOW -> "FLOW"
+    Template.HERO -> "HERO"
+    Template.STRIP -> "STRIP"
+    Template.PILE -> "STACK"
 }
 
 fun aspectLabel(aspect: AspectPreset): String = when (aspect) {
-    AspectPreset.AUTO -> "Oto"
+    AspectPreset.AUTO -> "Auto"
     AspectPreset.SQUARE -> "1:1"
+    AspectPreset.PORTRAIT -> "3:4"
     AspectPreset.FOUR_FIVE -> "4:5"
     AspectPreset.STORY -> "9:16"
+    AspectPreset.TALL -> "2:3"
+    AspectPreset.CLASSIC -> "3:2"
     AspectPreset.WIDE -> "16:9"
     AspectPreset.DESKTOP -> "16:10"
-    AspectPreset.CLASSIC -> "3:2"
+    AspectPreset.BANNER -> "2:1"
 }
 
 fun ratioLabel(value: Float): String {
@@ -649,8 +652,10 @@ fun ratioLabel(value: Float): String {
         1f to "1:1",
         0.8f to "4:5",
         9f / 16f to "9:16",
+        2f / 3f to "2:3",
         16f / 9f to "16:9",
         1.6f to "16:10",
+        2f to "2:1",
         1.5f to "3:2",
         4f / 3f to "4:3",
         3f / 4f to "3:4",

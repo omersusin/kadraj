@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.omersusin.kadraj.EditorViewModel
+import com.omersusin.kadraj.BuildConfig
 import com.omersusin.kadraj.ui.components.ButtonTone
 import com.omersusin.kadraj.ui.components.CircleIconButton
 import com.omersusin.kadraj.ui.components.Glyph
@@ -50,7 +50,7 @@ fun InfoSheet(
         verticalAlignment = Alignment.Top,
     ) {
         BasicText(
-            text = "KADRAJ HAKKINDA",
+            text = "ABOUT KADRAJ",
             style = Kadraj.Type.Label.copy(
                 color = Kadraj.TerracottaSoft,
                 letterSpacing = 2.0.sp,
@@ -64,12 +64,12 @@ fun InfoSheet(
             tint = Kadraj.Muted,
             background = Color.Transparent,
             border = Kadraj.Line,
-            contentDescription = "Kapat",
+            contentDescription = "Close",
         )
     }
     Spacer(Modifier.height(18.dp))
     BasicText(
-        text = "Kareler arasında",
+        text = "A pause between",
         style = Kadraj.Type.Display.copy(
             color = Kadraj.Paper,
             fontSize = 32.sp,
@@ -77,7 +77,7 @@ fun InfoSheet(
         ),
     )
     BasicText(
-        text = "bir nefes.",
+        text = "frames.",
         style = Kadraj.Type.HeroItalic.copy(
             color = Kadraj.TerracottaSoft,
             fontSize = 32.sp,
@@ -86,9 +86,9 @@ fun InfoSheet(
     )
     Spacer(Modifier.height(14.dp))
     BasicText(
-        text = "Kadraj, telefon ve masaüstü görüntülerini tek bir editoryal kompozisyonda " +
-            "buluşturur. Oranları okur, boşlukları dengeler; senin yerine düşünür ama " +
-            "kararı sana bırakır. Hesap yok, bulut yok, yükleme yok.",
+        text = "Kadraj brings phone and desktop captures into one editorial composition. " +
+            "It reads ratios, balances negative space, and leaves the final call to you. " +
+            "No account, no cloud, no upload.",
         style = Kadraj.Type.Body.copy(color = Kadraj.Muted),
     )
     Spacer(Modifier.height(20.dp))
@@ -97,23 +97,23 @@ fun InfoSheet(
 
     InfoTip(
         number = "01",
-        title = "Oranı seç, gerisini bırak.",
-        body = "Otomatik şablon; portre, manzara ve karışık görselleri ayrı ayrı okur. " +
-            "İstersen ızgara, akış, vitrin, şerit ya da yığın düzenine geç.",
+        title = "Choose a ratio, let go.",
+        body = "Auto reads portrait, landscape, and mixed selections differently. " +
+            "Switch to grid, flow, hero, strip, or stack whenever you want.",
     )
     Spacer(Modifier.height(17.dp))
     InfoTip(
         number = "02",
-        title = "Sahneye dokun.",
-        body = "Bir görsele dokunarak seç, sürükleyerek kadrajı kaydır. Çift dokunuş " +
-            "doldur ve sığdır arasında geçiş yapar.",
+        title = "Touch the canvas.",
+        body = "Tap a photo to select it, then drag to move the crop. Double-tap to switch " +
+            "between fill and fit. The Photo tab adds looks, zoom, tilt, and flips.",
     )
     Spacer(Modifier.height(17.dp))
     InfoTip(
         number = "03",
-        title = "Sessizce güçlü.",
-        body = "Dokulu paletler, yumuşak gölgeler ve 4K çıktı. Tüm işlemler cihazında " +
-            "tamamlanır; görsellerin cihazından ayrılmaz.",
+        title = "Quietly capable.",
+        body = "Textured palettes, soft shadows, captions, and 4K output. Everything " +
+            "finishes on your device; your photos never leave it.",
     )
 
     Spacer(Modifier.height(22.dp))
@@ -121,9 +121,10 @@ fun InfoSheet(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        InfoStat(value = "12", label = "görsel", modifier = Modifier.weight(1f))
-        InfoStat(value = "4K", label = "çıktı", modifier = Modifier.weight(1f))
-        InfoStat(value = "100%", label = "yerel", modifier = Modifier.weight(1f))
+        InfoStat(value = "12", label = "photos", modifier = Modifier.weight(1f))
+        InfoStat(value = "7", label = "looks", modifier = Modifier.weight(1f))
+        InfoStat(value = "4K", label = "output", modifier = Modifier.weight(1f))
+        InfoStat(value = "100%", label = "local", modifier = Modifier.weight(1f))
     }
 
     if (hasImages) {
@@ -132,7 +133,7 @@ fun InfoSheet(
         Spacer(Modifier.height(17.dp))
         if (!confirming) {
             KadrajButton(
-                label = "Yeni kolaj başlat",
+                label = "Start a new collage",
                 onClick = { confirming = true },
                 modifier = Modifier.fillMaxWidth(),
                 tone = ButtonTone.Quiet,
@@ -140,7 +141,7 @@ fun InfoSheet(
             )
         } else {
             BasicText(
-                text = "Mevcut kadraj kapanacak. Devam edilsin mi?",
+                text = "The current collage will close. Continue?",
                 style = Kadraj.Type.BodySmall.copy(color = Kadraj.TerracottaSoft),
             )
             Spacer(Modifier.height(11.dp))
@@ -149,13 +150,13 @@ fun InfoSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 KadrajButton(
-                    label = "Vazgeç",
+                    label = "Cancel",
                     onClick = { confirming = false },
                     modifier = Modifier.weight(1f),
                     tone = ButtonTone.Quiet,
                 )
                 KadrajButton(
-                    label = "Başlat",
+                    label = "Start",
                     onClick = onNewProject,
                     modifier = Modifier.weight(1f),
                 )
@@ -169,7 +170,7 @@ fun InfoSheet(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicText(
-            text = "SÜRÜM 1.0.0",
+            text = "VERSION ${BuildConfig.VERSION_NAME}",
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,
                 letterSpacing = 1.3.sp,

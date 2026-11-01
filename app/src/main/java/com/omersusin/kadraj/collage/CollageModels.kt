@@ -15,11 +15,14 @@ enum class Template {
 enum class AspectPreset(val ratio: Float?) {
     AUTO(null),
     SQUARE(1f),
+    PORTRAIT(3f / 4f),
     FOUR_FIVE(4f / 5f),
     STORY(9f / 16f),
+    TALL(2f / 3f),
+    CLASSIC(3f / 2f),
     WIDE(16f / 9f),
     DESKTOP(16f / 10f),
-    CLASSIC(3f / 2f),
+    BANNER(2f / 1f),
 }
 
 enum class FitMode {

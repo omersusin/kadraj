@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import com.omersusin.kadraj.collage.CollageStyle
 import com.omersusin.kadraj.collage.LayoutResult
 import com.omersusin.kadraj.image.ImageLoader
+import com.omersusin.kadraj.render.CaptionTypefaces
 import com.omersusin.kadraj.render.CollagePainter
 import com.omersusin.kadraj.render.ImageProvider
 import com.omersusin.kadraj.render.ImageRenderState
@@ -22,7 +23,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 enum class ExportSize(val label: String, val longSide: Int) {
-    AUTO("Oto", 2560),
+    AUTO("Auto", 2560),
     HIGH("2K", 3200),
     ULTRA("4K", 3840),
 }
@@ -100,7 +101,11 @@ class CollageExporter(
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val provider = ImageProvider { imageId, targetWidth, targetHeight ->
             val uri = uriById[imageId] ?: return@ImageProvider null
-            val needed = max(targetWidth, targetHeight).coerceIn(96, 4096)
+            val state = imageStates[imageId]
+            val zoom = state?.zoom ?: 1f
+            val needed = (max(targetWidth, targetHeight) * max(1f, zoom) * 1.1f)
+                .roundToInt()
+                .coerceIn(96, 4096)
             loader.decodeForExport(uri, needed)?.let { decoded ->
                 ProvidedImage(decoded, recycleAfterUse = true)
             }
@@ -114,6 +119,7 @@ class CollageExporter(
                 style = style,
                 provider = provider,
                 imageStates = imageStates,
+                captionTypeface = CaptionTypefaces.load(context, style.caption.font),
             )
         } catch (error: Throwable) {
             bitmap.recycle()
@@ -133,7 +139,7 @@ class CollageExporter(
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-            ?: error("Galeriye kayıt yeri açılamadı.")
+            ?: error("Couldn't open a place in Photos.")
         try {
             resolver.openOutputStream(uri)?.use { stream ->
                 val compressed = bitmap.compress(
@@ -141,8 +147,8 @@ class CollageExporter(
                     96,
                     stream,
                 )
-                if (!compressed) error("Görsel sıkıştırılamadı.")
-            } ?: error("Çıktı akışı açılamadı.")
+                if (!compressed) error("Couldn't compress the image.")
+            } ?: error("Couldn't open the output stream.")
             values.clear()
             values.put(MediaStore.Images.Media.IS_PENDING, 0)
             resolver.update(uri, values, null, null)

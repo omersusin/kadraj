@@ -45,6 +45,16 @@ enum class Glyph {
     Mixed,
     Trash,
     More,
+    Undo,
+    Redo,
+    Copy,
+    FlipHorizontal,
+    FlipVertical,
+    Reset,
+    AlignLeft,
+    AlignCenter,
+    AlignRight,
+    Text,
 }
 
 @Composable
@@ -353,6 +363,112 @@ private fun DrawScope.drawGlyph(glyph: Glyph, color: Color, strokeWidth: Float) 
             drawCircle(color, 1.35f * scale, point(5.5f, 12f))
             drawCircle(color, 1.35f * scale, point(12f, 12f))
             drawCircle(color, 1.35f * scale, point(18.5f, 12f))
+        }
+        Glyph.Undo -> {
+            path {
+                moveTo(x(4f), y(10f))
+                lineTo(x(4f), y(5f))
+                lineTo(x(9f), y(5f))
+            }
+            path {
+                moveTo(x(4.6f), y(9f))
+                cubicTo(x(6.2f), y(5f), x(10f), y(3.8f), x(14f), y(4.8f))
+                cubicTo(x(19f), y(6f), x(21f), y(10.5f), x(19.2f), y(15f))
+                cubicTo(x(17.4f), y(19.5f), x(12.5f), y(21f), x(8.5f), y(19f))
+            }
+        }
+        Glyph.Redo -> {
+            path {
+                moveTo(x(20f), y(10f))
+                lineTo(x(20f), y(5f))
+                lineTo(x(15f), y(5f))
+            }
+            path {
+                moveTo(x(19.4f), y(9f))
+                cubicTo(x(17.8f), y(5f), x(14f), y(3.8f), x(10f), y(4.8f))
+                cubicTo(x(5f), y(6f), x(3f), y(10.5f), x(4.8f), y(15f))
+                cubicTo(x(6.6f), y(19.5f), x(11.5f), y(21f), x(15.5f), y(19f))
+            }
+        }
+        Glyph.Copy -> {
+            roundRect(8f, 8f, 11f, 11f, 2f)
+            path {
+                moveTo(x(8f), y(7f))
+                lineTo(x(8f), y(6f))
+                quadraticBezierTo(x(8f), y(4f), x(10f), y(4f))
+                lineTo(x(16f), y(4f))
+                quadraticBezierTo(x(18f), y(4f), x(18f), y(6f))
+                lineTo(x(18f), y(8f))
+            }
+        }
+        Glyph.FlipHorizontal -> {
+            line(12f, 3.5f, 12f, 20.5f)
+            path {
+                moveTo(x(3.5f), y(7f))
+                lineTo(x(9f), y(12f))
+                lineTo(x(3.5f), y(17f))
+                close()
+            }
+            path {
+                moveTo(x(20.5f), y(7f))
+                lineTo(x(15f), y(12f))
+                lineTo(x(20.5f), y(17f))
+                close()
+            }
+        }
+        Glyph.FlipVertical -> {
+            line(3.5f, 12f, 20.5f, 12f)
+            path {
+                moveTo(x(7f), y(3.5f))
+                lineTo(x(12f), y(9f))
+                lineTo(x(17f), y(3.5f))
+                close()
+            }
+            path {
+                moveTo(x(7f), y(20.5f))
+                lineTo(x(12f), y(15f))
+                lineTo(x(17f), y(20.5f))
+                close()
+            }
+        }
+        Glyph.Reset -> {
+            drawArc(
+                color = color,
+                startAngle = -65f,
+                sweepAngle = 295f,
+                useCenter = false,
+                topLeft = point(4f, 4f),
+                size = Size(16f * scale, 16f * scale),
+                style = stroke,
+            )
+            path {
+                moveTo(x(16.5f), y(2.8f))
+                lineTo(x(21f), y(5.3f))
+                lineTo(x(17.4f), y(9.2f))
+            }
+        }
+        Glyph.AlignLeft -> {
+            line(4f, 6f, 20f, 6f)
+            line(4f, 10f, 14f, 10f)
+            line(4f, 14f, 18f, 14f)
+            line(4f, 18f, 11f, 18f)
+        }
+        Glyph.AlignCenter -> {
+            line(4f, 6f, 20f, 6f)
+            line(7f, 10f, 17f, 10f)
+            line(5f, 14f, 19f, 14f)
+            line(9f, 18f, 15f, 18f)
+        }
+        Glyph.AlignRight -> {
+            line(4f, 6f, 20f, 6f)
+            line(10f, 10f, 20f, 10f)
+            line(6f, 14f, 20f, 14f)
+            line(13f, 18f, 20f, 18f)
+        }
+        Glyph.Text -> {
+            line(5f, 5f, 19f, 5f)
+            line(12f, 5f, 12f, 20f)
+            line(8.5f, 20f, 15.5f, 20f)
         }
     }
 }

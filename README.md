@@ -1,61 +1,60 @@
 # Kadraj
 
-**Ekran görüntüleri ve fotoğraflar için editoryal kolaj stüdyosu.**
+**An editorial collage studio for screenshots and photos.**
 
-Kadraj, görsellerin oranını okur; telefon ekran görüntülerini, masaüstü
-ekran görüntülerini ve karışık seçkileri ayrı ayrı anlar. Düzeni, boşluğu
-ve kadrajı buna göre kurar. Her şey cihazda kalır.
+Kadraj reads the shape of your images. Phone captures, desktop captures, and mixed selections each get a layout that understands their ratios. Negative space, rhythm, and framing follow from there. Everything stays on your device.
 
-[**Android APK'yı indir**](https://github.com/omersusin/kadraj/releases/latest) ·
-Android 10 ve üzeri · Yaklaşık 2 MB
+[**Download the Android APK**](https://github.com/omersusin/kadraj/releases/latest) ·
+Android 10 and up · About 2 MB
 
-## Neden Kadraj?
+## Why Kadraj?
 
-Çoğu kolaj uygulaması fotoğrafları eşit karelere sıkıştırır. Kadraj ise önce
-seçkideki baskın yönü ve karışık oranları inceler; ardından kompozisyonu
-görsellerin kendi diline göre kurar. Telefon ekran görüntüleri uzun kalır,
-masaüstü görüntüleri genişler, karışık seçkiler kendi ritmini bulur.
+Most collage apps squeeze every photo into the same square. Kadraj first studies the dominant orientation and the mix of ratios in your selection, then builds the composition around the images themselves. Phone screenshots stay tall, desktop captures stretch wide, and mixed sets find their own rhythm.
 
-- **Akıllı oran analizi** — portre, manzara ve karışık seçkiler ayrı değerlendirilir.
-- **Altı düzen** — Otomatik, Izgara, Akış, Vitrin, Şerit ve Yığın.
-- **Yedi tuval oranı** — serbest bırakabilir veya 1:1, 4:5, 9:16, 16:9, 16:10, 3:2 seçebilirsin.
-- **Kadraj kontrolü** — görseli sürükleyerek odak noktasını değiştir; çift dokunuşla doldur ve sığdır arasında geçiş yap.
-- **Sekiz palet** — Kâğıt, Gece, Kil, Adaçayı, Sis, Gül, Fildişi ve Zeytin.
-- **İnce ayarlar** — aralık, kenar, köşe, paspartu, gölge ve film dokusu.
-- **Cihazda üretim** — JPEG veya PNG, 2K ve 4K çıktı; galeride `Kadraj` albümü.
-- **Hesap yok, bulut yok** — internet izni yok; görseller cihazdan ayrılmaz.
+- **Smart ratio analysis** — portrait, landscape, and mixed selections are treated differently.
+- **Six layouts** — Auto, Grid, Flow, Hero, Strip, and Stack.
+- **Nine canvas ratios plus Auto** — 1:1, 3:4, 4:5, 9:16, 2:3, 3:2, 16:9, 16:10, and 2:1.
+- **Per-photo looks** — Original, Warm, Cool, Mono, Fade, Vivid, and Film with adjustable strength.
+- **Frame controls** — drag to set the crop, zoom, tilt, flip horizontally or vertically, duplicate, or reset a photo.
+- **Captions** — serif or sans, adjustable size, three placements, three alignments, auto/paper/accent tones, and an optional plate.
+- **Undo and redo** — up to 40 steps, including continuous slider adjustments.
+- **Eight palettes** — Paper, Night, Clay, Sage, Mist, Rose, Ivory, and Olive.
+- **Fine tuning** — spacing, margin, corners, mat, shadow, grain, and a one-tap style randomizer.
+- **On-device output** — JPEG or PNG at Auto, 2K, or 4K; saved to the `Kadraj` album in Photos.
+- **No account, no cloud** — no internet permission; your photos never leave the device.
 
-## Düzenler
+## Layouts
 
-| Düzen | Ne zaman? |
+| Layout | When to use it |
 | --- | --- |
-| **Otomatik** | Seçkinin yönünü ve çeşitliliğini okur; en dengeli düzeni seçer. |
-| **Izgara** | Eşit ritim isteyen, aynı orandaki fotoğraflar için. |
-| **Akış** | Farklı yükseklikleri koruyan serbest kolon kompozisyonu. |
-| **Vitrin** | Tek bir kahraman görsel ve onu tamamlayan küçük kareler. |
-| **Şerit** | Yatay ya da dikey, sinematik bir dizilim. |
-| **Yığın** | Hafif dönüşlerle elde yerleştirilmiş gibi duran katmanlar. |
+| **Auto** | Reads the selection's orientation and variety, then picks the most balanced arrangement. |
+| **Grid** | For photos with a similar ratio and an even rhythm. |
+| **Flow** | A free column composition that preserves different heights. |
+| **Hero** | One lead image supported by smaller companions. |
+| **Strip** | A cinematic horizontal or vertical sequence. |
+| **Stack** | Layered pieces with slight rotations, as if placed by hand. |
 
-## Kullanım
+## How to use it
 
-1. Galerinden 1–12 görsel seç.
-2. Şablonu ve tuval oranını belirle; Kadraj önizlemeyi anında kurar.
-3. Görsele dokunarak seç, sürükleyerek kadrajı kaydır.
-4. Stil sekmesinden paleti, boşlukları ve dokuyu ayarla.
-5. Boyut ve formatı seçip galeriye kaydet; istersen doğrudan paylaş.
+1. Choose 1–12 images from your gallery.
+2. Pick a template and canvas ratio; the preview updates instantly.
+3. Tap a photo to select it, then drag to move the crop.
+4. Open the Photo tab for looks, zoom, tilt, flips, duplication, or resets.
+5. Open the Text tab to add a caption and tune its type and placement.
+6. Choose a size and format, save to Photos, and share directly if you like.
 
-## Kurulum
+## Install
 
-1. [Son sürüm APK'yı indir](https://github.com/omersusin/kadraj/releases/latest).
-2. Android ayarlarından bu kaynağa uygulama yükleme izni ver.
-3. APK'yı aç ve kur.
+1. [Download the latest APK](https://github.com/omersusin/kadraj/releases/latest).
+2. Allow app installs from this source in Android settings.
+3. Open the APK and install.
 
-> APK `com.omersusin.kadraj` paketiyle imzalıdır. Sonraki sürümler aynı imza
-> anahtarıyla yayınlanır; güncellemeler veri kaybı olmadan yüklenebilir.
+> The APK is signed for the `com.omersusin.kadraj` package. Future releases use
+> the same signing key, so updates install without losing data.
 
-## Geliştirme
+## Development
 
-Gereksinimler: JDK 17, Android SDK 35 ve Gradle 8.9.
+Requirements: JDK 17, Android SDK 35, and Gradle 8.9.
 
 ```bash
 git clone https://github.com/omersusin/kadraj.git
@@ -64,7 +63,7 @@ cd kadraj
 ./gradlew assembleDebug
 ```
 
-İmzalı sürüm derlemesi için şu ortam değişkenleri gerekir:
+A signed release build needs these environment variables:
 
 ```bash
 KADRAJ_KEYSTORE=/path/to/release.p12
@@ -74,26 +73,26 @@ KADRAJ_KEY_PASSWORD=...
 ./gradlew assembleRelease
 ```
 
-Çıktı: `app/build/outputs/apk/release/app-release.apk`.
+Output: `app/build/outputs/apk/release/app-release.apk`.
 
-GitHub Actions her `main` gönderiminde testleri ve R8'li sürüm derlemesini
-çalıştırır; imzalı APK'yı `zipalign` ve `apksigner` ile doğrular. `v*`
-biçimindeki etiketler APK'yı GitHub Releases'e yayınlar.
+GitHub Actions runs the unit tests and an R8 release build on every push to
+`main`, then verifies the signed APK with `zipalign` and `apksigner`. Tags in
+the `v*` format publish the APK to GitHub Releases.
 
-## Teknik yapı
+## Technical notes
 
-- Kotlin 2.0 ve Jetpack Compose; Material kütüphanesi kullanılmaz.
-- Saf Kotlin düzen motoru ve JVM birim testleri.
-- Önizleme ile dışa aktarma aynı Canvas ressamını paylaşır.
-- R8 küçültme, kaynak küçültme ve imzalı release yapılandırması.
+- Kotlin 2.0 and Jetpack Compose; no Material library.
+- A pure Kotlin layout engine with JVM unit tests.
+- Preview and export share the same Canvas renderer.
+- R8 minification, resource shrinking, and a signed release configuration.
 - `minSdk 29`, `targetSdk 35`.
 
-## Yazı tipleri
+## Typefaces
 
-Başlıklar **Fraunces**, arayüz **Manrope** ile dizilir. Her iki yazı tipi de
-SIL Open Font License 1.1 kapsamında kullanılır; lisanslar
-[`licenses/`](licenses/) altındadır.
+Headlines are set in **Fraunces**; the interface uses **Manrope**. Both are
+licensed under the SIL Open Font License 1.1, with licenses in
+[`licenses/`](licenses/).
 
-## Lisans
+## License
 
 [MIT](LICENSE) · Ömer SÜSİN
