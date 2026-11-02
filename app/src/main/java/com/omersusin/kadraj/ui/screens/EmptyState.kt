@@ -96,7 +96,7 @@ fun EmptyState(
                 Wordmark()
                 Spacer(Modifier.weight(1f))
                 BasicText(
-                    text = "ISSUE 01",
+                    text = "ISSUE 02",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
                         letterSpacing = 1.8.sp,
@@ -275,6 +275,8 @@ private fun HistoryAction(
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
+            .background(Kadraj.Glass)
+            .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
             .pressable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -307,7 +309,7 @@ private fun Feature(
         GlyphIcon(
             glyph = glyph,
             modifier = Modifier.size(17.dp),
-            tint = Kadraj.TerracottaSoft,
+            tint = Kadraj.Peach,
             strokeWidth = 1.45.dp,
         )
         Spacer(Modifier.height(8.dp))
@@ -353,8 +355,9 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Terracotta.copy(alpha = 0.18f),
-                        Kadraj.Terracotta.copy(alpha = 0.05f),
+                        Kadraj.Peach.copy(alpha = 0.18f),
+                        Kadraj.Terracotta.copy(alpha = 0.09f),
+                        Kadraj.Violet.copy(alpha = 0.04f),
                         Color.Transparent,
                     ),
                     center = center,
@@ -370,7 +373,7 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
                 style = Stroke(width = 1f),
             )
             drawCircle(
-                color = Kadraj.Terracotta.copy(alpha = 0.22f),
+                color = Kadraj.Peach.copy(alpha = 0.24f),
                 radius = min(width, height) * 0.47f,
                 center = center,
                 style = Stroke(width = 1f),
@@ -379,12 +382,12 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
             drawSpark(
                 center = Offset(width * 0.84f, height * 0.17f),
                 radius = min(width, height) * 0.035f,
-                color = Kadraj.TerracottaSoft.copy(alpha = 0.8f),
+                color = Kadraj.Peach.copy(alpha = 0.85f),
             )
             drawSpark(
                 center = Offset(width * 0.13f, height * 0.62f),
                 radius = min(width, height) * 0.018f,
-                color = Kadraj.Paper.copy(alpha = 0.45f),
+                color = Kadraj.Violet.copy(alpha = 0.55f),
             )
 
             val phoneWidth = min(width * 0.44f, height * 0.52f)

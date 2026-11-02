@@ -5,6 +5,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -52,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -118,26 +120,38 @@ fun KadrajButton(
     enabled: Boolean = true,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(17.dp)
+    val shape = RoundedCornerShape(19.dp)
     val background = when (tone) {
-        ButtonTone.Accent -> Brush.horizontalGradient(
-            listOf(Kadraj.TerracottaSoft, Kadraj.Terracotta),
+        ButtonTone.Accent -> Brush.linearGradient(
+            listOf(Kadraj.Peach, Kadraj.TerracottaSoft, Kadraj.Terracotta),
         )
-        ButtonTone.Paper -> Brush.horizontalGradient(listOf(Kadraj.Paper, Kadraj.PaperDim))
-        ButtonTone.Quiet -> Brush.horizontalGradient(
-            listOf(Kadraj.InkSoft, Kadraj.InkSoft),
+        ButtonTone.Paper -> Brush.linearGradient(
+            listOf(Color(0xFFFFFFFF), Kadraj.Paper, Kadraj.PaperDim),
+        )
+        ButtonTone.Quiet -> Brush.verticalGradient(
+            listOf(Kadraj.InkLift, Kadraj.InkSoft),
         )
     }
     val contentColor = when (tone) {
         ButtonTone.Accent, ButtonTone.Paper -> Kadraj.Ink
         ButtonTone.Quiet -> Kadraj.Paper
     }
-    val borderColor = if (tone == ButtonTone.Quiet) Kadraj.LineStrong else Color.Transparent
+    val borderColor = when (tone) {
+        ButtonTone.Quiet -> Kadraj.LineStrong
+        else -> Color.White.copy(alpha = 0.2f)
+    }
     val hapticType = HapticFeedbackType.TextHandleMove
 
     Box(
         modifier = modifier
             .height(54.dp)
+            .shadow(
+                elevation = if (tone == ButtonTone.Accent) 18.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.65f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.45f),
+            )
             .clip(shape)
             .background(background)
             .border(1.dp, borderColor, shape)
@@ -148,6 +162,18 @@ fun KadrajButton(
             .padding(horizontal = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color.White.copy(alpha = if (tone == ButtonTone.Accent) 0.2f else 0.08f),
+                            Color.Transparent,
+                        ),
+                    ),
+                ),
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -190,6 +216,7 @@ fun CircleIconButton(
     contentDescription: String? = null,
 ) {
     val haptics = LocalHapticFeedback.current
+    val hasFill = background.alpha > 0.04f
     val semanticsModifier = if (contentDescription != null) {
         Modifier.semantics { this.contentDescription = contentDescription }
     } else {
@@ -199,6 +226,13 @@ fun CircleIconButton(
         modifier = modifier
             .size(size)
             .then(semanticsModifier)
+            .shadow(
+                elevation = if (hasFill) 9.dp else 0.dp,
+                shape = CircleShape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.38f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.28f),
+            )
             .clip(CircleShape)
             .background(background)
             .border(1.dp, border, CircleShape)
@@ -208,6 +242,17 @@ fun CircleIconButton(
             },
         contentAlignment = Alignment.Center,
     ) {
+        if (hasFill) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.White.copy(alpha = 0.13f), Color.Transparent),
+                        ),
+                    ),
+            )
+        }
         GlyphIcon(
             glyph = glyph,
             modifier = Modifier.size(size * 0.42f),
@@ -226,14 +271,29 @@ fun ChoiceChip(
 ) {
     val haptics = LocalHapticFeedback.current
     val shape = RoundedCornerShape(50)
-    val background = if (selected) Kadraj.Paper else Color.Transparent
-    val content = if (selected) Kadraj.Ink else Kadraj.Muted
+    val background = if (selected) {
+        Brush.horizontalGradient(listOf(Color(0xFFFFFFFF), Kadraj.Paper, Kadraj.PaperDim))
+    } else {
+        Brush.horizontalGradient(listOf(Kadraj.Glass, Color.Transparent))
+    }
+    val content = if (selected) Kadraj.Ink else Kadraj.PaperDim
     Box(
         modifier = modifier
             .height(30.dp)
+            .shadow(
+                elevation = if (selected) 10.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.5f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.35f),
+            )
             .clip(shape)
             .background(background)
-            .border(1.dp, if (selected) Color.Transparent else Kadraj.Line, shape)
+            .border(
+                1.dp,
+                if (selected) Color.White.copy(alpha = 0.38f) else Kadraj.Line,
+                shape,
+            )
             .pressable {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
@@ -256,17 +316,34 @@ fun TemplateChip(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(14.dp)
+    val shape = RoundedCornerShape(15.dp)
     val content = if (selected) Kadraj.Paper else Kadraj.Muted
     Column(
         modifier = modifier
             .width(66.dp)
             .height(58.dp)
+            .shadow(
+                elevation = if (selected) 12.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.42f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.3f),
+            )
             .clip(shape)
-            .background(if (selected) Kadraj.InkSoft else Color.Transparent)
+            .background(
+                if (selected) {
+                    Brush.verticalGradient(listOf(Kadraj.InkLift, Kadraj.InkSoft))
+                } else {
+                    Brush.verticalGradient(listOf(Kadraj.Glass, Color.Transparent))
+                },
+            )
             .border(
                 width = 1.dp,
-                color = if (selected) Kadraj.Terracotta.copy(alpha = 0.62f) else Kadraj.Line,
+                color = if (selected) {
+                    Kadraj.TerracottaSoft.copy(alpha = 0.72f)
+                } else {
+                    Kadraj.Line
+                },
                 shape = shape,
             )
             .pressable {
@@ -279,7 +356,7 @@ fun TemplateChip(
         GlyphIcon(
             glyph = glyphForTemplate(template),
             modifier = Modifier.size(19.dp),
-            tint = if (selected) Kadraj.TerracottaSoft else Kadraj.Muted,
+            tint = if (selected) Kadraj.Peach else Kadraj.Muted,
             strokeWidth = 1.55.dp,
         )
         Spacer(Modifier.height(6.dp))
@@ -306,11 +383,26 @@ fun ToggleChip(
     Row(
         modifier = modifier
             .height(30.dp)
+            .shadow(
+                elevation = if (selected) 8.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.45f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.3f),
+            )
             .clip(shape)
-            .background(if (selected) Kadraj.InkSoft else Color.Transparent)
+            .background(
+                if (selected) {
+                    Brush.horizontalGradient(
+                        listOf(Kadraj.Terracotta.copy(alpha = 0.24f), Kadraj.InkSoft),
+                    )
+                } else {
+                    Brush.horizontalGradient(listOf(Kadraj.Glass, Color.Transparent))
+                },
+            )
             .border(
                 1.dp,
-                if (selected) Kadraj.Terracotta.copy(alpha = 0.55f) else Kadraj.Line,
+                if (selected) Kadraj.TerracottaSoft.copy(alpha = 0.62f) else Kadraj.Line,
                 shape,
             )
             .pressable {
@@ -323,9 +415,11 @@ fun ToggleChip(
     ) {
         Box(
             modifier = Modifier
-                .size(6.dp)
+                .size(7.dp)
                 .clip(CircleShape)
-                .background(if (selected) Kadraj.TerracottaSoft else Kadraj.MutedDim),
+                .background(
+                    if (selected) Kadraj.Peach else Kadraj.MutedDim.copy(alpha = 0.7f),
+                ),
         )
         BasicText(
             text = label,
@@ -346,10 +440,32 @@ fun DockTab(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
+    val shape = RoundedCornerShape(17.dp)
+    val indicatorWidth by animateDpAsState(
+        targetValue = if (selected) 12.dp else 0.dp,
+        animationSpec = tween(180, easing = FastOutSlowInEasing),
+        label = "dock-indicator",
+    )
     Column(
         modifier = modifier
             .height(54.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .shadow(
+                elevation = if (selected) 12.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.5f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.34f),
+            )
+            .clip(shape)
+            .background(
+                if (selected) {
+                    Brush.verticalGradient(
+                        listOf(Kadraj.Terracotta.copy(alpha = 0.26f), Kadraj.InkSoft.copy(alpha = 0.12f)),
+                    )
+                } else {
+                    Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent))
+                },
+            )
             .pressable {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
@@ -360,7 +476,7 @@ fun DockTab(
         GlyphIcon(
             glyph = glyph,
             modifier = Modifier.size(18.dp),
-            tint = if (selected) Kadraj.TerracottaSoft else Kadraj.MutedDim,
+            tint = if (selected) Kadraj.Peach else Kadraj.MutedDim,
             strokeWidth = 1.55.dp,
         )
         Spacer(Modifier.height(5.dp))
@@ -371,6 +487,20 @@ fun DockTab(
                 fontSize = 9.sp,
                 letterSpacing = 1.2.sp,
             ),
+        )
+        Spacer(Modifier.height(4.dp))
+        Box(
+            modifier = Modifier
+                .width(indicatorWidth)
+                .height(2.dp)
+                .clip(RoundedCornerShape(50))
+                .background(
+                    if (selected) {
+                        Brush.horizontalGradient(listOf(Kadraj.Peach, Kadraj.Violet))
+                    } else {
+                        Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent))
+                    },
+                ),
         )
     }
 }
@@ -386,7 +516,7 @@ fun KadrajSlider(
 ) {
     val knobRadius = 7.dp
     val knobRadiusPx = with(LocalDensity.current) { knobRadius.toPx() }
-    val active = Kadraj.Terracotta
+    val active = Kadraj.TerracottaSoft
     val track = Kadraj.LineStrong
     val currentOnChange by rememberUpdatedState(onValueChange)
 
@@ -440,22 +570,32 @@ fun KadrajSlider(
                 )
                 if (knobX > startX) {
                     drawLine(
-                        color = active,
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(Kadraj.TerracottaSoft, Kadraj.Peach),
+                            startX = startX,
+                            endX = endX,
+                        ),
                         start = androidx.compose.ui.geometry.Offset(startX, centerY),
                         end = androidx.compose.ui.geometry.Offset(knobX, centerY),
-                        strokeWidth = 2.dp.toPx(),
+                        strokeWidth = 2.5.dp.toPx(),
                         cap = StrokeCap.Round,
                     )
                 }
                 drawCircle(
-                    color = active.copy(alpha = 0.22f),
-                    radius = knobRadiusPx + 2.dp.toPx(),
+                    color = active.copy(alpha = 0.16f),
+                    radius = knobRadiusPx + 3.5.dp.toPx(),
                     center = androidx.compose.ui.geometry.Offset(knobX, centerY),
                 )
                 drawCircle(
                     color = Kadraj.Paper,
-                    radius = 4.6.dp.toPx(),
+                    radius = 4.8.dp.toPx(),
                     center = androidx.compose.ui.geometry.Offset(knobX, centerY),
+                )
+                drawCircle(
+                    color = active,
+                    radius = 4.8.dp.toPx(),
+                    center = androidx.compose.ui.geometry.Offset(knobX, centerY),
+                    style = Stroke(width = 1.4.dp.toPx()),
                 )
             }
         }
@@ -489,9 +629,17 @@ fun Wordmark(modifier: Modifier = Modifier) {
         )
         Box(
             modifier = Modifier
-                .size(5.dp)
+                .size(7.dp)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = CircleShape,
+                    clip = false,
+                    ambientColor = Kadraj.Terracotta,
+                    spotColor = Kadraj.Violet,
+                )
                 .clip(CircleShape)
-                .background(Kadraj.Terracotta),
+                .background(Brush.linearGradient(listOf(Kadraj.Peach, Kadraj.Terracotta, Kadraj.Violet)))
+                .border(0.5.dp, Color.White.copy(alpha = 0.45f), CircleShape),
         )
     }
 }
@@ -500,9 +648,16 @@ fun Wordmark(modifier: Modifier = Modifier) {
 fun NoticePill(message: String, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(18.dp))
-            .background(Kadraj.InkLift)
-            .border(1.dp, Kadraj.Line, RoundedCornerShape(18.dp))
+            .shadow(
+                elevation = 16.dp,
+                shape = RoundedCornerShape(19.dp),
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.32f),
+                spotColor = Kadraj.Violet.copy(alpha = 0.22f),
+            )
+            .clip(RoundedCornerShape(19.dp))
+            .background(Brush.horizontalGradient(listOf(Kadraj.InkLift, Kadraj.InkRaised)))
+            .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(19.dp))
             .padding(horizontal = 14.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(9.dp),
@@ -595,12 +750,23 @@ fun ModalSheet(
                     modifier = Modifier
                         .fillMaxWidth()
                         .widthIn(max = 620.dp)
-                        .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-                        .background(Kadraj.InkRaised)
+                        .shadow(
+                            elevation = 34.dp,
+                            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp),
+                            clip = false,
+                            ambientColor = Kadraj.Terracotta.copy(alpha = 0.28f),
+                            spotColor = Kadraj.Violet.copy(alpha = 0.2f),
+                        )
+                        .clip(RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp))
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(Color(0xFF241B12), Kadraj.InkRaised, Color(0xFF110E0A)),
+                            ),
+                        )
                         .border(
                             width = 1.dp,
                             color = Kadraj.LineStrong,
-                            shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp),
                         )
                         .pointerInput(Unit) { detectTapGestures { } }
                         .windowInsetsPadding(WindowInsets.navigationBars)
@@ -611,10 +777,10 @@ fun ModalSheet(
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .width(36.dp)
-                            .height(4.dp)
+                            .width(42.dp)
+                            .height(3.dp)
                             .clip(RoundedCornerShape(50))
-                            .background(Kadraj.MutedDim.copy(alpha = 0.55f)),
+                            .background(Brush.horizontalGradient(listOf(Kadraj.Peach, Kadraj.Violet))),
                     )
                     Spacer(Modifier.height(22.dp))
                     content()

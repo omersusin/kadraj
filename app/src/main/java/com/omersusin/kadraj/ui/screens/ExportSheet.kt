@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -154,9 +155,16 @@ fun ExportSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(176.dp)
+                    .shadow(
+                        elevation = 18.dp,
+                        shape = RoundedCornerShape(18.dp),
+                        clip = false,
+                        ambientColor = Kadraj.Terracotta.copy(alpha = 0.32f),
+                        spotColor = Kadraj.Violet.copy(alpha = 0.2f),
+                    )
                     .clip(RoundedCornerShape(18.dp))
                     .background(Kadraj.Ink)
-                    .border(1.dp, Kadraj.Line, RoundedCornerShape(18.dp))
+                    .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(18.dp))
                     .padding(10.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -282,11 +290,24 @@ private fun ExportOption(
     Column(
         modifier = modifier
             .height(54.dp)
+            .shadow(
+                elevation = if (selected) 9.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.4f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.28f),
+            )
             .clip(shape)
-            .background(if (selected) Kadraj.InkSoft else Color.Transparent)
+            .background(
+                if (selected) {
+                    Brush.verticalGradient(listOf(Kadraj.InkLift, Kadraj.InkSoft))
+                } else {
+                    Brush.verticalGradient(listOf(Kadraj.Glass, Color.Transparent))
+                },
+            )
             .border(
                 width = 1.dp,
-                color = if (selected) Kadraj.Terracotta.copy(alpha = 0.62f) else Kadraj.Line,
+                color = if (selected) Kadraj.Peach.copy(alpha = 0.7f) else Kadraj.Line,
                 shape = shape,
             )
             .pressable {
@@ -333,16 +354,23 @@ private fun ExportSuccess(
         Box(
             modifier = Modifier
                 .size(78.dp)
+                .shadow(
+                    elevation = 20.dp,
+                    shape = CircleShape,
+                    clip = false,
+                    ambientColor = Kadraj.Terracotta.copy(alpha = 0.7f),
+                    spotColor = Kadraj.Violet.copy(alpha = 0.3f),
+                )
                 .clip(CircleShape)
                 .background(
                     Brush.radialGradient(
                         listOf(
-                            Kadraj.Terracotta.copy(alpha = 0.22f),
+                            Kadraj.Peach.copy(alpha = 0.26f),
                             Kadraj.InkSoft,
                         ),
                     ),
                 )
-                .border(1.dp, Kadraj.Terracotta.copy(alpha = 0.65f), CircleShape),
+                .border(1.dp, Kadraj.Peach.copy(alpha = 0.7f), CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             GlyphIcon(

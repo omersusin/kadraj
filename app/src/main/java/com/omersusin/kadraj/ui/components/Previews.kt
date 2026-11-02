@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -104,11 +105,18 @@ fun ImageThumb(
         modifier = modifier
             .size(52.dp)
             .semantics { contentDescription = label }
+            .shadow(
+                elevation = if (selected) 10.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.5f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.34f),
+            )
             .clip(shape)
             .background(Kadraj.InkSoft)
             .border(
-                width = if (selected) 1.6.dp else 1.dp,
-                color = if (selected) Kadraj.Terracotta else Kadraj.Line,
+                width = if (selected) 1.8.dp else 1.dp,
+                color = if (selected) Kadraj.Peach else Kadraj.Line,
                 shape = shape,
             )
             .then(
@@ -178,11 +186,11 @@ fun AddImageTile(
         )
         Spacer(Modifier.height(3.dp))
         BasicText(
-            text = "EKLE",
+            text = "ADD",
             style = Kadraj.Type.LabelSmall.copy(
-                color = Kadraj.Muted,
+                color = Kadraj.PaperDim,
                 fontSize = 7.5.sp,
-                letterSpacing = 0.8.sp,
+                letterSpacing = 1.0.sp,
             ),
         )
     }

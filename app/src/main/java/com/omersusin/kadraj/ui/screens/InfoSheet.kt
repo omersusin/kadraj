@@ -106,7 +106,8 @@ fun InfoSheet(
         number = "02",
         title = "Touch the canvas.",
         body = "Tap a photo to select it, then drag to move the crop. Double-tap to switch " +
-            "between fill and fit. The Photo tab adds looks, zoom, tilt, and flips.",
+            "between fill and fit. The Photo tab adds looks, light, color, warmth, " +
+            "zoom, tilt, and flips.",
     )
     Spacer(Modifier.height(17.dp))
     InfoTip(

@@ -100,7 +100,40 @@ object Palettes {
         grainAlpha = 13,
     )
 
-    val all: List<Palette> = listOf(Paper, Night, Clay, Sage, Mist, Rose, Ivory, Olive)
+    val Sunset = Palette(
+        id = "sunset",
+        name = "Sunset",
+        colors = listOf(0xFF54283A.toInt(), 0xFF7B3743.toInt(), 0xFF29141F.toInt()),
+        matte = 0xFFFFE8D9.toInt(),
+        surface = 0xFF5A2B36.toInt(),
+        accent = 0xFFFF9E74.toInt(),
+        dark = true,
+        grainAlpha = 14,
+    )
+
+    val Lagoon = Palette(
+        id = "lagoon",
+        name = "Lagoon",
+        colors = listOf(0xFF0D3034.toInt(), 0xFF15545B.toInt(), 0xFF071B1E.toInt()),
+        matte = 0xFFE4F7F0.toInt(),
+        surface = 0xFF113F44.toInt(),
+        accent = 0xFF77E6C7.toInt(),
+        dark = true,
+        grainAlpha = 13,
+    )
+
+    val all: List<Palette> = listOf(
+        Paper,
+        Night,
+        Clay,
+        Sage,
+        Mist,
+        Rose,
+        Ivory,
+        Olive,
+        Sunset,
+        Lagoon,
+    )
 
     fun byId(id: String): Palette = all.firstOrNull { it.id == id } ?: Paper
 }

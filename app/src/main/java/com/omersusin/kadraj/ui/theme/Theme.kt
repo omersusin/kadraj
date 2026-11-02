@@ -12,24 +12,32 @@ import androidx.compose.ui.unit.sp
 import com.omersusin.kadraj.R
 
 object Kadraj {
-    val Ink = Color(0xFF0E0D0B)
-    val InkRaised = Color(0xFF161411)
-    val InkSoft = Color(0xFF1D1A16)
-    val InkLift = Color(0xFF242019)
+    val Ink = Color(0xFF0D0C0A)
+    val InkRaised = Color(0xFF15120E)
+    val InkSoft = Color(0xFF1D1914)
+    val InkLift = Color(0xFF272117)
+    val InkDeep = Color(0xFF070605)
 
-    val Paper = Color(0xFFF3EDE3)
-    val PaperDim = Color(0xFFD8CFC0)
-    val Muted = Color(0xFF9C9385)
-    val MutedDim = Color(0xFF6C655B)
+    val Paper = Color(0xFFF5EFE5)
+    val PaperDim = Color(0xFFD9D0C0)
+    val Muted = Color(0xFF9E9587)
+    val MutedDim = Color(0xFF6E675C)
 
-    val Terracotta = Color(0xFFD17252)
-    val TerracottaSoft = Color(0xFFE19275)
+    val Terracotta = Color(0xFFD47251)
+    val TerracottaSoft = Color(0xFFE99A76)
+    val Ember = Color(0xFFA84934)
+    val Peach = Color(0xFFFFB58B)
+    val Acid = Color(0xFFD8F27A)
+    val Sky = Color(0xFF8FD8F1)
+    val Violet = Color(0xFFA998FF)
     val Moss = Color(0xFF93A287)
     val Gold = Color(0xFFC8A15C)
 
     val Line = Color(0x1FFFFFFF)
-    val LineStrong = Color(0x33FFFFFF)
-    val Scrim = Color(0xCC080706)
+    val LineStrong = Color(0x38FFFFFF)
+    val Glass = Color(0x17FFFFFF)
+    val GlassStrong = Color(0x29FFFFFF)
+    val Scrim = Color(0xD9080706)
 
     val Fraunces = FontFamily(
         Font(R.font.fraunces_light, FontWeight.Light),
@@ -88,6 +96,13 @@ object Kadraj {
             fontWeight = FontWeight.SemiBold,
             fontSize = 19.sp,
             letterSpacing = 0.2.sp,
+        )
+        val Sticker = TextStyle(
+            fontFamily = Manrope,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 8.sp,
+            lineHeight = 10.sp,
+            letterSpacing = 1.8.sp,
         )
         val Title = TextStyle(
             fontFamily = Manrope,

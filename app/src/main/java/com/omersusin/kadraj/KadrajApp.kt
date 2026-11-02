@@ -25,12 +25,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.omersusin.kadraj.ui.components.AuroraBackdrop
 import com.omersusin.kadraj.ui.components.ModalSheet
 import com.omersusin.kadraj.ui.components.NoticePill
 import com.omersusin.kadraj.ui.screens.EditorScreen
@@ -39,7 +36,6 @@ import com.omersusin.kadraj.ui.screens.ExportSheet
 import com.omersusin.kadraj.ui.screens.InfoSheet
 import com.omersusin.kadraj.ui.theme.Kadraj
 import kotlinx.coroutines.delay
-import kotlin.random.Random
 
 @Composable
 fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
@@ -98,9 +94,10 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Kadraj.Ink)
-            .appBackdrop(),
+            .background(Kadraj.Ink),
     ) {
+        AuroraBackdrop()
+
         if (images.isEmpty()) {
             EmptyState(
                 onPickImages = pickImages,
@@ -161,72 +158,5 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
                 onNewProject = startNewProject,
             )
         }
-    }
-}
-
-private fun Modifier.appBackdrop(): Modifier = drawBehind {
-    drawRect(
-        brush = Brush.verticalGradient(
-            colors = listOf(
-                Kadraj.InkRaised,
-                Kadraj.Ink,
-                Color(0xFF090806),
-            ),
-        ),
-    )
-
-    val terracottaCenter = Offset(size.width * 0.13f, size.height * 0.06f)
-    val terracottaRadius = size.width * 0.95f
-    drawCircle(
-        brush = Brush.radialGradient(
-            colors = listOf(
-                Kadraj.Terracotta.copy(alpha = 0.075f),
-                Color.Transparent,
-            ),
-            center = terracottaCenter,
-            radius = terracottaRadius,
-        ),
-        radius = terracottaRadius,
-        center = terracottaCenter,
-    )
-
-    val mossCenter = Offset(size.width * 0.92f, size.height * 0.78f)
-    val mossRadius = size.width * 0.8f
-    drawCircle(
-        brush = Brush.radialGradient(
-            colors = listOf(
-                Kadraj.Moss.copy(alpha = 0.035f),
-                Color.Transparent,
-            ),
-            center = mossCenter,
-            radius = mossRadius,
-        ),
-        radius = mossRadius,
-        center = mossCenter,
-    )
-
-    drawLine(
-        color = Kadraj.Line,
-        start = Offset(size.width * 0.075f, 0f),
-        end = Offset(size.width * 0.075f, size.height),
-        strokeWidth = 1f,
-    )
-    drawLine(
-        color = Kadraj.Line,
-        start = Offset(size.width * 0.925f, 0f),
-        end = Offset(size.width * 0.925f, size.height),
-        strokeWidth = 1f,
-    )
-
-    val random = Random(17)
-    repeat(70) {
-        drawCircle(
-            color = Kadraj.Paper.copy(alpha = 0.02f),
-            radius = 0.65f.dp.toPx(),
-            center = Offset(
-                random.nextFloat() * size.width,
-                random.nextFloat() * size.height,
-            ),
-        )
     }
 }

@@ -18,6 +18,10 @@ data class CollageImage(
     val tilt: Float = 0f,
     val flipX: Boolean = false,
     val flipY: Boolean = false,
+    val brightness: Float = 0f,
+    val contrast: Float = 0f,
+    val saturation: Float = 0f,
+    val warmth: Float = 0f,
 ) {
     val aspect: Float
         get() = width.toFloat() / height.coerceAtLeast(1)

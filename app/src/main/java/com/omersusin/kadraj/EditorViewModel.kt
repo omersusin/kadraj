@@ -225,6 +225,96 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun setBrightness(id: Long, value: Float) {
+        if (images.none { it.id == id }) return
+        recordHistory("brightness-$id")
+        images = images.map {
+            if (it.id == id) it.copy(brightness = value.coerceIn(-1f, 1f)) else it
+        }
+    }
+
+    fun setContrast(id: Long, value: Float) {
+        if (images.none { it.id == id }) return
+        recordHistory("contrast-$id")
+        images = images.map {
+            if (it.id == id) it.copy(contrast = value.coerceIn(-1f, 1f)) else it
+        }
+    }
+
+    fun setSaturation(id: Long, value: Float) {
+        if (images.none { it.id == id }) return
+        recordHistory("saturation-$id")
+        images = images.map {
+            if (it.id == id) it.copy(saturation = value.coerceIn(-1f, 1f)) else it
+        }
+    }
+
+    fun setWarmth(id: Long, value: Float) {
+        if (images.none { it.id == id }) return
+        recordHistory("warmth-$id")
+        images = images.map {
+            if (it.id == id) it.copy(warmth = value.coerceIn(-1f, 1f)) else it
+        }
+    }
+
+    fun resetTone(id: Long) {
+        val image = images.firstOrNull { it.id == id } ?: return
+        if (image.brightness == 0f &&
+            image.contrast == 0f &&
+            image.saturation == 0f &&
+            image.warmth == 0f
+        ) {
+            return
+        }
+        recordHistory()
+        images = images.map {
+            if (it.id == id) {
+                it.copy(
+                    brightness = 0f,
+                    contrast = 0f,
+                    saturation = 0f,
+                    warmth = 0f,
+                )
+            } else {
+                it
+            }
+        }
+        showNotice("Photo tone reset.")
+    }
+
+    fun applyTreatmentToAll(id: Long) {
+        val source = images.firstOrNull { it.id == id } ?: return
+        if (images.size < 2) return
+        recordHistory()
+        images = images.map { image ->
+            image.copy(
+                look = source.look,
+                lookAmount = source.lookAmount,
+                brightness = source.brightness,
+                contrast = source.contrast,
+                saturation = source.saturation,
+                warmth = source.warmth,
+            )
+        }
+        showNotice("This treatment now runs through every photo.")
+    }
+
+    fun autoEnhance() {
+        if (images.isEmpty()) return
+        recordHistory()
+        images = images.map { image ->
+            image.copy(
+                look = if (image.look == PhotoLook.ORIGINAL) PhotoLook.FILM else image.look,
+                lookAmount = if (image.look == PhotoLook.ORIGINAL) 0.42f else image.lookAmount,
+                brightness = (image.brightness + 0.04f).coerceIn(-1f, 1f),
+                contrast = (image.contrast + 0.10f).coerceIn(-1f, 1f),
+                saturation = (image.saturation + 0.08f).coerceIn(-1f, 1f),
+                warmth = (image.warmth + 0.12f).coerceIn(-1f, 1f),
+            )
+        }
+        showNotice("A little more life, in every frame.")
+    }
+
     fun setZoom(id: Long, zoom: Float) {
         if (images.none { it.id == id }) return
         recordHistory("zoom-$id")
@@ -265,6 +355,10 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     tilt = 0f,
                     flipX = false,
                     flipY = false,
+                    brightness = 0f,
+                    contrast = 0f,
+                    saturation = 0f,
+                    warmth = 0f,
                 )
             } else {
                 it
@@ -482,6 +576,10 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                 tilt = it.tilt,
                 flipX = it.flipX,
                 flipY = it.flipY,
+                brightness = it.brightness,
+                contrast = it.contrast,
+                saturation = it.saturation,
+                warmth = it.warmth,
             )
         }
 

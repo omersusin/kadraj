@@ -1,5 +1,12 @@
 package com.omersusin.kadraj.ui.components
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +33,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -58,6 +66,7 @@ fun CollageStage(
     onFocus: (Long, Float, Float) -> Unit,
     onToggleFit: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    guides: Boolean = false,
 ) {
     val previews = rememberPreviewLoadStates(loader, images)
     val revision = previews.revision.value
@@ -67,6 +76,21 @@ fun CollageStage(
     val captionTypeface = remember(context, style.caption.font) {
         CaptionTypefaces.load(context, style.caption.font)
     }
+    val transition = rememberInfiniteTransition(label = "stage-aura")
+    val auraRotation by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(26000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "stage-aura-rotation",
+    )
+    val guideAlpha by animateFloatAsState(
+        targetValue = if (guides) 1f else 0f,
+        animationSpec = tween(220),
+        label = "guide-alpha",
+    )
 
     val currentLayout by rememberUpdatedState(layout)
     val currentImages by rememberUpdatedState(images)
@@ -90,6 +114,10 @@ fun CollageStage(
                 tilt = it.tilt,
                 flipX = it.flipX,
                 flipY = it.flipY,
+                brightness = it.brightness,
+                contrast = it.contrast,
+                saturation = it.saturation,
+                warmth = it.warmth,
             )
         }
     }
@@ -116,19 +144,83 @@ fun CollageStage(
             canvasWidth = canvasHeight * safeAspect
         }
 
-        Canvas(Modifier.fillMaxSize()) {
+        Canvas(
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer { rotationZ = auraRotation },
+        ) {
             val center = Offset(size.width / 2f, size.height / 2f)
+            val glowRadius = size.minDimension * 0.7f
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Terracotta.copy(alpha = 0.11f),
+                        Kadraj.Peach.copy(alpha = 0.13f),
+                        Kadraj.Terracotta.copy(alpha = 0.07f),
                         Color.Transparent,
                     ),
                     center = center,
-                    radius = size.minDimension * 0.68f,
+                    radius = glowRadius,
                 ),
-                radius = size.minDimension * 0.68f,
+                radius = glowRadius,
                 center = center,
+            )
+
+            val orbitRadius = size.minDimension * 0.46f
+            val orbitTopLeft = Offset(
+                center.x - orbitRadius,
+                center.y - orbitRadius,
+            )
+            val orbitSize = androidx.compose.ui.geometry.Size(orbitRadius * 2f, orbitRadius * 2f)
+            drawArc(
+                brush = Brush.sweepGradient(
+                    listOf(
+                        Color.Transparent,
+                        Kadraj.Peach.copy(alpha = 0.32f),
+                        Kadraj.Violet.copy(alpha = 0.24f),
+                        Color.Transparent,
+                    ),
+                    center = center,
+                ),
+                startAngle = 10f,
+                sweepAngle = 118f,
+                useCenter = false,
+                topLeft = orbitTopLeft,
+                size = orbitSize,
+                style = androidx.compose.ui.graphics.drawscope.Stroke(
+                    width = 1.3.dp.toPx(),
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                ),
+            )
+            drawArc(
+                brush = Brush.sweepGradient(
+                    listOf(
+                        Color.Transparent,
+                        Kadraj.Acid.copy(alpha = 0.26f),
+                        Color.Transparent,
+                    ),
+                    center = center,
+                ),
+                startAngle = 196f,
+                sweepAngle = 72f,
+                useCenter = false,
+                topLeft = orbitTopLeft,
+                size = orbitSize,
+                style = androidx.compose.ui.graphics.drawscope.Stroke(
+                    width = 1.dp.toPx(),
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                ),
+            )
+
+            val dotCenter = Offset(center.x + orbitRadius, center.y)
+            drawCircle(
+                color = Kadraj.Peach.copy(alpha = 0.55f),
+                radius = 2.2.dp.toPx(),
+                center = dotCenter,
+            )
+            drawCircle(
+                color = Kadraj.Peach.copy(alpha = 0.12f),
+                radius = 7.dp.toPx(),
+                center = dotCenter,
             )
         }
 
@@ -252,6 +344,48 @@ fun CollageStage(
                             captionTypeface = captionTypeface,
                         )
                     }
+
+                    if (guideAlpha > 0.01f) {
+                        val third = 1f / 3f
+                        val lineColor = Color.White.copy(alpha = 0.34f * guideAlpha)
+                        val shadowColor = Color.Black.copy(alpha = 0.22f * guideAlpha)
+                        listOf(third, third * 2f).forEach { fraction ->
+                            val x = size.width * fraction
+                            drawLine(
+                                color = shadowColor,
+                                start = Offset(x, 0f),
+                                end = Offset(x, size.height),
+                                strokeWidth = 2.5f,
+                            )
+                            drawLine(
+                                color = lineColor,
+                                start = Offset(x, 0f),
+                                end = Offset(x, size.height),
+                                strokeWidth = 1f,
+                            )
+                            val y = size.height * fraction
+                            drawLine(
+                                color = shadowColor,
+                                start = Offset(0f, y),
+                                end = Offset(size.width, y),
+                                strokeWidth = 2.5f,
+                            )
+                            drawLine(
+                                color = lineColor,
+                                start = Offset(0f, y),
+                                end = Offset(size.width, y),
+                                strokeWidth = 1f,
+                            )
+                        }
+                        drawCircle(
+                            color = lineColor,
+                            radius = 3.5.dp.toPx(),
+                            center = Offset(size.width / 2f, size.height / 2f),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                width = 1f,
+                            ),
+                        )
+                    }
                 }
 
                 if (loading) {
@@ -310,6 +444,10 @@ fun CollagePreview(
                 tilt = it.tilt,
                 flipX = it.flipX,
                 flipY = it.flipY,
+                brightness = it.brightness,
+                contrast = it.contrast,
+                saturation = it.saturation,
+                warmth = it.warmth,
             )
         }
     }

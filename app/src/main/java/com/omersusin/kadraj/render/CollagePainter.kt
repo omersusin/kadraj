@@ -53,6 +53,10 @@ data class ImageRenderState(
     val tilt: Float = 0f,
     val flipX: Boolean = false,
     val flipY: Boolean = false,
+    val brightness: Float = 0f,
+    val contrast: Float = 0f,
+    val saturation: Float = 0f,
+    val warmth: Float = 0f,
 )
 
 fun interface ImageProvider {
@@ -61,7 +65,15 @@ fun interface ImageProvider {
 
 object CollagePainter {
     private val grain: Bitmap by lazy { createGrain(128) }
-    private val filterCache = ConcurrentHashMap<Int, ColorMatrixColorFilter>()
+    private data class FilterKey(
+        val look: PhotoLook,
+        val strength: Int,
+        val brightness: Int,
+        val contrast: Int,
+        val saturation: Int,
+        val warmth: Int,
+    )
+    private val filterCache = ConcurrentHashMap<FilterKey, ColorMatrixColorFilter>()
     private val identity = floatArrayOf(
         1f, 0f, 0f, 0f, 0f,
         0f, 1f, 0f, 0f, 0f,
@@ -264,7 +276,7 @@ object CollagePainter {
         val cover = if (abs(tilt) > 0.01f) tiltCoverScale(rect.width(), rect.height(), tilt) else 1f
         val scale = zoom * cover
         val previousFilter = paint.colorFilter
-        val filter = photoFilter(state.look, state.lookAmount)
+        val filter = photoFilter(state)
         if (filter != null) paint.colorFilter = filter
 
         try {
@@ -426,14 +438,56 @@ object CollagePainter {
         )
     }
 
-    private fun photoFilter(look: PhotoLook, amount: Float): ColorMatrixColorFilter? {
-        val strength = amount.coerceIn(0f, 1f)
-        if (look == PhotoLook.ORIGINAL || strength <= 0.01f) return null
-        val key = look.ordinal * 100 + (strength * 20f).roundToInt()
+    private fun photoFilter(state: ImageRenderState): ColorMatrixColorFilter? {
+        val look = state.look
+        val strength = if (look == PhotoLook.ORIGINAL) {
+            0
+        } else {
+            (state.lookAmount.coerceIn(0f, 1f) * 48f).roundToInt()
+        }
+        val brightness = (state.brightness.coerceIn(-1f, 1f) * 48f).roundToInt()
+        val contrast = (state.contrast.coerceIn(-1f, 1f) * 48f).roundToInt()
+        val saturation = (state.saturation.coerceIn(-1f, 1f) * 48f).roundToInt()
+        val warmth = (state.warmth.coerceIn(-1f, 1f) * 48f).roundToInt()
+        val neutral = strength == 0 &&
+            brightness == 0 &&
+            contrast == 0 &&
+            saturation == 0 &&
+            warmth == 0
+        if (neutral) return null
+
+        val key = FilterKey(look, strength, brightness, contrast, saturation, warmth)
         return filterCache.getOrPut(key) {
             val target = targetMatrix(look).array
-            val mixed = FloatArray(20) { identity[it] + (target[it] - identity[it]) * strength }
-            ColorMatrixColorFilter(ColorMatrix(mixed))
+            val mix = strength / 48f
+            val mixed = FloatArray(20) {
+                identity[it] + (target[it] - identity[it]) * mix
+            }
+            val matrix = ColorMatrix(mixed)
+
+            if (saturation != 0) {
+                val scale = (1f + (saturation / 48f) * 0.9f).coerceIn(0.1f, 1.9f)
+                matrix.postConcat(ColorMatrix().apply { setSaturation(scale) })
+            }
+
+            val contrastScale = 1f + (contrast / 48f) * 0.38f
+            val contrastOffset = (1f - contrastScale) * 128f + (brightness / 48f) * 44f
+            if (contrast != 0 || brightness != 0) {
+                matrix.postConcat(colorContrast(contrastScale, contrastOffset))
+            }
+
+            if (warmth != 0) {
+                val warmthAmount = warmth / 48f
+                matrix.postConcat(
+                    colorOffset(
+                        warmthAmount * 20f,
+                        warmthAmount * 4f,
+                        -warmthAmount * 18f,
+                    ),
+                )
+            }
+
+            ColorMatrixColorFilter(matrix)
         }
     }
 
