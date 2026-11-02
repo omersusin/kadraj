@@ -82,22 +82,22 @@ fun ExportSheet(
     ) {
         Column {
             BasicText(
-                text = "EXPORT",
-                style = Kadraj.Type.Label.copy(
-                    color = Kadraj.TerracottaSoft,
-                    letterSpacing = 2.0.sp,
-                ),
-            )
-            Spacer(Modifier.height(8.dp))
-            BasicText(
-                text = when (viewModel.exportState) {
-                    is EditorViewModel.ExportState.Saved -> "Your Kadraj is ready."
-                    else -> "Make your Kadraj."
-                },
+                text = "Export",
                 style = Kadraj.Type.Display.copy(
                     color = Kadraj.Paper,
-                    fontSize = 31.sp,
-                    lineHeight = 34.sp,
+                    fontSize = 24.sp,
+                    lineHeight = 28.sp,
+                ),
+            )
+            Spacer(Modifier.height(3.dp))
+            BasicText(
+                text = when (viewModel.exportState) {
+                    is EditorViewModel.ExportState.Saved -> "Your collage is ready."
+                    else -> "Choose a size, then save."
+                },
+                style = Kadraj.Type.BodySmall.copy(
+                    color = Kadraj.Muted,
+                    fontSize = 11.5.sp,
                 ),
             )
         }
@@ -124,29 +124,30 @@ fun ExportSheet(
         else -> {
             Spacer(Modifier.height(10.dp))
             BasicText(
-                text = "Your composition is rendered on-device at full resolution and " +
-                    "saved to the Kadraj album in Photos.",
+                text = "Rendered on-device at full resolution and saved to the Kadraj " +
+                    "album in Photos.",
                 style = Kadraj.Type.Body.copy(color = Kadraj.Muted),
             )
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 BasicText(
-                    text = "PREVIEW",
-                    style = Kadraj.Type.LabelSmall.copy(
+                    text = "Preview",
+                    style = Kadraj.Type.BodySmall.copy(
                         color = Kadraj.MutedDim,
-                        letterSpacing = 1.5.sp,
+                        fontSize = 11.sp,
                     ),
                 )
                 Spacer(Modifier.weight(1f))
                 BasicText(
                     text = if (viewModel.template == Template.FLOW) {
-                        "FREE"
+                        "Free flow"
                     } else {
                         ratioLabel(layout.aspect)
                     },
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.PaperDim,
-                        letterSpacing = 1.1.sp,
+                        fontSize = 10.sp,
+                        letterSpacing = 0.3.sp,
                     ),
                 )
             }
@@ -154,17 +155,17 @@ fun ExportSheet(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(176.dp)
+                    .height(146.dp)
                     .shadow(
-                        elevation = 18.dp,
-                        shape = RoundedCornerShape(18.dp),
+                        elevation = 16.dp,
+                        shape = RoundedCornerShape(16.dp),
                         clip = false,
-                        ambientColor = Kadraj.Terracotta.copy(alpha = 0.32f),
-                        spotColor = Kadraj.Violet.copy(alpha = 0.2f),
+                        ambientColor = Color.Black,
+                        spotColor = Color.Black,
                     )
-                    .clip(RoundedCornerShape(18.dp))
+                    .clip(RoundedCornerShape(16.dp))
                     .background(Kadraj.Ink)
-                    .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(18.dp))
+                    .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(16.dp))
                     .padding(10.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -179,10 +180,10 @@ fun ExportSheet(
             Spacer(Modifier.height(17.dp))
 
             BasicText(
-                text = "SIZE",
-                style = Kadraj.Type.LabelSmall.copy(
+                text = "Size",
+                style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
+                    fontSize = 11.sp,
                 ),
             )
             Spacer(Modifier.height(7.dp))
@@ -203,10 +204,10 @@ fun ExportSheet(
             Spacer(Modifier.height(13.dp))
 
             BasicText(
-                text = "FORMAT",
-                style = Kadraj.Type.LabelSmall.copy(
+                text = "Format",
+                style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
+                    fontSize = 11.sp,
                 ),
             )
             Spacer(Modifier.height(7.dp))
@@ -227,7 +228,7 @@ fun ExportSheet(
             Spacer(Modifier.height(13.dp))
             BasicText(
                 text = "${dimensions.first} × ${dimensions.second} px  ·  " +
-                    "${viewModel.exportFormat.label}  ·  Processed on device",
+                    "${viewModel.exportFormat.label}  ·  On-device",
                 style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 10.5.sp,
@@ -247,20 +248,20 @@ fun ExportSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp)
-                        .clip(RoundedCornerShape(17.dp))
+                        .height(52.dp)
+                        .clip(RoundedCornerShape(16.dp))
                         .background(Kadraj.InkSoft)
-                        .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(17.dp)),
+                        .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(16.dp)),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     KadrajSpinner(diameter = 17.dp)
                     Spacer(Modifier.width(10.dp))
                     BasicText(
-                        text = "RENDERING",
+                        text = "Rendering",
                         style = Kadraj.Type.Button.copy(
                             color = Kadraj.PaperDim,
-                            letterSpacing = 1.3.sp,
+                            letterSpacing = 0.2.sp,
                         ),
                     )
                 }
@@ -289,25 +290,14 @@ private fun ExportOption(
     val shape = RoundedCornerShape(13.dp)
     Column(
         modifier = modifier
-            .height(54.dp)
-            .shadow(
-                elevation = if (selected) 9.dp else 0.dp,
-                shape = shape,
-                clip = false,
-                ambientColor = Kadraj.Terracotta.copy(alpha = 0.4f),
-                spotColor = Kadraj.Terracotta.copy(alpha = 0.28f),
-            )
+            .height(56.dp)
             .clip(shape)
             .background(
-                if (selected) {
-                    Brush.verticalGradient(listOf(Kadraj.InkLift, Kadraj.InkSoft))
-                } else {
-                    Brush.verticalGradient(listOf(Kadraj.Glass, Color.Transparent))
-                },
+                if (selected) Kadraj.Peach.copy(alpha = 0.13f) else Kadraj.InkSoft,
             )
             .border(
                 width = 1.dp,
-                color = if (selected) Kadraj.Peach.copy(alpha = 0.7f) else Kadraj.Line,
+                color = if (selected) Kadraj.Peach.copy(alpha = 0.45f) else Kadraj.Line,
                 shape = shape,
             )
             .pressable {
@@ -329,9 +319,9 @@ private fun ExportOption(
         BasicText(
             text = detail,
             style = Kadraj.Type.LabelSmall.copy(
-                color = Kadraj.MutedDim,
+                color = if (selected) Kadraj.Peach else Kadraj.MutedDim,
                 fontSize = 8.sp,
-                letterSpacing = 0.6.sp,
+                letterSpacing = 0.3.sp,
             ),
         )
     }
@@ -353,24 +343,10 @@ private fun ExportSuccess(
         Spacer(Modifier.height(18.dp))
         Box(
             modifier = Modifier
-                .size(78.dp)
-                .shadow(
-                    elevation = 20.dp,
-                    shape = CircleShape,
-                    clip = false,
-                    ambientColor = Kadraj.Terracotta.copy(alpha = 0.7f),
-                    spotColor = Kadraj.Violet.copy(alpha = 0.3f),
-                )
+                .size(68.dp)
                 .clip(CircleShape)
-                .background(
-                    Brush.radialGradient(
-                        listOf(
-                            Kadraj.Peach.copy(alpha = 0.26f),
-                            Kadraj.InkSoft,
-                        ),
-                    ),
-                )
-                .border(1.dp, Kadraj.Peach.copy(alpha = 0.7f), CircleShape),
+                .background(Kadraj.Peach.copy(alpha = 0.12f))
+                .border(1.dp, Kadraj.Peach.copy(alpha = 0.34f), CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             GlyphIcon(
@@ -382,9 +358,11 @@ private fun ExportSuccess(
         }
         Spacer(Modifier.height(16.dp))
         BasicText(
-            text = "Saved to Photos.",
-            style = Kadraj.Type.DisplaySmall.copy(
+            text = "Saved to Photos",
+            style = Kadraj.Type.Display.copy(
                 color = Kadraj.Paper,
+                fontSize = 24.sp,
+                lineHeight = 28.sp,
                 textAlign = TextAlign.Center,
             ),
         )
@@ -449,10 +427,10 @@ private fun ExportSuccess(
                 strokeWidth = 1.6.dp,
             )
             BasicText(
-                text = "NEW COLLAGE",
-                style = Kadraj.Type.LabelSmall.copy(
+                text = "New collage",
+                style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.Muted,
-                    letterSpacing = 1.3.sp,
+                    fontSize = 11.sp,
                 ),
             )
         }

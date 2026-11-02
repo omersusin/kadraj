@@ -11,12 +11,18 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,8 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.omersusin.kadraj.ui.components.AuroraBackdrop
+import com.omersusin.kadraj.ui.components.ButtonTone
+import com.omersusin.kadraj.ui.components.KadrajButton
 import com.omersusin.kadraj.ui.components.ModalSheet
 import com.omersusin.kadraj.ui.components.NoticePill
 import com.omersusin.kadraj.ui.screens.EditorScreen
@@ -41,6 +50,7 @@ import kotlinx.coroutines.delay
 fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
     var showExport by rememberSaveable { mutableStateOf(false) }
+    var showCloseConfirm by rememberSaveable { mutableStateOf(false) }
 
     val images = viewModel.images
     val notice = viewModel.notice
@@ -74,6 +84,7 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
     val startNewProject: () -> Unit = {
         showExport = false
         showInfo = false
+        showCloseConfirm = false
         viewModel.newProject()
     }
 
@@ -83,6 +94,19 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
         } else {
             showInfo = false
         }
+    }
+
+    BackHandler(enabled = showCloseConfirm) {
+        showCloseConfirm = false
+    }
+
+    BackHandler(
+        enabled = images.isNotEmpty() &&
+            !showInfo &&
+            !showExport &&
+            !showCloseConfirm,
+    ) {
+        showCloseConfirm = true
     }
 
     LaunchedEffect(notice?.id) {
@@ -114,6 +138,7 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
                 onPickImages = pickImages,
                 onExport = openExport,
                 onInfo = { showInfo = true },
+                onCloseProject = { showCloseConfirm = true },
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -157,6 +182,46 @@ fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
                 onClose = { showExport = false },
                 onNewProject = startNewProject,
             )
+        }
+
+        ModalSheet(
+            visible = showCloseConfirm,
+            onDismiss = { showCloseConfirm = false },
+        ) {
+            BasicText(
+                text = "Close collage?",
+                style = Kadraj.Type.Display.copy(
+                    color = Kadraj.Paper,
+                    fontSize = 24.sp,
+                    lineHeight = 28.sp,
+                ),
+            )
+            Spacer(Modifier.height(8.dp))
+            BasicText(
+                text = "Your current edits will be cleared. Export first if you want to keep this collage.",
+                style = Kadraj.Type.Body.copy(color = Kadraj.Muted),
+            )
+            Spacer(Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                KadrajButton(
+                    label = "Keep editing",
+                    onClick = { showCloseConfirm = false },
+                    modifier = Modifier.weight(1f),
+                    tone = ButtonTone.Quiet,
+                )
+                KadrajButton(
+                    label = "Close",
+                    onClick = {
+                        showCloseConfirm = false
+                        viewModel.newProject()
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Spacer(Modifier.height(4.dp))
         }
     }
 }

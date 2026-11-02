@@ -77,14 +77,14 @@ fun CollageStage(
         CaptionTypefaces.load(context, style.caption.font)
     }
     val transition = rememberInfiniteTransition(label = "stage-aura")
-    val auraRotation by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
+    val auraPulse by transition.animateFloat(
+        initialValue = 0.72f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(26000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
+            animation = tween(7200, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "stage-aura-rotation",
+        label = "stage-aura-pulse",
     )
     val guideAlpha by animateFloatAsState(
         targetValue = if (guides) 1f else 0f,
@@ -130,7 +130,7 @@ fun CollageStage(
             }
         }
     }
-    val shape = RoundedCornerShape(3.dp)
+    val shape = RoundedCornerShape(6.dp)
 
     BoxWithConstraints(
         modifier = modifier,
@@ -144,18 +144,14 @@ fun CollageStage(
             canvasWidth = canvasHeight * safeAspect
         }
 
-        Canvas(
-            Modifier
-                .fillMaxSize()
-                .graphicsLayer { rotationZ = auraRotation },
-        ) {
+        Canvas(Modifier.fillMaxSize()) {
             val center = Offset(size.width / 2f, size.height / 2f)
-            val glowRadius = size.minDimension * 0.7f
+            val glowRadius = size.minDimension * 0.64f * auraPulse
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Peach.copy(alpha = 0.13f),
-                        Kadraj.Terracotta.copy(alpha = 0.07f),
+                        Kadraj.Peach.copy(alpha = 0.11f * auraPulse),
+                        Kadraj.Terracotta.copy(alpha = 0.035f),
                         Color.Transparent,
                     ),
                     center = center,
@@ -164,63 +160,13 @@ fun CollageStage(
                 radius = glowRadius,
                 center = center,
             )
-
-            val orbitRadius = size.minDimension * 0.46f
-            val orbitTopLeft = Offset(
-                center.x - orbitRadius,
-                center.y - orbitRadius,
-            )
-            val orbitSize = androidx.compose.ui.geometry.Size(orbitRadius * 2f, orbitRadius * 2f)
-            drawArc(
-                brush = Brush.sweepGradient(
-                    listOf(
-                        Color.Transparent,
-                        Kadraj.Peach.copy(alpha = 0.32f),
-                        Kadraj.Violet.copy(alpha = 0.24f),
-                        Color.Transparent,
-                    ),
-                    center = center,
-                ),
-                startAngle = 10f,
-                sweepAngle = 118f,
-                useCenter = false,
-                topLeft = orbitTopLeft,
-                size = orbitSize,
-                style = androidx.compose.ui.graphics.drawscope.Stroke(
-                    width = 1.3.dp.toPx(),
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round,
-                ),
-            )
-            drawArc(
-                brush = Brush.sweepGradient(
-                    listOf(
-                        Color.Transparent,
-                        Kadraj.Acid.copy(alpha = 0.26f),
-                        Color.Transparent,
-                    ),
-                    center = center,
-                ),
-                startAngle = 196f,
-                sweepAngle = 72f,
-                useCenter = false,
-                topLeft = orbitTopLeft,
-                size = orbitSize,
+            drawCircle(
+                color = Kadraj.Paper.copy(alpha = 0.035f),
+                radius = size.minDimension * 0.45f,
+                center = center,
                 style = androidx.compose.ui.graphics.drawscope.Stroke(
                     width = 1.dp.toPx(),
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round,
                 ),
-            )
-
-            val dotCenter = Offset(center.x + orbitRadius, center.y)
-            drawCircle(
-                color = Kadraj.Peach.copy(alpha = 0.55f),
-                radius = 2.2.dp.toPx(),
-                center = dotCenter,
-            )
-            drawCircle(
-                color = Kadraj.Peach.copy(alpha = 0.12f),
-                radius = 7.dp.toPx(),
-                center = dotCenter,
             )
         }
 
@@ -229,7 +175,7 @@ fun CollageStage(
                 modifier = Modifier
                     .size(canvasWidth, canvasHeight)
                     .shadow(
-                        elevation = 22.dp,
+                        elevation = 24.dp,
                         shape = shape,
                         clip = false,
                         ambientColor = Color.Black,
@@ -340,7 +286,7 @@ fun CollageStage(
                             provider = provider,
                             imageStates = imageStates,
                             selectedId = selectedId,
-                            selectionColor = 0xFFD17252.toInt(),
+                            selectionColor = 0xFFFF9E73.toInt(),
                             captionTypeface = captionTypeface,
                         )
                     }
@@ -394,19 +340,19 @@ fun CollageStage(
                             .align(Alignment.TopCenter)
                             .padding(top = 10.dp)
                             .clip(RoundedCornerShape(50))
-                            .background(Kadraj.Ink.copy(alpha = 0.86f))
+                            .background(Kadraj.Ink.copy(alpha = 0.9f))
                             .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
-                            .padding(horizontal = 11.dp, vertical = 7.dp),
+                            .padding(horizontal = 12.dp, vertical = 7.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         KadrajSpinner(diameter = 13.dp)
                         BasicText(
-                            text = "PREPARING PHOTOS",
+                            text = "Preparing photos",
                             style = Kadraj.Type.LabelSmall.copy(
                                 color = Kadraj.PaperDim,
-                                fontSize = 8.sp,
-                                letterSpacing = 1.1.sp,
+                                fontSize = 9.sp,
+                                letterSpacing = 0.3.sp,
                             ),
                         )
                     }
@@ -476,8 +422,8 @@ fun CollagePreview(
             Canvas(
                 modifier = Modifier
                     .size(canvasWidth, canvasHeight)
-                    .clip(RoundedCornerShape(3.dp))
-                    .border(1.dp, Kadraj.Line, RoundedCornerShape(3.dp)),
+                    .clip(RoundedCornerShape(5.dp))
+                    .border(1.dp, Kadraj.Line, RoundedCornerShape(5.dp)),
             ) {
                 @Suppress("UNUSED_EXPRESSION")
                 revision

@@ -80,80 +80,65 @@ fun EmptyState(
             .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         val compact = maxHeight < 700.dp
-        val heroSize = if (maxWidth < 360.dp) 39.sp else 45.sp
+        val artworkHeight = if (compact) 204.dp else 252.dp
+        val heroSize = if (maxWidth < 360.dp) 33.sp else 37.sp
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 26.dp),
+                .padding(horizontal = 20.dp),
         ) {
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Wordmark()
                 Spacer(Modifier.weight(1f))
-                BasicText(
-                    text = "ISSUE 02",
-                    style = Kadraj.Type.LabelSmall.copy(
-                        color = Kadraj.MutedDim,
-                        letterSpacing = 1.8.sp,
-                    ),
-                )
-                Spacer(Modifier.width(12.dp))
                 CircleIconButton(
                     glyph = Glyph.Info,
                     onClick = onInfo,
-                    size = 36.dp,
+                    size = 34.dp,
                     tint = Kadraj.Muted,
                     background = Color.Transparent,
                     border = Kadraj.Line,
-                    contentDescription = "About Kadraj",
+                    contentDescription = "Help and info",
                 )
             }
 
-            Spacer(Modifier.height(if (compact) 8.dp else 18.dp))
+            Spacer(Modifier.height(6.dp))
             CollageArtwork(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(if (compact) 240.dp else 294.dp),
+                    .height(artworkHeight),
             )
-            Spacer(Modifier.height(if (compact) 12.dp else 20.dp))
+            Spacer(Modifier.height(if (compact) 14.dp else 20.dp))
 
             BasicText(
-                text = "SMART COLLAGE STUDIO",
-                style = Kadraj.Type.Label.copy(
-                    color = Kadraj.TerracottaSoft,
-                    letterSpacing = 2.1.sp,
-                ),
-            )
-            Spacer(Modifier.height(12.dp))
-            BasicText(
-                text = "Your frames,",
+                text = "Your photos,",
                 style = Kadraj.Type.Hero.copy(
                     color = Kadraj.Paper,
                     fontSize = heroSize,
-                    lineHeight = (heroSize.value + 2).sp,
+                    lineHeight = (heroSize.value + 1).sp,
                 ),
             )
             BasicText(
-                text = "in one frame.",
+                text = "beautifully composed.",
                 style = Kadraj.Type.HeroItalic.copy(
-                    color = Kadraj.TerracottaSoft,
-                    fontSize = heroSize,
+                    color = Kadraj.Peach,
+                    fontSize = (heroSize.value - 2).sp,
                     lineHeight = (heroSize.value + 2).sp,
                 ),
             )
-            Spacer(Modifier.height(13.dp))
+            Spacer(Modifier.height(10.dp))
             BasicText(
-                text = "Choose phone and desktop captures. Kadraj reads every frame's ratio " +
-                    "and builds the composition around it; you add the final touch.",
-                modifier = Modifier.fillMaxWidth(0.96f),
+                text = "Pick phone and desktop shots. Kadraj reads every ratio, finds the " +
+                    "rhythm, and builds the frame around your photos.",
+                modifier = Modifier.fillMaxWidth(0.98f),
                 style = Kadraj.Type.Body.copy(color = Kadraj.Muted),
             )
-            Spacer(Modifier.height(22.dp))
+            Spacer(Modifier.height(if (compact) 16.dp else 20.dp))
 
             KadrajButton(
                 label = "Choose photos",
@@ -162,7 +147,7 @@ fun EmptyState(
                 leadingGlyph = Glyph.Image,
                 trailingGlyph = Glyph.ArrowRight,
             )
-            Spacer(Modifier.height(11.dp))
+            Spacer(Modifier.height(10.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -176,24 +161,47 @@ fun EmptyState(
                 )
                 Spacer(Modifier.width(6.dp))
                 BasicText(
-                    text = "Processed on device  ·  Up to ${EditorViewModel.MAX_IMAGES} photos",
-                    style = Kadraj.Type.LabelSmall.copy(
+                    text = "On-device  ·  Up to ${EditorViewModel.MAX_IMAGES} photos",
+                    style = Kadraj.Type.BodySmall.copy(
                         color = Kadraj.MutedDim,
-                        letterSpacing = 0.8.sp,
+                        fontSize = 10.5.sp,
                     ),
                 )
             }
+
+            Spacer(Modifier.height(if (compact) 18.dp else 24.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Feature(
+                    glyph = Glyph.Phone,
+                    label = "Ratio aware",
+                    modifier = Modifier.weight(1f),
+                )
+                Feature(
+                    glyph = Glyph.Sparkle,
+                    label = "7 looks",
+                    modifier = Modifier.weight(1f),
+                )
+                Feature(
+                    glyph = Glyph.Download,
+                    label = "4K export",
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
             if (canUndo || canRedo) {
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(14.dp))
                 Row(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (canUndo) {
                         HistoryAction(
                             glyph = Glyph.Undo,
-                            label = "UNDO",
+                            label = "Undo",
                             onClick = {
                                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 onUndo()
@@ -201,9 +209,10 @@ fun EmptyState(
                         )
                     }
                     if (canRedo) {
+                        Spacer(Modifier.width(8.dp))
                         HistoryAction(
                             glyph = Glyph.Redo,
-                            label = "REDO",
+                            label = "Redo",
                             onClick = {
                                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 onRedo()
@@ -213,55 +222,32 @@ fun EmptyState(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Feature(
-                    glyph = Glyph.Phone,
-                    title = "RATIO",
-                    detail = "aware",
-                    modifier = Modifier.weight(1f),
-                )
-                Feature(
-                    glyph = Glyph.Sparkle,
-                    title = "TEXTURED",
-                    detail = "aesthetic",
-                    modifier = Modifier.weight(1f),
-                )
-                Feature(
-                    glyph = Glyph.Download,
-                    title = "4K",
-                    detail = "export",
-                    modifier = Modifier.weight(1f),
-                )
-            }
-
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(18.dp))
             Box(Modifier.fillMaxWidth().height(1.dp).background(Kadraj.Line))
-            Spacer(Modifier.height(13.dp))
+            Spacer(Modifier.height(11.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BasicText(
-                    text = "KADRAJ ${BuildConfig.VERSION_NAME}",
+                    text = "Kadraj ${BuildConfig.VERSION_NAME}",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
-                        letterSpacing = 1.5.sp,
+                        fontSize = 8.5.sp,
+                        letterSpacing = 0.4.sp,
                     ),
                 )
                 Spacer(Modifier.weight(1f))
                 BasicText(
-                    text = "ENGLISH  ·  ON-DEVICE",
+                    text = "Local  ·  Private",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
-                        letterSpacing = 1.5.sp,
+                        fontSize = 8.5.sp,
+                        letterSpacing = 0.4.sp,
                     ),
                 )
             }
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(14.dp))
         }
     }
 }
@@ -275,12 +261,12 @@ private fun HistoryAction(
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(Kadraj.Glass)
+            .background(Kadraj.InkSoft)
             .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
             .pressable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(7.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         GlyphIcon(
             glyph = glyph,
@@ -290,9 +276,9 @@ private fun HistoryAction(
         )
         BasicText(
             text = label,
-            style = Kadraj.Type.LabelSmall.copy(
+            style = Kadraj.Type.BodySmall.copy(
                 color = Kadraj.Muted,
-                letterSpacing = 1.1.sp,
+                fontSize = 11.sp,
             ),
         )
     }
@@ -301,31 +287,32 @@ private fun HistoryAction(
 @Composable
 private fun Feature(
     glyph: Glyph,
-    title: String,
-    detail: String,
+    label: String,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(Kadraj.InkSoft.copy(alpha = 0.7f))
+            .border(1.dp, Kadraj.Line, RoundedCornerShape(12.dp))
+            .padding(horizontal = 10.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
         GlyphIcon(
             glyph = glyph,
-            modifier = Modifier.size(17.dp),
+            modifier = Modifier.size(14.dp),
             tint = Kadraj.Peach,
             strokeWidth = 1.45.dp,
         )
-        Spacer(Modifier.height(8.dp))
         BasicText(
-            text = title,
+            text = label,
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.PaperDim,
-                letterSpacing = 1.5.sp,
+                fontSize = 8.5.sp,
+                letterSpacing = 0.1.sp,
             ),
-        )
-        BasicText(
-            text = detail,
-            style = Kadraj.Type.BodySmall.copy(
-                color = Kadraj.MutedDim,
-                fontSize = 11.5.sp,
-            ),
+            maxLines = 1,
         )
     }
 }
@@ -355,9 +342,9 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Peach.copy(alpha = 0.18f),
-                        Kadraj.Terracotta.copy(alpha = 0.09f),
-                        Kadraj.Violet.copy(alpha = 0.04f),
+                        Kadraj.Peach.copy(alpha = 0.14f),
+                        Kadraj.Terracotta.copy(alpha = 0.05f),
+                        Color.Transparent,
                         Color.Transparent,
                     ),
                     center = center,
@@ -373,7 +360,7 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
                 style = Stroke(width = 1f),
             )
             drawCircle(
-                color = Kadraj.Peach.copy(alpha = 0.24f),
+                color = Kadraj.Peach.copy(alpha = 0.16f),
                 radius = min(width, height) * 0.47f,
                 center = center,
                 style = Stroke(width = 1f),
@@ -418,30 +405,6 @@ private fun CollageArtwork(modifier: Modifier = Modifier) {
             )
         }
 
-        BasicText(
-            text = "01 / PHONE",
-            modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 18.dp),
-            style = Kadraj.Type.LabelSmall.copy(
-                color = Kadraj.MutedDim,
-                letterSpacing = 1.4.sp,
-            ),
-        )
-        BasicText(
-            text = "02 / DESKTOP",
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 4.dp, bottom = 14.dp),
-            style = Kadraj.Type.LabelSmall.copy(
-                color = Kadraj.MutedDim,
-                letterSpacing = 1.4.sp,
-            ),
-        )
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 0.dp, top = 30.dp)
-                .width(18.dp)
-                .height(1.dp)
-                .background(Kadraj.Terracotta.copy(alpha = 0.6f)),
-        )
     }
 }
 
@@ -496,7 +459,7 @@ private fun DrawScope.drawPhoneCard(
         clipPath(clip) {
             drawRect(
                 brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFFF1E9DB), Color(0xFFD9C9B0)),
+                    colors = listOf(Color(0xFFF0EAE0), Color(0xFFD8CFC2)),
                     start = Offset(left, top),
                     end = Offset(left + width, top + height),
                 ),
@@ -521,7 +484,7 @@ private fun DrawScope.drawPhoneCard(
             val photoHeight = height * 0.5f
             drawRoundRect(
                 brush = Brush.verticalGradient(
-                    listOf(Color(0xFFB76549), Color(0xFF6E3A2B)),
+                    listOf(Color(0xFFD98767), Color(0xFF604038)),
                     startY = photoTop,
                     endY = photoTop + photoHeight,
                 ),
@@ -599,7 +562,7 @@ private fun DrawScope.drawDesktopCard(
         clipPath(clip) {
             drawRect(
                 brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFF211C16), Color(0xFF100E0B)),
+                    colors = listOf(Color(0xFF1A1A1D), Color(0xFF0D0D0F)),
                     start = Offset(left, top),
                     end = Offset(left + width, top + height),
                 ),
@@ -638,7 +601,7 @@ private fun DrawScope.drawDesktopCard(
             val bigWidth = (width - pad * 3f) * 0.58f
             drawRoundRect(
                 brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFFD8C7AC), Color(0xFFB6A186)),
+                    colors = listOf(Color(0xFFE2D8C8), Color(0xFFB9AC99)),
                     start = Offset(left + pad, contentTop),
                     end = Offset(left + pad + bigWidth, contentTop + contentHeight),
                 ),

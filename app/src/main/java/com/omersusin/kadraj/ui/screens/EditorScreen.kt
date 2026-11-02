@@ -1,13 +1,16 @@
 package com.omersusin.kadraj.ui.screens
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -16,6 +19,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +34,10 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +46,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +67,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omersusin.kadraj.CollageImage
@@ -111,10 +122,12 @@ fun EditorScreen(
     onPickImages: () -> Unit,
     onExport: () -> Unit,
     onInfo: () -> Unit,
+    onCloseProject: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var tab by rememberSaveable { mutableStateOf(EditorTab.Layout) }
     var guides by rememberSaveable { mutableStateOf(false) }
+    var dockExpanded by rememberSaveable { mutableStateOf(true) }
 
     val images = viewModel.images
     val selectedImage = viewModel.selectedImage
@@ -128,155 +141,155 @@ fun EditorScreen(
     ) {
         viewModel.buildLayout()
     }
+    val ratioText = if (viewModel.template == Template.FLOW) {
+        "Free flow"
+    } else {
+        ratioLabel(layout.aspect)
+    }
 
-    Column(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
-        EditorTopBar(
-            imageCount = images.size,
-            canUndo = viewModel.canUndo,
-            canRedo = viewModel.canRedo,
-            onUndo = viewModel::undo,
-            onRedo = viewModel::redo,
-            onExport = onExport,
-            onInfo = onInfo,
-        )
+        val panelMaxHeight = (maxHeight * 0.42f).coerceIn(180.dp, 326.dp)
+        Column(Modifier.fillMaxSize()) {
+            EditorTopBar(
+                imageCount = images.size,
+                ratio = ratioText,
+                canUndo = viewModel.canUndo,
+                canRedo = viewModel.canRedo,
+                onUndo = viewModel::undo,
+                onRedo = viewModel::redo,
+                onExport = onExport,
+                onInfo = onInfo,
+                onCloseProject = onCloseProject,
+            )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 22.dp)
-                .padding(top = 5.dp, bottom = 7.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BasicText(
-                text = "COMPOSITION",
-                style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
-                ),
-            )
-            Spacer(Modifier.width(9.dp))
-            Box(Modifier.width(14.dp).height(1.dp).background(Kadraj.LineStrong))
-            Spacer(Modifier.width(9.dp))
-            BasicText(
-                text = if (viewModel.template == Template.FLOW) {
-                    "FREE"
-                } else {
-                    ratioLabel(layout.aspect)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 2.dp, bottom = 6.dp),
+            ) {
+                CollageStage(
+                    layout = layout,
+                    style = viewModel.style,
+                    images = images,
+                    selectedId = viewModel.selectedId,
+                    loader = viewModel.imageLoader,
+                    onSelect = { id ->
+                        viewModel.selectImage(id)
+                        if (id != null) {
+                            tab = EditorTab.Photo
+                            dockExpanded = true
+                        }
+                    },
+                    onFocus = viewModel::updateFocus,
+                    onToggleFit = viewModel::toggleFit,
+                    guides = guides,
+                    modifier = Modifier.fillMaxSize(),
+                )
+
+                CircleIconButton(
+                    glyph = Glyph.Grid,
+                    onClick = { guides = !guides },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(10.dp),
+                    size = 32.dp,
+                    tint = if (guides) Kadraj.Peach else Kadraj.Muted,
+                    background = if (guides) {
+                        Kadraj.Peach.copy(alpha = 0.16f)
+                    } else {
+                        Kadraj.Ink.copy(alpha = 0.72f)
+                    },
+                    border = if (guides) {
+                        Kadraj.Peach.copy(alpha = 0.55f)
+                    } else {
+                        Kadraj.Line
+                    },
+                    contentDescription = if (guides) {
+                        "Hide composition guides"
+                    } else {
+                        "Show composition guides"
+                    },
+                )
+            }
+
+            EditorDock(
+                tab = tab,
+                onTabChange = {
+                    tab = it
+                    dockExpanded = true
                 },
-                style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.PaperDim,
-                    letterSpacing = 1.2.sp,
-                ),
-            )
-            Spacer(Modifier.weight(1f))
-            BasicText(
-                text = "${images.size} / ${EditorViewModel.MAX_IMAGES}",
-                style = Kadraj.Type.Numeric.copy(
-                    color = Kadraj.MutedDim,
-                    fontSize = 9.5.sp,
-                ),
-            )
-            Spacer(Modifier.width(7.dp))
-            CircleIconButton(
-                glyph = Glyph.Grid,
-                onClick = { guides = !guides },
-                size = 25.dp,
-                tint = if (guides) Kadraj.Peach else Kadraj.Muted,
-                background = if (guides) {
-                    Kadraj.Terracotta.copy(alpha = 0.18f)
-                } else {
-                    Color.Transparent
-                },
-                border = if (guides) {
-                    Kadraj.TerracottaSoft.copy(alpha = 0.6f)
-                } else {
-                    Kadraj.Line
-                },
-                contentDescription = if (guides) {
-                    "Hide composition guides"
-                } else {
-                    "Show composition guides"
-                },
+                expanded = dockExpanded,
+                onExpandedChange = { dockExpanded = it },
+                panelMaxHeight = panelMaxHeight,
+                viewModel = viewModel,
+                selectedImage = selectedImage,
+                onPickImages = onPickImages,
             )
         }
-
-        CollageStage(
-            layout = layout,
-            style = viewModel.style,
-            images = images,
-            selectedId = viewModel.selectedId,
-            loader = viewModel.imageLoader,
-            onSelect = { id ->
-                viewModel.selectImage(id)
-                if (id != null) tab = EditorTab.Photo
-            },
-            onFocus = viewModel::updateFocus,
-            onToggleFit = viewModel::toggleFit,
-            guides = guides,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 8.dp),
-        )
-
-        EditorDock(
-            tab = tab,
-            onTabChange = { tab = it },
-            viewModel = viewModel,
-            selectedImage = selectedImage,
-            onPickImages = onPickImages,
-        )
     }
 }
 
 @Composable
 private fun EditorTopBar(
     imageCount: Int,
+    ratio: String,
     canUndo: Boolean,
     canRedo: Boolean,
     onUndo: () -> Unit,
     onRedo: () -> Unit,
     onExport: () -> Unit,
     onInfo: () -> Unit,
+    onCloseProject: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
-            .padding(horizontal = 18.dp),
+            .height(58.dp)
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
+        CircleIconButton(
+            glyph = Glyph.ChevronLeft,
+            onClick = onCloseProject,
+            size = 36.dp,
+            tint = Kadraj.Paper,
+            background = Kadraj.InkSoft,
+            border = Kadraj.Line,
+            contentDescription = "Close project",
+        )
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f)) {
             Wordmark()
             Spacer(Modifier.height(2.dp))
             BasicText(
-                text = "$imageCount ${if (imageCount == 1) "PHOTO" else "PHOTOS"}",
+                text = "${imageCount} ${if (imageCount == 1) "photo" else "photos"}  ·  $ratio",
+                maxLines = 1,
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
-                    fontSize = 8.sp,
-                    letterSpacing = 1.0.sp,
+                    fontSize = 9.sp,
+                    letterSpacing = 0.35.sp,
                 ),
             )
         }
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.width(6.dp))
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
-                .background(Kadraj.GlassStrong)
+                .background(Kadraj.InkSoft.copy(alpha = 0.65f))
                 .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
-                .padding(2.dp),
+                .padding(horizontal = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             CircleIconButton(
                 glyph = Glyph.Undo,
                 onClick = onUndo,
-                size = 28.dp,
+                size = 30.dp,
                 tint = if (canUndo) Kadraj.PaperDim else Kadraj.MutedDim,
                 background = Color.Transparent,
                 border = Color.Transparent,
@@ -286,7 +299,7 @@ private fun EditorTopBar(
             CircleIconButton(
                 glyph = Glyph.Redo,
                 onClick = onRedo,
-                size = 28.dp,
+                size = 30.dp,
                 tint = if (canRedo) Kadraj.PaperDim else Kadraj.MutedDim,
                 background = Color.Transparent,
                 border = Color.Transparent,
@@ -294,17 +307,17 @@ private fun EditorTopBar(
                 contentDescription = "Redo",
             )
         }
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.width(4.dp))
         CircleIconButton(
             glyph = Glyph.Info,
             onClick = onInfo,
-            size = 34.dp,
+            size = 32.dp,
             tint = Kadraj.Muted,
-            background = Kadraj.Glass,
+            background = Color.Transparent,
             border = Kadraj.Line,
-            contentDescription = "About Kadraj",
+            contentDescription = "Help and info",
         )
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.width(7.dp))
         ExportPill(onClick = onExport)
     }
 }
@@ -317,39 +330,39 @@ private fun ExportPill(onClick: () -> Unit) {
         modifier = Modifier
             .height(36.dp)
             .shadow(
-                elevation = 12.dp,
+                elevation = 10.dp,
                 shape = shape,
                 clip = false,
-                ambientColor = Kadraj.Terracotta.copy(alpha = 0.65f),
-                spotColor = Kadraj.Violet.copy(alpha = 0.32f),
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.35f),
+                spotColor = Kadraj.Terracotta.copy(alpha = 0.2f),
             )
             .clip(shape)
             .background(
                 Brush.horizontalGradient(
-                    listOf(Kadraj.Peach, Kadraj.Terracotta, Kadraj.Ember),
+                    listOf(Kadraj.Peach, Kadraj.TerracottaSoft),
                 ),
             )
-            .border(1.dp, Color.White.copy(alpha = 0.25f), shape)
+            .border(1.dp, Color.White.copy(alpha = 0.18f), shape)
             .pressable {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             }
             .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         GlyphIcon(
             glyph = Glyph.Export,
-            modifier = Modifier.size(13.dp),
+            modifier = Modifier.size(14.dp),
             tint = Kadraj.Ink,
             strokeWidth = 1.8.dp,
         )
         BasicText(
-            text = "EXPORT",
+            text = "Export",
             style = Kadraj.Type.Button.copy(
                 color = Kadraj.Ink,
-                fontSize = 9.5.sp,
-                letterSpacing = 1.1.sp,
+                fontSize = 11.5.sp,
+                letterSpacing = 0.1.sp,
             ),
         )
     }
@@ -359,103 +372,137 @@ private fun ExportPill(onClick: () -> Unit) {
 private fun EditorDock(
     tab: EditorTab,
     onTabChange: (EditorTab) -> Unit,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    panelMaxHeight: Dp,
     viewModel: EditorViewModel,
     selectedImage: CollageImage?,
     onPickImages: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(27.dp)
+    val shape = RoundedCornerShape(26.dp)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 13.dp)
-            .padding(bottom = 9.dp)
+            .padding(horizontal = 10.dp)
+            .padding(bottom = 8.dp)
             .shadow(
-                elevation = 30.dp,
+                elevation = 20.dp,
                 shape = shape,
                 clip = false,
-                ambientColor = Kadraj.Terracotta.copy(alpha = 0.26f),
-                spotColor = Kadraj.Violet.copy(alpha = 0.18f),
+                ambientColor = Color.Black,
+                spotColor = Color.Black,
             )
             .clip(shape)
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF261E14).copy(alpha = 0.98f),
-                        Kadraj.InkRaised.copy(alpha = 0.98f),
-                        Color(0xFF100D09).copy(alpha = 0.99f),
-                    ),
+            .background(Kadraj.InkRaised.copy(alpha = 0.98f))
+            .border(1.dp, Kadraj.Line, shape)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = 0.86f,
+                    stiffness = Spring.StiffnessMediumLow,
                 ),
-            )
-            .border(
-                1.dp,
-                Brush.verticalGradient(
-                    listOf(
-                        Kadraj.Peach.copy(alpha = 0.34f),
-                        Kadraj.LineStrong,
-                        Kadraj.Violet.copy(alpha = 0.24f),
-                    ),
-                ),
-                shape,
-            )
-            .animateContentSize(),
+            ),
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(18.dp)
+                .pressable { onExpandedChange(!expanded) },
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(34.dp)
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(Kadraj.LineStrong),
+            )
+        }
+
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(1.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             DockTab(
                 glyph = Glyph.Grid,
-                label = "LAYOUT",
+                label = "Layout",
                 selected = tab == EditorTab.Layout,
                 onClick = { onTabChange(EditorTab.Layout) },
                 modifier = Modifier.weight(1f),
             )
             DockTab(
                 glyph = Glyph.Sliders,
-                label = "STYLE",
+                label = "Style",
                 selected = tab == EditorTab.Style,
                 onClick = { onTabChange(EditorTab.Style) },
                 modifier = Modifier.weight(1f),
             )
             DockTab(
                 glyph = Glyph.Image,
-                label = "PHOTO",
+                label = "Photo",
                 selected = tab == EditorTab.Photo,
                 onClick = { onTabChange(EditorTab.Photo) },
                 modifier = Modifier.weight(1f),
             )
             DockTab(
                 glyph = Glyph.Text,
-                label = "TEXT",
+                label = "Text",
                 selected = tab == EditorTab.Text,
                 onClick = { onTabChange(EditorTab.Text) },
                 modifier = Modifier.weight(1f),
             )
+            CircleIconButton(
+                glyph = if (expanded) Glyph.ChevronDown else Glyph.ChevronUp,
+                onClick = { onExpandedChange(!expanded) },
+                size = 30.dp,
+                tint = Kadraj.Muted,
+                background = Color.Transparent,
+                border = Color.Transparent,
+                contentDescription = if (expanded) {
+                    "Collapse controls"
+                } else {
+                    "Expand controls"
+                },
+            )
+            Spacer(Modifier.width(3.dp))
         }
-        Hairline()
-        AnimatedContent(
-            targetState = tab,
-            modifier = Modifier.fillMaxWidth(),
-            transitionSpec = {
-                (
-                    fadeIn(tween(180)) +
-                        slideInVertically(tween(220)) { height -> height / 10 }
-                    ).togetherWith(
-                    fadeOut(tween(110)) +
-                        slideOutVertically(tween(150)) { height -> -height / 12 },
-                )
-            },
-            label = "dock-panel",
-        ) { currentTab ->
-            when (currentTab) {
-                EditorTab.Layout -> LayoutControls(viewModel)
-                EditorTab.Style -> StyleControls(viewModel)
-                EditorTab.Photo -> PhotoControls(
-                    viewModel = viewModel,
-                    selectedImage = selectedImage,
-                    onPickImages = onPickImages,
-                )
-                EditorTab.Text -> TextControls(viewModel)
+
+        AnimatedVisibility(
+            visible = expanded,
+            enter = fadeIn(tween(160)) + expandVertically(tween(220)),
+            exit = fadeOut(tween(100)) + shrinkVertically(tween(160)),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = panelMaxHeight)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                Hairline(Modifier.padding(horizontal = 16.dp))
+                AnimatedContent(
+                    targetState = tab,
+                    modifier = Modifier.fillMaxWidth(),
+                    transitionSpec = {
+                        (
+                            fadeIn(tween(170)) +
+                                slideInVertically(tween(210)) { height -> height / 10 }
+                            ).togetherWith(
+                            fadeOut(tween(90)) +
+                                slideOutVertically(tween(130)) { height -> -height / 12 },
+                        )
+                    },
+                    label = "dock-panel",
+                ) { currentTab ->
+                    when (currentTab) {
+                        EditorTab.Layout -> LayoutControls(viewModel)
+                        EditorTab.Style -> StyleControls(viewModel)
+                        EditorTab.Photo -> PhotoControls(
+                            viewModel = viewModel,
+                            selectedImage = selectedImage,
+                            onPickImages = onPickImages,
+                        )
+                        EditorTab.Text -> TextControls(viewModel)
+                    }
+                }
             }
         }
     }
@@ -463,172 +510,184 @@ private fun EditorDock(
 
 @Composable
 private fun LayoutControls(viewModel: EditorViewModel) {
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    val templates = Template.entries
+    val aspects = AspectPreset.entries
+
+    Column(Modifier.padding(top = 12.dp, bottom = 14.dp)) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             BasicText(
-                text = "TEMPLATE",
+                text = "Template",
+                style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
+            )
+            Spacer(Modifier.width(8.dp))
+            BasicText(
+                text = templateLabel(viewModel.template),
                 style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
+                    color = Kadraj.Peach,
+                    fontSize = 9.sp,
+                    letterSpacing = 0.4.sp,
                 ),
             )
             Spacer(Modifier.weight(1f))
             CircleIconButton(
                 glyph = Glyph.Shuffle,
                 onClick = viewModel::shuffle,
-                size = 28.dp,
+                size = 30.dp,
                 tint = Kadraj.Muted,
-                background = Color.Transparent,
+                background = Kadraj.InkSoft,
                 border = Kadraj.Line,
                 enabled = viewModel.images.size > 1,
                 contentDescription = "Shuffle photos",
             )
         }
-        Spacer(Modifier.height(6.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Template.entries.forEach { template ->
-                TemplateChip(
-                    template = template,
-                    selected = viewModel.template == template,
-                    onClick = { viewModel.updateTemplate(template) },
-                )
-            }
+        Spacer(Modifier.height(9.dp))
+        AutoScrollRow(
+            entries = templates,
+            selectedIndex = templates.indexOf(viewModel.template),
+            key = { it.name },
+            modifier = Modifier.padding(horizontal = 16.dp),
+        ) { template ->
+            TemplateChip(
+                template = template,
+                selected = viewModel.template == template,
+                onClick = { viewModel.updateTemplate(template) },
+            )
         }
-        Spacer(Modifier.height(10.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(Modifier.height(13.dp))
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             BasicText(
-                text = "RATIO",
-                style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
-                ),
+                text = "Ratio",
+                style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
             )
             Spacer(Modifier.weight(1f))
             if (viewModel.template == Template.FLOW) {
                 BasicText(
-                    text = "FLOW SETS ITS OWN RATIO",
+                    text = "Flow chooses its own frame",
                     style = Kadraj.Type.LabelSmall.copy(
-                        color = Kadraj.TerracottaSoft,
-                        fontSize = 8.sp,
-                        letterSpacing = 0.9.sp,
+                        color = Kadraj.MutedDim,
+                        fontSize = 9.sp,
+                        letterSpacing = 0.2.sp,
                     ),
                 )
             }
         }
-        Spacer(Modifier.height(6.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
-        ) {
-            AspectPreset.entries.forEach { aspect ->
-                ChoiceChip(
-                    label = aspectLabel(aspect),
-                    selected = viewModel.aspect == aspect,
-                    onClick = { viewModel.updateAspect(aspect) },
-                )
-            }
+        Spacer(Modifier.height(7.dp))
+        AutoScrollRow(
+            entries = aspects,
+            selectedIndex = aspects.indexOf(viewModel.aspect),
+            key = { it.name },
+            modifier = Modifier.padding(horizontal = 16.dp),
+        ) { aspect ->
+            ChoiceChip(
+                label = aspectLabel(aspect),
+                selected = viewModel.aspect == aspect,
+                onClick = { viewModel.updateAspect(aspect) },
+            )
         }
     }
 }
 
 @Composable
 private fun StyleControls(viewModel: EditorViewModel) {
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    val palettes = Palettes.all
+    val selectedPalette = palettes.indexOfFirst { it.id == viewModel.style.palette.id }
+
+    Column(Modifier.padding(top = 12.dp, bottom = 14.dp)) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             BasicText(
-                text = "PALETTE",
-                style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
-                ),
+                text = "Style",
+                style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
             )
-            Spacer(Modifier.width(7.dp))
+            Spacer(Modifier.width(8.dp))
             BasicText(
-                text = viewModel.style.palette.name.uppercase(Locale.ENGLISH),
+                text = viewModel.style.palette.name,
                 style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.TerracottaSoft,
-                    letterSpacing = 1.1.sp,
+                    color = Kadraj.Peach,
+                    fontSize = 9.sp,
+                    letterSpacing = 0.2.sp,
                 ),
             )
             Spacer(Modifier.weight(1f))
             CircleIconButton(
                 glyph = Glyph.Sparkle,
                 onClick = viewModel::randomizeStyle,
-                size = 26.dp,
-                tint = Kadraj.TerracottaSoft,
-                background = Color.Transparent,
-                border = Kadraj.Line,
+                size = 30.dp,
+                tint = Kadraj.Peach,
+                background = Kadraj.Peach.copy(alpha = 0.12f),
+                border = Kadraj.Peach.copy(alpha = 0.25f),
                 contentDescription = "Surprise me",
             )
-            Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(7.dp))
             CircleIconButton(
                 glyph = Glyph.Reset,
                 onClick = viewModel::resetStyle,
-                size = 26.dp,
+                size = 30.dp,
                 tint = Kadraj.Muted,
-                background = Color.Transparent,
+                background = Kadraj.InkSoft,
                 border = Kadraj.Line,
                 contentDescription = "Reset style",
             )
         }
-        Spacer(Modifier.height(7.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
-        ) {
-            Palettes.all.forEach { palette ->
-                PaletteSwatch(
-                    palette = palette,
-                    selected = viewModel.style.palette.id == palette.id,
-                    onClick = { viewModel.setPalette(palette) },
+        Spacer(Modifier.height(9.dp))
+        AutoScrollRow(
+            entries = palettes,
+            selectedIndex = selectedPalette,
+            key = { it.id },
+            modifier = Modifier.padding(horizontal = 16.dp),
+        ) { palette ->
+            PaletteSwatch(
+                palette = palette,
+                selected = viewModel.style.palette.id == palette.id,
+                onClick = { viewModel.setPalette(palette) },
+            )
+        }
+        Spacer(Modifier.height(10.dp))
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            KadrajSlider(
+                label = "Spacing",
+                value = viewModel.style.gap,
+                valueRange = 0f..0.06f,
+                onValueChange = viewModel::setGap,
+            )
+            KadrajSlider(
+                label = "Margin",
+                value = viewModel.style.margin,
+                valueRange = 0f..0.12f,
+                onValueChange = viewModel::setMargin,
+            )
+            KadrajSlider(
+                label = "Corners",
+                value = viewModel.style.radius,
+                valueRange = 0f..0.1f,
+                onValueChange = viewModel::setRadius,
+            )
+            Spacer(Modifier.height(5.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                ToggleChip(
+                    label = "Mat",
+                    selected = viewModel.style.mat > 0.002f,
+                    onClick = viewModel::toggleMat,
+                )
+                ToggleChip(
+                    label = "Shadow",
+                    selected = viewModel.style.shadow,
+                    onClick = viewModel::toggleShadow,
+                )
+                ToggleChip(
+                    label = "Grain",
+                    selected = viewModel.style.texture,
+                    onClick = viewModel::toggleTexture,
                 )
             }
-        }
-        Spacer(Modifier.height(7.dp))
-        KadrajSlider(
-            label = "Spacing",
-            value = viewModel.style.gap,
-            valueRange = 0f..0.06f,
-            onValueChange = viewModel::setGap,
-        )
-        KadrajSlider(
-            label = "Margin",
-            value = viewModel.style.margin,
-            valueRange = 0f..0.12f,
-            onValueChange = viewModel::setMargin,
-        )
-        KadrajSlider(
-            label = "Corners",
-            value = viewModel.style.radius,
-            valueRange = 0f..0.1f,
-            onValueChange = viewModel::setRadius,
-        )
-        Spacer(Modifier.height(4.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            ToggleChip(
-                label = "Mat",
-                selected = viewModel.style.mat > 0.002f,
-                onClick = viewModel::toggleMat,
-            )
-            ToggleChip(
-                label = "Shadow",
-                selected = viewModel.style.shadow,
-                onClick = viewModel::toggleShadow,
-            )
-            ToggleChip(
-                label = "Grain",
-                selected = viewModel.style.texture,
-                onClick = viewModel::toggleTexture,
-            )
         }
     }
 }
@@ -643,64 +702,72 @@ private fun PhotoControls(
     val images = viewModel.images
     val index = selectedImage?.let { images.indexOfFirst { item -> item.id == it.id } } ?: -1
     var panel by rememberSaveable { mutableStateOf(PhotoPanel.Look) }
+    val thumbState = rememberLazyListState()
 
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    LaunchedEffect(index) {
+        if (index >= 0) {
+            thumbState.animateScrollToItem(index)
+        }
+    }
+
+    Column(Modifier.padding(top = 12.dp, bottom = 14.dp)) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             BasicText(
-                text = "PHOTOS",
-                style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
-                ),
+                text = "Photo",
+                style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
             )
-            Spacer(Modifier.width(7.dp))
+            Spacer(Modifier.width(8.dp))
             BasicText(
-                text = "${images.size}/${EditorViewModel.MAX_IMAGES}",
+                text = if (index >= 0) "${index + 1} of ${images.size}" else "${images.size} selected",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
-                    fontSize = 8.sp,
-                    letterSpacing = 0.8.sp,
+                    fontSize = 9.sp,
+                    letterSpacing = 0.3.sp,
                 ),
             )
             Spacer(Modifier.weight(1f))
             Row(
                 modifier = Modifier
-                    .height(28.dp)
+                    .height(30.dp)
                     .clip(RoundedCornerShape(50))
-                    .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(50))
+                    .background(Kadraj.Peach.copy(alpha = 0.13f))
+                    .border(1.dp, Kadraj.Peach.copy(alpha = 0.25f), RoundedCornerShape(50))
                     .pressable(enabled = images.size < EditorViewModel.MAX_IMAGES) {
                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         onPickImages()
                     }
-                    .padding(horizontal = 10.dp),
+                    .padding(horizontal = 11.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 GlyphIcon(
                     glyph = Glyph.Plus,
                     modifier = Modifier.size(11.dp),
-                    tint = Kadraj.TerracottaSoft,
+                    tint = Kadraj.Peach,
                     strokeWidth = 1.8.dp,
                 )
                 BasicText(
-                    text = "ADD",
+                    text = "Add",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.PaperDim,
-                        fontSize = 8.sp,
-                        letterSpacing = 1.0.sp,
+                        fontSize = 9.sp,
+                        letterSpacing = 0.2.sp,
                     ),
                 )
             }
         }
-        Spacer(Modifier.height(7.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
+        Spacer(Modifier.height(9.dp))
+        LazyRow(
+            state = thumbState,
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            images.forEachIndexed { imageIndex, image ->
+            itemsIndexed(images, key = { _, image -> image.id }) { imageIndex, image ->
                 ImageThumb(
                     image = image,
                     loader = viewModel.imageLoader,
@@ -709,15 +776,18 @@ private fun PhotoControls(
                     label = "Photo ${imageIndex + 1}",
                 )
             }
-            AddImageTile(
-                onClick = onPickImages,
-                enabled = images.size < EditorViewModel.MAX_IMAGES,
-            )
+            item {
+                AddImageTile(
+                    onClick = onPickImages,
+                    enabled = images.size < EditorViewModel.MAX_IMAGES,
+                )
+            }
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(11.dp))
+
         if (selectedImage != null) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
@@ -751,14 +821,14 @@ private fun PhotoControls(
                     onClick = { viewModel.removeImage(selectedImage.id) },
                     size = 32.dp,
                     tint = Kadraj.TerracottaSoft,
-                    background = Kadraj.InkSoft,
-                    border = Kadraj.Line,
+                    background = Kadraj.Terracotta.copy(alpha = 0.1f),
+                    border = Kadraj.Terracotta.copy(alpha = 0.2f),
                     contentDescription = "Remove photo",
                 )
             }
-            Spacer(Modifier.height(7.dp))
+            Spacer(Modifier.height(10.dp))
             Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                modifier = Modifier.padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(7.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -778,83 +848,86 @@ private fun PhotoControls(
                     onClick = { panel = PhotoPanel.Frame },
                 )
             }
-            Spacer(Modifier.height(5.dp))
+            Spacer(Modifier.height(8.dp))
             when (panel) {
                 PhotoPanel.Look -> {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(7.dp),
-                    ) {
-                        PhotoLook.entries.forEach { look ->
-                            ChoiceChip(
-                                label = lookLabel(look),
-                                selected = selectedImage.look == look,
-                                onClick = { viewModel.setLook(selectedImage.id, look) },
+                    AutoScrollRow(
+                        entries = PhotoLook.entries,
+                        selectedIndex = PhotoLook.entries.indexOf(selectedImage.look),
+                        key = { it.name },
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    ) { look ->
+                        ChoiceChip(
+                            label = lookLabel(look),
+                            selected = selectedImage.look == look,
+                            onClick = { viewModel.setLook(selectedImage.id, look) },
+                        )
+                    }
+                    if (selectedImage.look != PhotoLook.ORIGINAL) {
+                        Spacer(Modifier.height(4.dp))
+                        Column(Modifier.padding(horizontal = 16.dp)) {
+                            KadrajSlider(
+                                label = "Strength",
+                                value = selectedImage.lookAmount,
+                                valueRange = 0f..1f,
+                                onValueChange = { viewModel.setLookAmount(selectedImage.id, it) },
                             )
                         }
                     }
-                    if (selectedImage.look != PhotoLook.ORIGINAL) {
-                        KadrajSlider(
-                            label = "Strength",
-                            value = selectedImage.lookAmount,
-                            valueRange = 0f..1f,
-                            onValueChange = { viewModel.setLookAmount(selectedImage.id, it) },
-                        )
-                    }
-                    Spacer(Modifier.height(3.dp))
+                    Spacer(Modifier.height(8.dp))
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(7.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         MiniAction(
                             glyph = Glyph.Sparkle,
-                            label = "AUTO ALL",
+                            label = "Auto all",
                             onClick = viewModel::autoEnhance,
                         )
                         if (images.size > 1) {
                             MiniAction(
                                 glyph = Glyph.Copy,
-                                label = "SYNC TO ALL",
+                                label = "Apply to all",
                                 onClick = { viewModel.applyTreatmentToAll(selectedImage.id) },
                             )
                         }
                     }
                 }
                 PhotoPanel.Adjust -> {
-                    KadrajSlider(
-                        label = "Light",
-                        value = selectedImage.brightness,
-                        valueRange = -1f..1f,
-                        onValueChange = { viewModel.setBrightness(selectedImage.id, it) },
-                        valueLabel = signedPercent(selectedImage.brightness),
-                    )
-                    KadrajSlider(
-                        label = "Contrast",
-                        value = selectedImage.contrast,
-                        valueRange = -1f..1f,
-                        onValueChange = { viewModel.setContrast(selectedImage.id, it) },
-                        valueLabel = signedPercent(selectedImage.contrast),
-                    )
-                    KadrajSlider(
-                        label = "Color",
-                        value = selectedImage.saturation,
-                        valueRange = -1f..1f,
-                        onValueChange = { viewModel.setSaturation(selectedImage.id, it) },
-                        valueLabel = signedPercent(selectedImage.saturation),
-                    )
-                    KadrajSlider(
-                        label = "Warmth",
-                        value = selectedImage.warmth,
-                        valueRange = -1f..1f,
-                        onValueChange = { viewModel.setWarmth(selectedImage.id, it) },
-                        valueLabel = signedPercent(selectedImage.warmth),
-                    )
-                    Spacer(Modifier.height(3.dp))
+                    Column(Modifier.padding(horizontal = 16.dp)) {
+                        KadrajSlider(
+                            label = "Light",
+                            value = selectedImage.brightness,
+                            valueRange = -1f..1f,
+                            onValueChange = { viewModel.setBrightness(selectedImage.id, it) },
+                            valueLabel = signedPercent(selectedImage.brightness),
+                        )
+                        KadrajSlider(
+                            label = "Contrast",
+                            value = selectedImage.contrast,
+                            valueRange = -1f..1f,
+                            onValueChange = { viewModel.setContrast(selectedImage.id, it) },
+                            valueLabel = signedPercent(selectedImage.contrast),
+                        )
+                        KadrajSlider(
+                            label = "Color",
+                            value = selectedImage.saturation,
+                            valueRange = -1f..1f,
+                            onValueChange = { viewModel.setSaturation(selectedImage.id, it) },
+                            valueLabel = signedPercent(selectedImage.saturation),
+                        )
+                        KadrajSlider(
+                            label = "Warmth",
+                            value = selectedImage.warmth,
+                            valueRange = -1f..1f,
+                            onValueChange = { viewModel.setWarmth(selectedImage.id, it) },
+                            valueLabel = signedPercent(selectedImage.warmth),
+                        )
+                    }
+                    Spacer(Modifier.height(7.dp))
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Row(
@@ -866,13 +939,13 @@ private fun PhotoControls(
                         ) {
                             MiniAction(
                                 glyph = Glyph.Reset,
-                                label = "RESET TONE",
+                                label = "Reset tone",
                                 onClick = { viewModel.resetTone(selectedImage.id) },
                             )
                             if (images.size > 1) {
                                 MiniAction(
                                     glyph = Glyph.Copy,
-                                    label = "SYNC TO ALL",
+                                    label = "Apply to all",
                                     onClick = { viewModel.applyTreatmentToAll(selectedImage.id) },
                                 )
                             }
@@ -880,29 +953,32 @@ private fun PhotoControls(
                         Spacer(Modifier.width(7.dp))
                         MiniAction(
                             glyph = Glyph.Sparkle,
-                            label = "AUTO ALL",
+                            label = "Auto all",
                             onClick = viewModel::autoEnhance,
                             highlighted = true,
                         )
                     }
                 }
                 PhotoPanel.Frame -> {
-                    KadrajSlider(
-                        label = "Zoom",
-                        value = selectedImage.zoom,
-                        valueRange = 1f..3f,
-                        onValueChange = { viewModel.setZoom(selectedImage.id, it) },
-                        valueLabel = "${(selectedImage.zoom * 100f).roundToInt()}%",
-                    )
-                    KadrajSlider(
-                        label = "Tilt",
-                        value = selectedImage.tilt,
-                        valueRange = -12f..12f,
-                        onValueChange = { viewModel.setTilt(selectedImage.id, it) },
-                        valueLabel = "${selectedImage.tilt.roundToInt()}\u00B0",
-                    )
-                    Spacer(Modifier.height(3.dp))
+                    Column(Modifier.padding(horizontal = 16.dp)) {
+                        KadrajSlider(
+                            label = "Zoom",
+                            value = selectedImage.zoom,
+                            valueRange = 1f..3f,
+                            onValueChange = { viewModel.setZoom(selectedImage.id, it) },
+                            valueLabel = "${(selectedImage.zoom * 100f).roundToInt()}%",
+                        )
+                        KadrajSlider(
+                            label = "Tilt",
+                            value = selectedImage.tilt,
+                            valueRange = -12f..12f,
+                            onValueChange = { viewModel.setTilt(selectedImage.id, it) },
+                            valueLabel = "${selectedImage.tilt.roundToInt()}\u00B0",
+                        )
+                    }
+                    Spacer(Modifier.height(7.dp))
                     Row(
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(7.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -939,33 +1015,46 @@ private fun PhotoControls(
                             onClick = { viewModel.resetPhoto(selectedImage.id) },
                             size = 32.dp,
                             tint = Kadraj.TerracottaSoft,
-                            background = Kadraj.InkSoft,
-                            border = Kadraj.Line,
+                            background = Kadraj.Terracotta.copy(alpha = 0.1f),
+                            border = Kadraj.Terracotta.copy(alpha = 0.2f),
                             contentDescription = "Reset photo",
                         )
                     }
                 }
             }
-            Spacer(Modifier.height(5.dp))
+            Spacer(Modifier.height(8.dp))
             BasicText(
                 text = when (panel) {
                     PhotoPanel.Look -> "Pick a look, then dial in its strength."
                     PhotoPanel.Adjust -> "Small corrections, applied to this photo only."
                     PhotoPanel.Frame -> "Drag the canvas to shift the crop. Double-tap to fill or fit."
                 },
-                style = Kadraj.Type.BodySmall.copy(
-                    color = Kadraj.MutedDim,
-                    fontSize = 10.sp,
-                ),
-            )
-        } else {
-            BasicText(
-                text = "Select a photo on the canvas to adjust its crop, look, and order.",
+                modifier = Modifier.padding(horizontal = 16.dp),
                 style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 10.5.sp,
                 ),
             )
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Kadraj.InkSoft)
+                    .border(1.dp, Kadraj.Line, RoundedCornerShape(14.dp))
+                    .padding(14.dp),
+            ) {
+                BasicText(
+                    text = "Choose a photo",
+                    style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
+                )
+                Spacer(Modifier.height(4.dp))
+                BasicText(
+                    text = "Tap any frame on the canvas to crop, tune, or reorder it.",
+                    style = Kadraj.Type.BodySmall.copy(color = Kadraj.Muted),
+                )
+            }
         }
     }
 }
@@ -975,13 +1064,19 @@ private fun TextControls(viewModel: EditorViewModel) {
     val caption = viewModel.style.caption
     val focusManager = LocalFocusManager.current
 
-    Column(Modifier.padding(horizontal = 16.dp).padding(top = 9.dp, bottom = 11.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicText(
-                text = "CAPTION",
+                text = "Caption",
+                style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
+            )
+            Spacer(Modifier.width(8.dp))
+            BasicText(
+                text = if (caption.text.isBlank()) "Optional" else "${caption.text.length}/120",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
-                    letterSpacing = 1.5.sp,
+                    fontSize = 9.sp,
+                    letterSpacing = 0.2.sp,
                 ),
             )
             Spacer(Modifier.weight(1f))
@@ -997,13 +1092,6 @@ private fun TextControls(viewModel: EditorViewModel) {
                 )
                 Spacer(Modifier.width(7.dp))
             }
-            BasicText(
-                text = "${caption.text.length}/120",
-                style = Kadraj.Type.Numeric.copy(
-                    color = Kadraj.MutedDim,
-                    fontSize = 8.5.sp,
-                ),
-            )
         }
         Spacer(Modifier.height(6.dp))
         BasicTextField(
@@ -1052,10 +1140,10 @@ private fun TextControls(viewModel: EditorViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 BasicText(
-                    text = "IDEAS",
-                    style = Kadraj.Type.LabelSmall.copy(
+                    text = "Ideas",
+                    style = Kadraj.Type.BodySmall.copy(
                         color = Kadraj.MutedDim,
-                        letterSpacing = 1.3.sp,
+                        fontSize = 11.sp,
                     ),
                 )
                 captionIdeas.forEach { idea ->
@@ -1141,11 +1229,11 @@ private fun TextControls(viewModel: EditorViewModel) {
             horizontalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             BasicText(
-                text = "TONE",
+                text = "Tone",
                 modifier = Modifier.width(38.dp),
-                style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.MutedDim,
-                    letterSpacing = 1.2.sp,
+                style = Kadraj.Type.BodySmall.copy(
+                    color = Kadraj.Muted,
+                    fontSize = 11.5.sp,
                 ),
             )
             ChoiceChip(
@@ -1222,24 +1310,11 @@ private fun FitOption(
     Box(
         modifier = Modifier
             .height(30.dp)
-            .shadow(
-                elevation = if (selected) 6.dp else 0.dp,
-                shape = shape,
-                clip = false,
-                ambientColor = Kadraj.Terracotta.copy(alpha = 0.4f),
-                spotColor = Kadraj.Terracotta.copy(alpha = 0.3f),
-            )
             .clip(shape)
-            .background(
-                if (selected) {
-                    Brush.horizontalGradient(listOf(Color.White, Kadraj.PaperDim))
-                } else {
-                    Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent))
-                },
-            )
+            .background(if (selected) Kadraj.Paper else Color.Transparent)
             .border(
                 1.dp,
-                if (selected) Color.White.copy(alpha = 0.35f) else Color.Transparent,
+                if (selected) Color.Transparent else Kadraj.Line,
                 shape,
             )
             .pressable {
@@ -1285,11 +1360,11 @@ private fun PaletteSwatch(
                 scaleY = scale
             }
             .shadow(
-                elevation = if (selected) 12.dp else 0.dp,
+                elevation = if (selected) 6.dp else 0.dp,
                 shape = CircleShape,
                 clip = false,
-                ambientColor = Kadraj.Terracotta.copy(alpha = 0.55f),
-                spotColor = Kadraj.Violet.copy(alpha = 0.25f),
+                ambientColor = Kadraj.Terracotta.copy(alpha = 0.3f),
+                spotColor = Kadraj.Violet.copy(alpha = 0.12f),
             )
             .clip(CircleShape)
             .border(
@@ -1361,11 +1436,40 @@ private fun MiniAction(
             text = label,
             style = Kadraj.Type.LabelSmall.copy(
                 color = if (highlighted) Kadraj.Paper else Kadraj.PaperDim,
-                fontSize = 8.sp,
-                letterSpacing = 1.0.sp,
+                fontSize = 9.sp,
+                letterSpacing = 0.2.sp,
             ),
             maxLines = 1,
         )
+    }
+}
+
+@Composable
+private fun <T> AutoScrollRow(
+    entries: List<T>,
+    selectedIndex: Int,
+    key: (T) -> Any,
+    modifier: Modifier = Modifier,
+    content: @Composable (T) -> Unit,
+) {
+    val state = rememberLazyListState()
+    LaunchedEffect(selectedIndex) {
+        if (selectedIndex >= 0) {
+            state.animateScrollToItem(selectedIndex)
+        }
+    }
+    LazyRow(
+        state = state,
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(end = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(
+            count = entries.size,
+            key = { index -> key(entries[index]) },
+        ) { index ->
+            content(entries[index])
+        }
     }
 }
 

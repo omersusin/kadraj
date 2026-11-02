@@ -12,32 +12,32 @@ import androidx.compose.ui.unit.sp
 import com.omersusin.kadraj.R
 
 object Kadraj {
-    val Ink = Color(0xFF0D0C0A)
-    val InkRaised = Color(0xFF15120E)
-    val InkSoft = Color(0xFF1D1914)
-    val InkLift = Color(0xFF272117)
-    val InkDeep = Color(0xFF070605)
+    val Ink = Color(0xFF0B0B0D)
+    val InkRaised = Color(0xFF121214)
+    val InkSoft = Color(0xFF19191C)
+    val InkLift = Color(0xFF232327)
+    val InkDeep = Color(0xFF060607)
 
-    val Paper = Color(0xFFF5EFE5)
-    val PaperDim = Color(0xFFD9D0C0)
-    val Muted = Color(0xFF9E9587)
-    val MutedDim = Color(0xFF6E675C)
+    val Paper = Color(0xFFF7F2EA)
+    val PaperDim = Color(0xFFD8D1C6)
+    val Muted = Color(0xFFA6A099)
+    val MutedDim = Color(0xFF77736E)
 
-    val Terracotta = Color(0xFFD47251)
-    val TerracottaSoft = Color(0xFFE99A76)
-    val Ember = Color(0xFFA84934)
-    val Peach = Color(0xFFFFB58B)
-    val Acid = Color(0xFFD8F27A)
-    val Sky = Color(0xFF8FD8F1)
-    val Violet = Color(0xFFA998FF)
-    val Moss = Color(0xFF93A287)
-    val Gold = Color(0xFFC8A15C)
+    val Terracotta = Color(0xFFFF8A5C)
+    val TerracottaSoft = Color(0xFFFFA37C)
+    val Ember = Color(0xFFE06F45)
+    val Peach = Color(0xFFFFB18A)
+    val Acid = Color(0xFFD7E8B0)
+    val Sky = Color(0xFFB5D5E3)
+    val Violet = Color(0xFFC8C0DE)
+    val Moss = Color(0xFFA8B2A0)
+    val Gold = Color(0xFFD6B77E)
 
-    val Line = Color(0x1FFFFFFF)
-    val LineStrong = Color(0x38FFFFFF)
-    val Glass = Color(0x17FFFFFF)
-    val GlassStrong = Color(0x29FFFFFF)
-    val Scrim = Color(0xD9080706)
+    val Line = Color(0x14FFFFFF)
+    val LineStrong = Color(0x2EFFFFFF)
+    val Glass = Color(0x0DFFFFFF)
+    val GlassStrong = Color(0x1AFFFFFF)
+    val Scrim = Color(0xEB0B0B0D)
 
     val Fraunces = FontFamily(
         Font(R.font.fraunces_light, FontWeight.Light),
@@ -59,70 +59,70 @@ object Kadraj {
 
     object Type {
         val Hero = TextStyle(
-            fontFamily = Fraunces,
-            fontWeight = FontWeight.Light,
-            fontSize = 46.sp,
-            lineHeight = 48.sp,
-            letterSpacing = (-0.6).sp,
+            fontFamily = Manrope,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 40.sp,
+            lineHeight = 42.sp,
+            letterSpacing = (-1.2).sp,
             lineHeightStyle = tight,
         )
         val HeroItalic = TextStyle(
             fontFamily = Fraunces,
             fontWeight = FontWeight.Light,
             fontStyle = FontStyle.Italic,
-            fontSize = 46.sp,
-            lineHeight = 48.sp,
-            letterSpacing = (-0.4).sp,
-            lineHeightStyle = tight,
-        )
-        val Display = TextStyle(
-            fontFamily = Fraunces,
-            fontWeight = FontWeight.Normal,
-            fontSize = 32.sp,
-            lineHeight = 36.sp,
+            fontSize = 36.sp,
+            lineHeight = 39.sp,
             letterSpacing = (-0.3).sp,
             lineHeightStyle = tight,
         )
-        val DisplaySmall = TextStyle(
-            fontFamily = Fraunces,
+        val Display = TextStyle(
+            fontFamily = Manrope,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 22.sp,
-            lineHeight = 26.sp,
-            letterSpacing = (-0.1).sp,
+            fontSize = 26.sp,
+            lineHeight = 30.sp,
+            letterSpacing = (-0.5).sp,
+            lineHeightStyle = tight,
+        )
+        val DisplaySmall = TextStyle(
+            fontFamily = Manrope,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            lineHeight = 24.sp,
+            letterSpacing = (-0.2).sp,
             lineHeightStyle = tight,
         )
         val Wordmark = TextStyle(
             fontFamily = Fraunces,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 19.sp,
-            letterSpacing = 0.2.sp,
+            fontSize = 20.sp,
+            letterSpacing = 0.1.sp,
         )
         val Sticker = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 8.sp,
-            lineHeight = 10.sp,
-            letterSpacing = 1.8.sp,
+            fontSize = 8.5.sp,
+            lineHeight = 11.sp,
+            letterSpacing = 1.4.sp,
         )
         val Title = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
-            lineHeight = 22.sp,
+            fontSize = 14.5.sp,
+            lineHeight = 20.sp,
             letterSpacing = (-0.1).sp,
         )
         val Body = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.Normal,
-            fontSize = 14.sp,
-            lineHeight = 21.sp,
+            fontSize = 13.5.sp,
+            lineHeight = 20.sp,
             letterSpacing = 0.05.sp,
         )
         val BodySmall = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.Normal,
-            fontSize = 12.5.sp,
-            lineHeight = 18.sp,
+            fontSize = 12.sp,
+            lineHeight = 17.sp,
             letterSpacing = 0.1.sp,
         )
         val Label = TextStyle(
@@ -130,32 +130,32 @@ object Kadraj {
             fontWeight = FontWeight.Medium,
             fontSize = 10.5.sp,
             lineHeight = 14.sp,
-            letterSpacing = 1.7.sp,
+            letterSpacing = 1.0.sp,
         )
         val LabelSmall = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.Medium,
-            fontSize = 9.sp,
-            lineHeight = 12.sp,
-            letterSpacing = 1.4.sp,
+            fontSize = 9.5.sp,
+            lineHeight = 13.sp,
+            letterSpacing = 0.8.sp,
         )
         val Button = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
-            letterSpacing = 1.2.sp,
+            fontSize = 13.sp,
+            letterSpacing = 0.2.sp,
         )
         val Chip = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.Medium,
-            fontSize = 12.sp,
-            letterSpacing = 0.2.sp,
+            fontSize = 12.5.sp,
+            letterSpacing = 0.1.sp,
         )
         val Numeric = TextStyle(
             fontFamily = Manrope,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 11.sp,
-            letterSpacing = 0.4.sp,
+            fontSize = 11.5.sp,
+            letterSpacing = 0.2.sp,
         )
     }
 }

@@ -19,51 +19,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.omersusin.kadraj.ui.theme.Kadraj
-import kotlin.math.min
 import kotlin.random.Random
 
 @Composable
 fun AuroraBackdrop(modifier: Modifier = Modifier) {
-    val transition = rememberInfiniteTransition(label = "aurora")
+    val transition = rememberInfiniteTransition(label = "backdrop")
     val drift by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(26000, easing = LinearEasing),
+            animation = tween(30000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse,
         ),
-        label = "aurora-drift",
+        label = "backdrop-drift",
     )
-    val dots = remember {
-        val random = Random(31)
-        List(82) {
-            Offset(random.nextFloat(), random.nextFloat())
-        }
+    val grain = remember {
+        val random = Random(17)
+        List(96) { Offset(random.nextFloat(), random.nextFloat()) }
     }
 
     Box(modifier.fillMaxSize()) {
         Canvas(Modifier.fillMaxSize()) {
             drawRect(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF19130D),
+                    listOf(
+                        Color(0xFF111113),
                         Kadraj.Ink,
                         Kadraj.InkDeep,
                     ),
                 ),
-            )
-            val halo = min(size.width, size.height)
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        Kadraj.InkDeep.copy(alpha = 0.42f),
-                    ),
-                    center = Offset(size.width / 2f, size.height / 2f),
-                    radius = halo * 0.9f,
-                ),
-                radius = halo * 0.9f,
-                center = Offset(size.width / 2f, size.height / 2f),
             )
         }
 
@@ -71,99 +55,60 @@ fun AuroraBackdrop(modifier: Modifier = Modifier) {
             Modifier
                 .fillMaxSize()
                 .graphicsLayer {
-                    scaleX = 1.18f
-                    scaleY = 1.18f
-                    translationX = (drift - 0.5f) * size.width * 0.07f
-                    translationY = (drift - 0.5f) * size.height * 0.03f
+                    scaleX = 1.08f
+                    scaleY = 1.08f
+                    translationX = (drift - 0.5f) * size.width * 0.035f
+                    translationY = (drift - 0.5f) * size.height * 0.02f
                 },
         ) {
-            val width = size.width
-            val height = size.height
-
-            val peachCenter = Offset(width * 0.08f, height * 0.02f)
-            val peachRadius = width * 1.02f
+            val warmCenter = Offset(size.width * 0.06f, -size.height * 0.06f)
+            val warmRadius = size.width * 0.95f
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Peach.copy(alpha = 0.13f),
-                        Kadraj.Terracotta.copy(alpha = 0.06f),
+                        Kadraj.Peach.copy(alpha = 0.11f),
+                        Kadraj.Terracotta.copy(alpha = 0.035f),
                         Color.Transparent,
                     ),
-                    center = peachCenter,
-                    radius = peachRadius,
+                    center = warmCenter,
+                    radius = warmRadius,
                 ),
-                radius = peachRadius,
-                center = peachCenter,
+                radius = warmRadius,
+                center = warmCenter,
             )
 
-            val violetCenter = Offset(width * 1.04f, height * 0.28f)
-            val violetRadius = width * 0.76f
+            val coolCenter = Offset(size.width * 1.02f, size.height * 0.72f)
+            val coolRadius = size.width * 0.72f
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Violet.copy(alpha = 0.11f),
+                        Color.White.copy(alpha = 0.035f),
                         Color.Transparent,
                     ),
-                    center = violetCenter,
-                    radius = violetRadius,
+                    center = coolCenter,
+                    radius = coolRadius,
                 ),
-                radius = violetRadius,
-                center = violetCenter,
-            )
-
-            val acidCenter = Offset(width * 0.18f, height * 0.93f)
-            val acidRadius = width * 0.7f
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Kadraj.Acid.copy(alpha = 0.06f),
-                        Color.Transparent,
-                    ),
-                    center = acidCenter,
-                    radius = acidRadius,
-                ),
-                radius = acidRadius,
-                center = acidCenter,
-            )
-
-            val skyCenter = Offset(width * 0.92f, height * 0.78f)
-            val skyRadius = width * 0.62f
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Kadraj.Sky.copy(alpha = 0.06f),
-                        Color.Transparent,
-                    ),
-                    center = skyCenter,
-                    radius = skyRadius,
-                ),
-                radius = skyRadius,
-                center = skyCenter,
+                radius = coolRadius,
+                center = coolCenter,
             )
         }
 
         Canvas(Modifier.fillMaxSize()) {
-            val width = size.width
-            val height = size.height
-
-            drawLine(
-                color = Kadraj.Line,
-                start = Offset(width * 0.072f, 0f),
-                end = Offset(width * 0.072f, height),
-                strokeWidth = 1f,
+            drawRect(
+                brush = Brush.radialGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color.Black.copy(alpha = 0.36f),
+                    ),
+                    center = Offset(size.width / 2f, size.height * 0.44f),
+                    radius = size.maxDimension * 0.72f,
+                ),
             )
-            drawLine(
-                color = Kadraj.Line,
-                start = Offset(width * 0.928f, 0f),
-                end = Offset(width * 0.928f, height),
-                strokeWidth = 1f,
-            )
-
-            dots.forEach { point ->
+            grain.forEach { point ->
                 drawCircle(
-                    color = Kadraj.Paper.copy(alpha = 0.024f),
-                    radius = 0.65.dp.toPx(),
-                    center = Offset(point.x * width, point.y * height),
+                    color = Kadraj.Paper.copy(alpha = 0.018f),
+                    radius = 0.7.dp.toPx(),
+                    center = Offset(point.x * size.width, point.y * size.height),
                 )
             }
         }

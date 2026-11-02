@@ -22,6 +22,8 @@ enum class Glyph {
     Close,
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
+    ChevronUp,
     Check,
     Export,
     Download,
@@ -132,6 +134,16 @@ private fun DrawScope.drawGlyph(glyph: Glyph, color: Color, strokeWidth: Float) 
             moveTo(x(9f), y(5f))
             lineTo(x(16f), y(12f))
             lineTo(x(9f), y(19f))
+        }
+        Glyph.ChevronDown -> path {
+            moveTo(x(5f), y(9f))
+            lineTo(x(12f), y(16f))
+            lineTo(x(19f), y(9f))
+        }
+        Glyph.ChevronUp -> path {
+            moveTo(x(5f), y(15f))
+            lineTo(x(12f), y(8f))
+            lineTo(x(19f), y(15f))
         }
         Glyph.Check -> path {
             moveTo(x(5f), y(12.5f))

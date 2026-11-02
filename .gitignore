@@ -13,3 +13,7 @@ captures/
 *.apk
 *.aab
 secrets/
+
+# Local visual checks
+Screenshot_*.png
+screenshots/

@@ -100,18 +100,11 @@ fun ImageThumb(
 ) {
     val haptics = LocalHapticFeedback.current
     val bitmap = rememberThumbnail(loader, image.uri).value
-    val shape = RoundedCornerShape(11.dp)
+    val shape = RoundedCornerShape(12.dp)
     Box(
         modifier = modifier
-            .size(52.dp)
+            .size(56.dp)
             .semantics { contentDescription = label }
-            .shadow(
-                elevation = if (selected) 10.dp else 0.dp,
-                shape = shape,
-                clip = false,
-                ambientColor = Kadraj.Terracotta.copy(alpha = 0.5f),
-                spotColor = Kadraj.Terracotta.copy(alpha = 0.34f),
-            )
             .clip(shape)
             .background(Kadraj.InkSoft)
             .border(
@@ -163,13 +156,13 @@ fun AddImageTile(
     enabled: Boolean = true,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(11.dp)
+    val shape = RoundedCornerShape(12.dp)
     Column(
         modifier = modifier
-            .size(52.dp)
+            .size(56.dp)
             .semantics { contentDescription = "Add photos" }
             .clip(shape)
-            .background(Color.Transparent)
+            .background(Kadraj.InkSoft.copy(alpha = 0.5f))
             .border(1.dp, Kadraj.LineStrong, shape)
             .pressable(enabled = enabled) {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -177,7 +170,7 @@ fun AddImageTile(
             },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(Modifier.height(11.dp))
+        Spacer(Modifier.height(13.dp))
         GlyphIcon(
             glyph = Glyph.Plus,
             modifier = Modifier.size(16.dp),
@@ -186,11 +179,11 @@ fun AddImageTile(
         )
         Spacer(Modifier.height(3.dp))
         BasicText(
-            text = "ADD",
+            text = "Add",
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.PaperDim,
-                fontSize = 7.5.sp,
-                letterSpacing = 1.0.sp,
+                fontSize = 8.sp,
+                letterSpacing = 0.3.sp,
             ),
         )
     }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
@@ -24,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omersusin.kadraj.BuildConfig
@@ -34,7 +32,6 @@ import com.omersusin.kadraj.ui.components.Glyph
 import com.omersusin.kadraj.ui.components.GlyphIcon
 import com.omersusin.kadraj.ui.components.Hairline
 import com.omersusin.kadraj.ui.components.KadrajButton
-import com.omersusin.kadraj.ui.components.KadrajSpinner
 import com.omersusin.kadraj.ui.theme.Kadraj
 
 @Composable
@@ -47,91 +44,77 @@ fun InfoSheet(
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicText(
-            text = "ABOUT KADRAJ",
-            style = Kadraj.Type.Label.copy(
-                color = Kadraj.TerracottaSoft,
-                letterSpacing = 2.0.sp,
-            ),
+            text = "Help & info",
+            style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
         )
         Spacer(Modifier.weight(1f))
         CircleIconButton(
             glyph = Glyph.Close,
             onClick = onClose,
-            size = 36.dp,
+            size = 34.dp,
             tint = Kadraj.Muted,
-            background = Color.Transparent,
+            background = Kadraj.InkSoft,
             border = Kadraj.Line,
             contentDescription = "Close",
         )
     }
-    Spacer(Modifier.height(18.dp))
+    Spacer(Modifier.height(16.dp))
     BasicText(
-        text = "A pause between",
+        text = "A quieter way to compose.",
         style = Kadraj.Type.Display.copy(
             color = Kadraj.Paper,
-            fontSize = 32.sp,
-            lineHeight = 35.sp,
+            fontSize = 24.sp,
+            lineHeight = 28.sp,
         ),
     )
+    Spacer(Modifier.height(8.dp))
     BasicText(
-        text = "frames.",
-        style = Kadraj.Type.HeroItalic.copy(
-            color = Kadraj.TerracottaSoft,
-            fontSize = 32.sp,
-            lineHeight = 35.sp,
-        ),
-    )
-    Spacer(Modifier.height(14.dp))
-    BasicText(
-        text = "Kadraj brings phone and desktop captures into one editorial composition. " +
-            "It reads ratios, balances negative space, and leaves the final call to you. " +
-            "No account, no cloud, no upload.",
+        text = "Kadraj brings phone and desktop captures into one considered frame. " +
+            "It reads ratios, balances negative space, and leaves the final call to you.",
         style = Kadraj.Type.Body.copy(color = Kadraj.Muted),
     )
+    Spacer(Modifier.height(14.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        Pill("On-device")
+        Pill("12 photos")
+        Pill("7 looks")
+        Pill("4K")
+    }
     Spacer(Modifier.height(20.dp))
     Hairline()
     Spacer(Modifier.height(18.dp))
 
     InfoTip(
-        number = "01",
-        title = "Choose a ratio, let go.",
+        glyph = Glyph.Grid,
+        title = "Choose a rhythm",
         body = "Auto reads portrait, landscape, and mixed selections differently. " +
             "Switch to grid, flow, hero, strip, or stack whenever you want.",
     )
-    Spacer(Modifier.height(17.dp))
+    Spacer(Modifier.height(16.dp))
     InfoTip(
-        number = "02",
-        title = "Touch the canvas.",
-        body = "Tap a photo to select it, then drag to move the crop. Double-tap to switch " +
-            "between fill and fit. The Photo tab adds looks, light, color, warmth, " +
-            "zoom, tilt, and flips.",
+        glyph = Glyph.Image,
+        title = "Shape every frame",
+        body = "Tap a photo, then drag the canvas to move the crop. Double-tap to switch " +
+            "between fill and fit. Photo adds looks, light, color, warmth, zoom, and tilt.",
     )
-    Spacer(Modifier.height(17.dp))
+    Spacer(Modifier.height(16.dp))
     InfoTip(
-        number = "03",
-        title = "Quietly capable.",
-        body = "Textured palettes, soft shadows, captions, and 4K output. Everything " +
-            "finishes on your device; your photos never leave it.",
+        glyph = Glyph.Lock,
+        title = "Private by design",
+        body = "Palettes, captions, and 4K output finish on your device. No account, " +
+            "no cloud, no upload.",
     )
-
-    Spacer(Modifier.height(22.dp))
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        InfoStat(value = "12", label = "photos", modifier = Modifier.weight(1f))
-        InfoStat(value = "7", label = "looks", modifier = Modifier.weight(1f))
-        InfoStat(value = "4K", label = "output", modifier = Modifier.weight(1f))
-        InfoStat(value = "100%", label = "local", modifier = Modifier.weight(1f))
-    }
 
     if (hasImages) {
-        Spacer(Modifier.height(22.dp))
+        Spacer(Modifier.height(20.dp))
         Hairline()
-        Spacer(Modifier.height(17.dp))
+        Spacer(Modifier.height(16.dp))
         if (!confirming) {
             KadrajButton(
                 label = "Start a new collage",
@@ -141,49 +124,85 @@ fun InfoSheet(
                 leadingGlyph = Glyph.Plus,
             )
         } else {
-            BasicText(
-                text = "The current collage will close. Continue?",
-                style = Kadraj.Type.BodySmall.copy(color = Kadraj.TerracottaSoft),
-            )
-            Spacer(Modifier.height(11.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Kadraj.Terracotta.copy(alpha = 0.09f))
+                    .border(1.dp, Kadraj.Terracotta.copy(alpha = 0.22f), RoundedCornerShape(14.dp))
+                    .padding(14.dp),
             ) {
-                KadrajButton(
-                    label = "Cancel",
-                    onClick = { confirming = false },
-                    modifier = Modifier.weight(1f),
-                    tone = ButtonTone.Quiet,
+                BasicText(
+                    text = "Close this collage?",
+                    style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
                 )
-                KadrajButton(
-                    label = "Start",
-                    onClick = onNewProject,
-                    modifier = Modifier.weight(1f),
+                Spacer(Modifier.height(4.dp))
+                BasicText(
+                    text = "The current edits will be cleared. This cannot be undone.",
+                    style = Kadraj.Type.BodySmall.copy(color = Kadraj.Muted),
                 )
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    KadrajButton(
+                        label = "Cancel",
+                        onClick = { confirming = false },
+                        modifier = Modifier.weight(1f),
+                        tone = ButtonTone.Quiet,
+                    )
+                    KadrajButton(
+                        label = "New collage",
+                        onClick = onNewProject,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
     }
 
-    Spacer(Modifier.height(20.dp))
+    Spacer(Modifier.height(18.dp))
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicText(
-            text = "VERSION ${BuildConfig.VERSION_NAME}",
+            text = "Kadraj ${BuildConfig.VERSION_NAME}",
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,
-                letterSpacing = 1.3.sp,
+                fontSize = 8.5.sp,
+                letterSpacing = 0.4.sp,
             ),
         )
         Spacer(Modifier.weight(1f))
         BasicText(
-            text = "FRAUNCES & MANROPE · OFL",
+            text = "Fraunces & Manrope · OFL",
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,
-                fontSize = 8.sp,
-                letterSpacing = 1.0.sp,
+                fontSize = 8.5.sp,
+                letterSpacing = 0.3.sp,
+            ),
+        )
+    }
+    Spacer(Modifier.height(10.dp))
+}
+
+@Composable
+private fun Pill(text: String) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(Kadraj.InkSoft)
+            .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
+            .padding(horizontal = 9.dp, vertical = 6.dp),
+    ) {
+        BasicText(
+            text = text,
+            style = Kadraj.Type.LabelSmall.copy(
+                color = Kadraj.PaperDim,
+                fontSize = 8.5.sp,
+                letterSpacing = 0.1.sp,
             ),
         )
     }
@@ -191,7 +210,7 @@ fun InfoSheet(
 
 @Composable
 private fun InfoTip(
-    number: String,
+    glyph: Glyph,
     title: String,
     body: String,
 ) {
@@ -201,18 +220,17 @@ private fun InfoTip(
     ) {
         Box(
             modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape)
-                .background(Kadraj.InkSoft)
-                .border(1.dp, Kadraj.LineStrong, CircleShape),
+                .size(34.dp)
+                .clip(RoundedCornerShape(11.dp))
+                .background(Kadraj.Peach.copy(alpha = 0.1f))
+                .border(1.dp, Kadraj.Peach.copy(alpha = 0.2f), RoundedCornerShape(11.dp)),
             contentAlignment = Alignment.Center,
         ) {
-            BasicText(
-                text = number,
-                style = Kadraj.Type.Numeric.copy(
-                    color = Kadraj.TerracottaSoft,
-                    fontSize = 9.sp,
-                ),
+            GlyphIcon(
+                glyph = glyph,
+                modifier = Modifier.size(16.dp),
+                tint = Kadraj.Peach,
+                strokeWidth = 1.5.dp,
             )
         }
         Column(Modifier.weight(1f)) {
@@ -223,45 +241,11 @@ private fun InfoTip(
                     fontSize = 14.sp,
                 ),
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(3.dp))
             BasicText(
                 text = body,
                 style = Kadraj.Type.BodySmall.copy(color = Kadraj.Muted),
             )
         }
-    }
-}
-
-@Composable
-private fun InfoStat(
-    value: String,
-    label: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(13.dp))
-            .background(Kadraj.InkSoft)
-            .border(1.dp, Kadraj.Line, RoundedCornerShape(13.dp))
-            .padding(horizontal = 12.dp, vertical = 11.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        BasicText(
-            text = value,
-            style = Kadraj.Type.DisplaySmall.copy(
-                color = Kadraj.Paper,
-                fontSize = 19.sp,
-                textAlign = TextAlign.Center,
-            ),
-        )
-        Spacer(Modifier.height(2.dp))
-        BasicText(
-            text = label,
-            style = Kadraj.Type.LabelSmall.copy(
-                color = Kadraj.MutedDim,
-                fontSize = 8.sp,
-                letterSpacing = 1.0.sp,
-            ),
-        )
     }
 }
