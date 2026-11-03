@@ -845,11 +845,13 @@ private fun PhotoControls(
                     label = "Photo ${imageIndex + 1}",
                 )
             }
-            item {
-                AddImageTile(
-                    onClick = onPickImages,
-                    enabled = images.size < EditorViewModel.MAX_IMAGES,
-                )
+            if (images.size < EditorViewModel.MAX_IMAGES) {
+                item {
+                    AddImageTile(
+                        onClick = onPickImages,
+                        enabled = true,
+                    )
+                }
             }
         }
         Spacer(Modifier.height(11.dp))
