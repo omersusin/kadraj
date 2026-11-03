@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.BasicText
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,16 +47,47 @@ import com.omersusin.kadraj.ui.screens.EmptyState
 import com.omersusin.kadraj.ui.screens.ExportSheet
 import com.omersusin.kadraj.ui.screens.InfoSheet
 import com.omersusin.kadraj.ui.theme.Kadraj
+import java.io.File
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Composable
-fun KadrajApp(viewModel: EditorViewModel = viewModel()) {
+fun KadrajApp(
+    viewModel: EditorViewModel = viewModel(),
+    startWithDemo: Boolean = false,
+) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
     var showExport by rememberSaveable { mutableStateOf(false) }
     var showCloseConfirm by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val images = viewModel.images
     val notice = viewModel.notice
+
+    LaunchedEffect(startWithDemo) {
+        if (!BuildConfig.DEBUG || !startWithDemo || images.isNotEmpty()) {
+            return@LaunchedEffect
+        }
+        val demoUris = withContext(Dispatchers.IO) {
+            listOf(
+                R.drawable.demo_portrait to "portrait.jpg",
+                R.drawable.demo_architecture to "architecture.jpg",
+                R.drawable.demo_coffee to "coffee.jpg",
+            ).mapNotNull { (resource, name) ->
+                runCatching {
+                    val file = File(context.cacheDir, "demo_$name")
+                    context.resources.openRawResource(resource).use { input ->
+                        file.outputStream().use { output -> input.copyTo(output) }
+                    }
+                    Uri.fromFile(file)
+                }.getOrNull()
+            }
+        }
+        if (demoUris.isNotEmpty()) {
+            viewModel.addImages(demoUris)
+        }
+    }
 
     val picker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(

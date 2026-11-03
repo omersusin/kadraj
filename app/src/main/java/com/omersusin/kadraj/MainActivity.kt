@@ -20,7 +20,10 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             KadrajTheme {
-                KadrajApp()
+                KadrajApp(
+                    startWithDemo = BuildConfig.DEBUG &&
+                        intent.getBooleanExtra("demoProject", false),
+                )
             }
         }
     }

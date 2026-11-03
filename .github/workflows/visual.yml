@@ -48,16 +48,21 @@ jobs:
             adb shell am start -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity
             sleep 10
             adb exec-out screencap -p > home.png
+            adb shell am force-stop com.omersusin.kadraj.debug
+            adb shell am start -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true
+            sleep 12
+            adb exec-out screencap -p > editor.png
             adb shell dumpsys activity activities | grep -E 'mResumedActivity' \
               > activity.txt || true
-            adb logcat -d -t 300 > logcat.txt || true
+            adb logcat -d -t 400 > logcat.txt || true
 
-      - name: Upload screenshot
+      - name: Upload screenshots
         uses: actions/upload-artifact@v4
         with:
-          name: kadraj-home-screenshot
+          name: kadraj-screenshots
           path: |
             home.png
+            editor.png
             activity.txt
             logcat.txt
           if-no-files-found: error
