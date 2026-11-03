@@ -45,8 +45,7 @@ jobs:
             -camera-back none -camera-front none
           script: |
             adb install -r app/build/outputs/apk/debug/app-debug.apk
-            adb shell am start -n \
-              com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity
+            adb shell am start -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity
             sleep 10
             adb exec-out screencap -p > home.png
             adb shell dumpsys activity activities | grep -E 'mResumedActivity' \
