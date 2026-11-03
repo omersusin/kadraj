@@ -52,8 +52,7 @@ jobs:
             adb shell am start -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true
             sleep 12
             adb exec-out screencap -p > editor.png
-            adb shell dumpsys activity activities | grep -E 'mResumedActivity' \
-              > activity.txt || true
+            adb shell dumpsys activity activities > activity.txt || true
             adb logcat -d -t 400 > logcat.txt || true
 
       - name: Upload screenshots

@@ -770,7 +770,7 @@ private fun PhotoControls(
             )
             Spacer(Modifier.width(8.dp))
             BasicText(
-                text = if (index >= 0) "${index + 1} of ${images.size}" else "${images.size} selected",
+                text = "${images.size} / ${EditorViewModel.MAX_IMAGES} photos",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 10.sp,
@@ -778,31 +778,51 @@ private fun PhotoControls(
                 ),
             )
             Spacer(Modifier.weight(1f))
+            val remaining = (EditorViewModel.MAX_IMAGES - images.size).coerceAtLeast(0)
+            val addLabel = when {
+                remaining == 0 -> "Full"
+                remaining <= 3 -> "Add $remaining"
+                else -> "Add"
+            }
             Row(
                 modifier = Modifier
-                    .height(30.dp)
+                    .height(34.dp)
                     .clip(RoundedCornerShape(50))
-                    .background(Kadraj.Peach.copy(alpha = 0.13f))
-                    .border(1.dp, Kadraj.Peach.copy(alpha = 0.25f), RoundedCornerShape(50))
-                    .pressable(enabled = images.size < EditorViewModel.MAX_IMAGES) {
+                    .background(
+                        if (remaining > 0) {
+                            Kadraj.Peach.copy(alpha = 0.16f)
+                        } else {
+                            Kadraj.InkLift.copy(alpha = 0.55f)
+                        },
+                    )
+                    .border(
+                        1.dp,
+                        if (remaining > 0) {
+                            Kadraj.Peach.copy(alpha = 0.32f)
+                        } else {
+                            Color.Transparent
+                        },
+                        RoundedCornerShape(50),
+                    )
+                    .pressable(enabled = remaining > 0) {
                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         onPickImages()
                     }
-                    .padding(horizontal = 11.dp),
+                    .padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 GlyphIcon(
                     glyph = Glyph.Plus,
-                    modifier = Modifier.size(11.dp),
-                    tint = Kadraj.Peach,
+                    modifier = Modifier.size(12.dp),
+                    tint = if (remaining > 0) Kadraj.Peach else Kadraj.MutedDim,
                     strokeWidth = 1.8.dp,
                 )
                 BasicText(
-                    text = "Add",
+                    text = addLabel,
                     style = Kadraj.Type.LabelSmall.copy(
-                        color = Kadraj.PaperDim,
-                        fontSize = 10.sp,
+                        color = if (remaining > 0) Kadraj.PaperDim else Kadraj.MutedDim,
+                        fontSize = 10.5.sp,
                         letterSpacing = 0.2.sp,
                     ),
                 )

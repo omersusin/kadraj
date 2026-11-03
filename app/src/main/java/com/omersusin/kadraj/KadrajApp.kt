@@ -25,10 +25,13 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.BasicText
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -89,9 +92,16 @@ fun KadrajApp(
         }
     }
 
+    val systemPickerMax = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            MediaStore.getPickImagesMaxLimit()
+        } else {
+            EditorViewModel.MAX_IMAGES
+        }
+    }
     val picker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(
-            EditorViewModel.MAX_IMAGES,
+            minOf(EditorViewModel.MAX_IMAGES, systemPickerMax).coerceAtLeast(2),
         ),
     ) { uris ->
         viewModel.addImages(uris)

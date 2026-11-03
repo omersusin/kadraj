@@ -123,6 +123,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
             when {
                 added.isEmpty() -> showNotice("Couldn't open those images. Try another selection.")
                 added.size < candidates.size -> showNotice("Some images couldn't be opened.")
+                images.size >= MAX_IMAGES -> showNotice("Collage full · $MAX_IMAGES photos.")
                 truncated -> showNotice("Added the first $MAX_IMAGES images.")
             }
         }
