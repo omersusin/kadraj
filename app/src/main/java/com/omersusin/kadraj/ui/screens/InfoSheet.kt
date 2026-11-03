@@ -171,7 +171,7 @@ fun InfoSheet(
             text = "Kadraj ${BuildConfig.VERSION_NAME}",
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,
-                fontSize = 8.5.sp,
+                fontSize = 9.5.sp,
                 letterSpacing = 0.4.sp,
             ),
         )
@@ -180,7 +180,7 @@ fun InfoSheet(
             text = "Fraunces & Manrope · OFL",
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,
-                fontSize = 8.5.sp,
+                fontSize = 9.5.sp,
                 letterSpacing = 0.3.sp,
             ),
         )
@@ -193,15 +193,14 @@ private fun Pill(text: String) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(Kadraj.InkSoft)
-            .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
-            .padding(horizontal = 9.dp, vertical = 6.dp),
+            .background(Kadraj.InkLift.copy(alpha = 0.7f))
+            .padding(horizontal = 10.dp, vertical = 6.dp),
     ) {
         BasicText(
             text = text,
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.PaperDim,
-                fontSize = 8.5.sp,
+                fontSize = 10.sp,
                 letterSpacing = 0.1.sp,
             ),
         )

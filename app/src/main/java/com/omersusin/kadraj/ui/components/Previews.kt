@@ -159,7 +159,7 @@ fun AddImageTile(
     val shape = RoundedCornerShape(12.dp)
     Column(
         modifier = modifier
-            .size(56.dp)
+            .size(58.dp)
             .semantics { contentDescription = "Add photos" }
             .clip(shape)
             .background(Kadraj.InkSoft.copy(alpha = 0.5f))
@@ -182,7 +182,7 @@ fun AddImageTile(
             text = "Add",
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.PaperDim,
-                fontSize = 8.sp,
+                fontSize = 9.5.sp,
                 letterSpacing = 0.3.sp,
             ),
         )

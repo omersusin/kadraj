@@ -1,11 +1,6 @@
 package com.omersusin.kadraj.ui.components
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -54,6 +49,7 @@ import com.omersusin.kadraj.render.ImageProvider
 import com.omersusin.kadraj.render.ImageRenderState
 import com.omersusin.kadraj.render.ProvidedImage
 import com.omersusin.kadraj.ui.theme.Kadraj
+import kotlin.math.roundToInt
 
 @Composable
 fun CollageStage(
@@ -76,16 +72,6 @@ fun CollageStage(
     val captionTypeface = remember(context, style.caption.font) {
         CaptionTypefaces.load(context, style.caption.font)
     }
-    val transition = rememberInfiniteTransition(label = "stage-aura")
-    val auraPulse by transition.animateFloat(
-        initialValue = 0.72f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(7200, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "stage-aura-pulse",
-    )
     val guideAlpha by animateFloatAsState(
         targetValue = if (guides) 1f else 0f,
         animationSpec = tween(220),
@@ -130,7 +116,7 @@ fun CollageStage(
             }
         }
     }
-    val shape = RoundedCornerShape(6.dp)
+    val shape = RoundedCornerShape(8.dp)
 
     BoxWithConstraints(
         modifier = modifier,
@@ -144,14 +130,60 @@ fun CollageStage(
             canvasWidth = canvasHeight * safeAspect
         }
 
+        Canvas(
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer { alpha = 0.3f },
+        ) {
+            var ambientWidth = size.width
+            var ambientHeight = ambientWidth / safeAspect
+            if (ambientHeight < size.height) {
+                ambientHeight = size.height
+                ambientWidth = ambientHeight * safeAspect
+            }
+            val left = (size.width - ambientWidth) / 2f
+            val top = (size.height - ambientHeight) / 2f
+            val sourceWidth = 960
+            val sourceHeight = (sourceWidth / safeAspect).roundToInt().coerceAtLeast(1)
+
+            drawIntoCanvas { canvas ->
+                val native = canvas.nativeCanvas
+                val checkpoint = native.save()
+                native.translate(left, top)
+                native.scale(
+                    ambientWidth / sourceWidth,
+                    ambientHeight / sourceHeight,
+                )
+                CollagePainter.draw(
+                    canvas = native,
+                    width = sourceWidth,
+                    height = sourceHeight,
+                    layout = layout,
+                    style = style,
+                    provider = provider,
+                    imageStates = imageStates,
+                    selectedId = null,
+                )
+                native.restoreToCount(checkpoint)
+            }
+        }
+
         Canvas(Modifier.fillMaxSize()) {
-            val center = Offset(size.width / 2f, size.height / 2f)
-            val glowRadius = size.minDimension * 0.64f * auraPulse
+            drawRect(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        Kadraj.Ink.copy(alpha = 0.58f),
+                        Kadraj.Ink.copy(alpha = 0.36f),
+                        Kadraj.Ink.copy(alpha = 0.68f),
+                    ),
+                ),
+            )
+            val center = Offset(size.width / 2f, size.height * 0.46f)
+            val glowRadius = size.minDimension * 0.58f
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Peach.copy(alpha = 0.11f * auraPulse),
-                        Kadraj.Terracotta.copy(alpha = 0.035f),
+                        Kadraj.Peach.copy(alpha = 0.07f),
                         Color.Transparent,
                     ),
                     center = center,
@@ -160,14 +192,6 @@ fun CollageStage(
                 radius = glowRadius,
                 center = center,
             )
-            drawCircle(
-                color = Kadraj.Paper.copy(alpha = 0.035f),
-                radius = size.minDimension * 0.45f,
-                center = center,
-                style = androidx.compose.ui.graphics.drawscope.Stroke(
-                    width = 1.dp.toPx(),
-                ),
-            )
         }
 
         if (canvasWidth > 0.dp && canvasHeight > 0.dp) {
@@ -175,7 +199,7 @@ fun CollageStage(
                 modifier = Modifier
                     .size(canvasWidth, canvasHeight)
                     .shadow(
-                        elevation = 24.dp,
+                        elevation = 28.dp,
                         shape = shape,
                         clip = false,
                         ambientColor = Color.Black,

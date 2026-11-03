@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
@@ -114,7 +113,6 @@ fun EmptyState(
         modifier = modifier.fillMaxSize(),
     ) {
         val compact = maxHeight < 700.dp
-        val headlineSize = if (maxWidth < 360.dp) 29.sp else 32.sp
 
         Column(
             modifier = Modifier
@@ -132,28 +130,8 @@ fun EmptyState(
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp),
             ) {
-                Spacer(Modifier.height(if (compact) 17.dp else 21.dp))
+                Spacer(Modifier.height(if (compact) 14.dp else 18.dp))
 
-                BasicText(
-                    text = "Mixed ratios.",
-                    style = Kadraj.Type.Display.copy(
-                        color = Kadraj.Paper,
-                        fontSize = headlineSize,
-                        lineHeight = (headlineSize.value + 2).sp,
-                        letterSpacing = (-0.7).sp,
-                    ),
-                )
-                BasicText(
-                    text = "One composition.",
-                    style = Kadraj.Type.Display.copy(
-                        color = Kadraj.Peach,
-                        fontSize = headlineSize,
-                        lineHeight = (headlineSize.value + 2).sp,
-                        letterSpacing = (-0.7).sp,
-                    ),
-                )
-
-                Spacer(Modifier.height(9.dp))
                 BasicText(
                     text = "Pick phone and desktop shots. Kadraj reads every frame and composes " +
                         "a balanced layout around them.",
@@ -187,7 +165,7 @@ fun EmptyState(
                         text = "On-device  ·  No account  ·  Up to ${EditorViewModel.MAX_IMAGES} photos",
                         style = Kadraj.Type.BodySmall.copy(
                             color = Kadraj.MutedDim,
-                            fontSize = 10.5.sp,
+                            fontSize = 11.sp,
                         ),
                     )
                 }
@@ -237,7 +215,7 @@ fun EmptyState(
                         text = "Kadraj ${BuildConfig.VERSION_NAME}",
                         style = Kadraj.Type.LabelSmall.copy(
                             color = Kadraj.MutedDim,
-                            fontSize = 8.5.sp,
+                            fontSize = 9.5.sp,
                             letterSpacing = 0.4.sp,
                         ),
                     )
@@ -246,7 +224,7 @@ fun EmptyState(
                         text = "Local  ·  Private",
                         style = Kadraj.Type.LabelSmall.copy(
                             color = Kadraj.MutedDim,
-                            fontSize = 8.5.sp,
+                            fontSize = 9.5.sp,
                             letterSpacing = 0.4.sp,
                         ),
                     )
@@ -353,12 +331,13 @@ private fun PhotoHero(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .height(96.dp)
+                .height(200.dp)
                 .background(
                     Brush.verticalGradient(
                         listOf(
                             Color.Transparent,
-                            Color.Black.copy(alpha = 0.56f),
+                            Color.Black.copy(alpha = 0.1f),
+                            Color.Black.copy(alpha = 0.72f),
                         ),
                     ),
                 ),
@@ -384,50 +363,31 @@ private fun PhotoHero(
             )
         }
 
-        Row(
+        Column(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
+                .align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = 20.dp, vertical = 22.dp),
         ) {
-            HeroTag(label = "Preview  ·  Auto layout", showDot = true)
-            Spacer(Modifier.weight(1f))
-            HeroTag(label = "3 photos")
-        }
-    }
-}
-
-@Composable
-private fun HeroTag(
-    label: String,
-    showDot: Boolean = false,
-) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(Color.Black.copy(alpha = 0.36f))
-            .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(50))
-            .padding(horizontal = 11.dp, vertical = 7.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(7.dp),
-    ) {
-        if (showDot) {
-            Box(
-                modifier = Modifier
-                    .size(5.dp)
-                    .clip(CircleShape)
-                    .background(Kadraj.Peach),
+            BasicText(
+                text = "Mixed ratios.",
+                style = Kadraj.Type.Display.copy(
+                    color = Kadraj.Paper,
+                    fontSize = 30.sp,
+                    lineHeight = 32.sp,
+                    letterSpacing = (-0.7).sp,
+                ),
+            )
+            BasicText(
+                text = "One composition.",
+                style = Kadraj.Type.Display.copy(
+                    color = Kadraj.Peach,
+                    fontSize = 30.sp,
+                    lineHeight = 32.sp,
+                    letterSpacing = (-0.7).sp,
+                ),
             )
         }
-        BasicText(
-            text = label,
-            style = Kadraj.Type.LabelSmall.copy(
-                color = Kadraj.Paper,
-                fontSize = 9.5.sp,
-                letterSpacing = 0.2.sp,
-            ),
-        )
     }
 }
 
@@ -481,7 +441,7 @@ private fun HistoryAction(
             text = label,
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.Muted,
-                fontSize = 9.5.sp,
+                fontSize = 10.5.sp,
                 letterSpacing = 0.2.sp,
             ),
         )
@@ -509,7 +469,7 @@ private fun Feature(
             text = label,
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.PaperDim,
-                fontSize = 9.5.sp,
+                fontSize = 10.5.sp,
                 letterSpacing = 0.1.sp,
             ),
             maxLines = 1,

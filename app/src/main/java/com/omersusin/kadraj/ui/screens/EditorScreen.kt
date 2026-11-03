@@ -156,8 +156,6 @@ fun EditorScreen(
         val panelMaxHeight = (maxHeight * 0.42f).coerceIn(180.dp, 326.dp)
         Column(Modifier.fillMaxSize()) {
             EditorTopBar(
-                imageCount = images.size,
-                ratio = ratioText,
                 canUndo = viewModel.canUndo,
                 canRedo = viewModel.canRedo,
                 onUndo = viewModel::undo,
@@ -191,6 +189,14 @@ fun EditorScreen(
                     onToggleFit = viewModel::toggleFit,
                     guides = guides,
                     modifier = Modifier.fillMaxSize(),
+                )
+
+                StageMetaPill(
+                    ratio = ratioText,
+                    photoCount = images.size,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(10.dp),
                 )
 
                 CircleIconButton(
@@ -238,8 +244,6 @@ fun EditorScreen(
 
 @Composable
 private fun EditorTopBar(
-    imageCount: Int,
-    ratio: String,
     canUndo: Boolean,
     canRedo: Boolean,
     onUndo: () -> Unit,
@@ -265,18 +269,8 @@ private fun EditorTopBar(
             contentDescription = "Close project",
         )
         Spacer(Modifier.width(10.dp))
-        Column(Modifier.weight(1f)) {
+        Box(Modifier.weight(1f)) {
             Wordmark()
-            Spacer(Modifier.height(2.dp))
-            BasicText(
-                text = "${imageCount} ${if (imageCount == 1) "photo" else "photos"}  ·  $ratio",
-                maxLines = 1,
-                style = Kadraj.Type.LabelSmall.copy(
-                    color = Kadraj.MutedDim,
-                    fontSize = 9.sp,
-                    letterSpacing = 0.35.sp,
-                ),
-            )
         }
         Spacer(Modifier.width(6.dp))
         Row(
@@ -320,6 +314,53 @@ private fun EditorTopBar(
         )
         Spacer(Modifier.width(7.dp))
         ExportPill(onClick = onExport)
+    }
+}
+
+@Composable
+private fun StageMetaPill(
+    ratio: String,
+    photoCount: Int,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(50)
+    Row(
+        modifier = modifier
+            .clip(shape)
+            .background(Kadraj.Ink.copy(alpha = 0.74f))
+            .border(1.dp, Kadraj.Line, shape)
+            .padding(horizontal = 11.dp, vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(5.dp)
+                .clip(CircleShape)
+                .background(Kadraj.Peach),
+        )
+        BasicText(
+            text = ratio,
+            style = Kadraj.Type.LabelSmall.copy(
+                color = Kadraj.PaperDim,
+                fontSize = 10.sp,
+                letterSpacing = 0.25.sp,
+            ),
+        )
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .height(10.dp)
+                .background(Kadraj.LineStrong),
+        )
+        BasicText(
+            text = "$photoCount ${if (photoCount == 1) "photo" else "photos"}",
+            style = Kadraj.Type.LabelSmall.copy(
+                color = Kadraj.Muted,
+                fontSize = 10.sp,
+                letterSpacing = 0.15.sp,
+            ),
+        )
     }
 }
 
@@ -394,7 +435,14 @@ private fun EditorDock(
                 spotColor = Color.Black,
             )
             .clip(shape)
-            .background(Kadraj.InkRaised.copy(alpha = 0.98f))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Kadraj.InkRaised,
+                        Kadraj.Ink,
+                    ),
+                ),
+            )
             .border(1.dp, Kadraj.Line, shape)
             .animateContentSize(
                 animationSpec = spring(
@@ -528,7 +576,7 @@ private fun LayoutControls(viewModel: EditorViewModel) {
                 text = templateLabel(viewModel.template),
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.Peach,
-                    fontSize = 9.sp,
+                    fontSize = 10.sp,
                     letterSpacing = 0.4.sp,
                 ),
             )
@@ -572,7 +620,7 @@ private fun LayoutControls(viewModel: EditorViewModel) {
                     text = "Flow chooses its own frame",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.MutedDim,
-                        fontSize = 9.sp,
+                        fontSize = 10.sp,
                         letterSpacing = 0.2.sp,
                     ),
                 )
@@ -613,7 +661,7 @@ private fun StyleControls(viewModel: EditorViewModel) {
                 text = viewModel.style.palette.name,
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.Peach,
-                    fontSize = 9.sp,
+                    fontSize = 10.sp,
                     letterSpacing = 0.2.sp,
                 ),
             )
@@ -725,7 +773,7 @@ private fun PhotoControls(
                 text = if (index >= 0) "${index + 1} of ${images.size}" else "${images.size} selected",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
-                    fontSize = 9.sp,
+                    fontSize = 10.sp,
                     letterSpacing = 0.3.sp,
                 ),
             )
@@ -754,7 +802,7 @@ private fun PhotoControls(
                     text = "Add",
                     style = Kadraj.Type.LabelSmall.copy(
                         color = Kadraj.PaperDim,
-                        fontSize = 9.sp,
+                        fontSize = 10.sp,
                         letterSpacing = 0.2.sp,
                     ),
                 )
@@ -1033,7 +1081,7 @@ private fun PhotoControls(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 style = Kadraj.Type.BodySmall.copy(
                     color = Kadraj.MutedDim,
-                    fontSize = 10.5.sp,
+                    fontSize = 11.5.sp,
                 ),
             )
         } else {
@@ -1076,7 +1124,7 @@ private fun TextControls(viewModel: EditorViewModel) {
                 text = if (caption.text.isBlank()) "Optional" else "${caption.text.length}/120",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
-                    fontSize = 9.sp,
+                    fontSize = 10.sp,
                     letterSpacing = 0.2.sp,
                 ),
             )
@@ -1437,7 +1485,7 @@ private fun MiniAction(
             text = label,
             style = Kadraj.Type.LabelSmall.copy(
                 color = if (highlighted) Kadraj.Paper else Kadraj.PaperDim,
-                fontSize = 9.sp,
+                fontSize = 10.sp,
                 letterSpacing = 0.2.sp,
             ),
             maxLines = 1,

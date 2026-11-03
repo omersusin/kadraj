@@ -245,12 +245,7 @@ fun ChoiceChip(
         modifier = modifier
             .height(32.dp)
             .clip(shape)
-            .background(if (selected) Kadraj.Paper else Kadraj.InkSoft)
-            .border(
-                1.dp,
-                if (selected) Color.Transparent else Kadraj.Line,
-                shape,
-            )
+            .background(if (selected) Kadraj.Paper else Kadraj.InkLift.copy(alpha = 0.62f))
             .pressable {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
@@ -277,13 +272,19 @@ fun TemplateChip(
     val content = if (selected) Kadraj.Paper else Kadraj.Muted
     Column(
         modifier = modifier
-            .width(66.dp)
-            .height(66.dp)
+            .width(72.dp)
+            .height(70.dp)
             .clip(shape)
-            .background(if (selected) Kadraj.InkLift else Kadraj.InkSoft.copy(alpha = 0.7f))
+            .background(
+                if (selected) {
+                    Kadraj.Peach.copy(alpha = 0.16f)
+                } else {
+                    Kadraj.InkLift.copy(alpha = 0.55f)
+                },
+            )
             .border(
                 width = 1.dp,
-                color = if (selected) Kadraj.Peach.copy(alpha = 0.7f) else Kadraj.Line,
+                color = if (selected) Kadraj.Peach.copy(alpha = 0.72f) else Color.Transparent,
                 shape = shape,
             )
             .pressable {
@@ -302,8 +303,8 @@ fun TemplateChip(
             text = templateLabel(template),
             style = Kadraj.Type.LabelSmall.copy(
                 color = content,
-                fontSize = 8.5.sp,
-                letterSpacing = 0.6.sp,
+                fontSize = 9.5.sp,
+                letterSpacing = 0.3.sp,
             ),
         )
     }
@@ -376,12 +377,11 @@ fun ToggleChip(
             .height(32.dp)
             .clip(shape)
             .background(
-                if (selected) Kadraj.Peach.copy(alpha = 0.16f) else Kadraj.InkSoft,
-            )
-            .border(
-                1.dp,
-                if (selected) Kadraj.Peach.copy(alpha = 0.42f) else Kadraj.Line,
-                shape,
+                if (selected) {
+                    Kadraj.Peach.copy(alpha = 0.2f)
+                } else {
+                    Kadraj.InkLift.copy(alpha = 0.62f)
+                },
             )
             .pressable {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -418,13 +418,14 @@ fun DockTab(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(13.dp)
+    val shape = RoundedCornerShape(14.dp)
     Column(
         modifier = modifier
-            .height(48.dp)
+            .height(50.dp)
+            .padding(horizontal = 2.dp)
             .clip(shape)
             .background(
-                if (selected) Kadraj.Peach.copy(alpha = 0.13f) else Color.Transparent,
+                if (selected) Kadraj.Peach else Color.Transparent,
             )
             .pressable {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -435,17 +436,17 @@ fun DockTab(
     ) {
         GlyphIcon(
             glyph = glyph,
-            modifier = Modifier.size(17.dp),
-            tint = if (selected) Kadraj.Peach else Kadraj.MutedDim,
-            strokeWidth = 1.55.dp,
+            modifier = Modifier.size(18.dp),
+            tint = if (selected) Kadraj.Ink else Kadraj.Muted,
+            strokeWidth = if (selected) 1.85.dp else 1.55.dp,
         )
         Spacer(Modifier.height(4.dp))
         BasicText(
             text = label,
             style = Kadraj.Type.LabelSmall.copy(
-                color = if (selected) Kadraj.Paper else Kadraj.MutedDim,
-                fontSize = 9.sp,
-                letterSpacing = 0.7.sp,
+                color = if (selected) Kadraj.Ink else Kadraj.Muted,
+                fontSize = 10.sp,
+                letterSpacing = 0.35.sp,
             ),
         )
     }
@@ -472,8 +473,8 @@ fun KadrajSlider(
     ) {
         BasicText(
             text = label,
-            modifier = Modifier.width(64.dp),
-            style = Kadraj.Type.BodySmall.copy(color = Kadraj.Muted, fontSize = 11.5.sp),
+            modifier = Modifier.width(66.dp),
+            style = Kadraj.Type.BodySmall.copy(color = Kadraj.Muted, fontSize = 12.sp),
         )
         Box(
             modifier = Modifier

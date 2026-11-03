@@ -320,7 +320,7 @@ private fun ExportOption(
             text = detail,
             style = Kadraj.Type.LabelSmall.copy(
                 color = if (selected) Kadraj.Peach else Kadraj.MutedDim,
-                fontSize = 8.sp,
+                fontSize = 9.5.sp,
                 letterSpacing = 0.3.sp,
             ),
         )
@@ -376,7 +376,7 @@ private fun ExportSuccess(
             text = result.fileName,
             style = Kadraj.Type.LabelSmall.copy(
                 color = Kadraj.MutedDim,
-                fontSize = 8.5.sp,
+                fontSize = 9.5.sp,
                 letterSpacing = 0.8.sp,
             ),
         )
