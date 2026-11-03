@@ -1,11 +1,11 @@
 # Kadraj v1.3.0
 
-A canvas-first rebuild with a calmer visual language, faster access to the tools that matter, and a safer project flow.
+A photo-first rebuild with a calmer visual language, faster access to the tools that matter, and a safer project flow.
 
 ## Highlights
 
 - **A new interface** — neutral charcoal, warm paper, and a single peach accent replace the heavy glass-and-aurora look.
-- **More canvas, less chrome** — the editor now centers the composition. The control deck collapses to a slim tab bar and expands only when you need it.
+- **More photo, less chrome** — a real sample collage renders Kadraj's own output on the start screen, while the editor centers the composition. The control deck collapses to a slim tab bar and expands only when you need it.
 - **No more clipped controls** — every panel scrolls, so tone, strength, caption, and frame options stay reachable on smaller screens.
 - **Automatic scroll-into-view** — the selected template, ratio, palette, photo, and look scroll into the visible strip.
 - **Visual template previews** — each layout chip shows the actual arrangement before you apply it.

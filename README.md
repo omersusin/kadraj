@@ -1,6 +1,6 @@
 # Kadraj
 
-**A canvas-first collage studio for screenshots and photos.**
+**A photo-first collage studio for screenshots and photos.**
 
 Kadraj reads the shape of your images. Phone captures, desktop captures, and mixed selections each get a layout that understands their ratios. Negative space, rhythm, and framing follow from there. Everything stays on your device.
 
@@ -13,14 +13,14 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 
 - **Smart ratio analysis** — portrait, landscape, and mixed selections are treated differently.
 - **Six layouts** — Auto, Grid, Flow, Hero, Strip, and Stack.
-- **Nine canvas ratios plus Auto** — 1:1, 3:4, 4:5, 9:16, 2:3, 3:2, 16:9, 16:10, and 2:1.
+- **Nine output ratios plus Auto** — 1:1, 3:4, 4:5, 9:16, 2:3, 3:2, 16:9, 16:10, and 2:1.
 - **Per-photo looks** — Original, Warm, Cool, Mono, Fade, Vivid, and Film with adjustable strength.
 - **Tone adjustments** — light, contrast, color, and warmth for every photo, with one-tap Auto Enhance and Sync to All.
 - **Frame controls** — drag to set the crop, zoom, tilt, flip horizontally or vertically, duplicate, or reset a photo.
-- **Composition guides** — a rule-of-thirds overlay with center mark, toggled from the canvas.
+- **Composition guides** — a rule-of-thirds overlay with center mark, toggled from the preview.
 - **Captions** — serif or sans, adjustable size, three placements, three alignments, auto/paper/accent tones, an optional plate, and quick starter lines.
 - **Undo and redo** — up to 40 steps, including continuous slider adjustments.
-- **Compact control deck** — a collapsible, scrollable bottom sheet keeps the canvas in view; the active tab, template, palette, photo, and look stay in reach.
+- **Compact control deck** — a collapsible, scrollable bottom sheet keeps the composition in view; the active tab, template, palette, photo, and look stay in reach.
 - **Ten palettes** — Paper, Night, Clay, Sage, Mist, Rose, Ivory, Olive, Sunset, and Lagoon.
 - **Fine tuning** — spacing, margin, corners, mat, shadow, grain, and a one-tap style randomizer.
 - **On-device output** — JPEG or PNG at Auto, 2K, or 4K; saved to the `Kadraj` album in Photos.
@@ -41,7 +41,7 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 ## How to use it
 
 1. Choose 1–12 images from your gallery.
-2. Pick a template and canvas ratio; visual template previews and real ratios make the choice immediate.
+2. Pick a template and output ratio; visual template previews and real ratios make the choice immediate.
 3. Tap a photo to select it, then drag to move the crop.
 4. Open the Photo tab for looks, tone adjustments, zoom, tilt, flips, duplication, or resets. Swipe the photo strip to move between images.
 5. Open the Text tab to add a caption, start from an idea, and tune its type and placement.
@@ -55,6 +55,12 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 
 > The APK is signed for the `com.omersusin.kadraj` package. Future releases use
 > the same signing key, so updates install without losing data.
+
+## Demo photography
+
+The start-screen collage is rendered from three sample photographs bundled from
+[Unsplash](https://unsplash.com/license). They are illustrative only; user
+photos are never uploaded or included in the app.
 
 ## Development
 
@@ -87,8 +93,8 @@ the `v*` format publish the APK to GitHub Releases.
 
 - Kotlin 2.0 and Jetpack Compose; no Material library.
 - A pure Kotlin layout engine with JVM unit tests.
-- Preview and export share the same Canvas renderer, including tone and look filters.
-- A canvas-first editor with a neutral charcoal palette, one peach accent, compact collapsible controls, and subtle motion, without a Material dependency.
+- Preview and export share the same renderer, including tone and look filters.
+- A photo-first interface with a neutral charcoal palette, one peach accent, compact collapsible controls, and subtle motion, without a Material dependency.
 - R8 minification, resource shrinking, and a signed release configuration.
 - `minSdk 29`, `targetSdk 35`.
 
