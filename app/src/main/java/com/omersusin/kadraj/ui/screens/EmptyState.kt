@@ -470,57 +470,60 @@ private fun HomeLayouts(bitmaps: List<Bitmap>?) {
             )
         }
         Spacer(Modifier.height(9.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            homeLayoutTemplates.forEach { template ->
-                Column(Modifier.width(82.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .width(82.dp)
-                            .height(82.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Kadraj.InkSoft)
-                            .border(
-                                1.dp,
-                                Color.White.copy(alpha = 0.07f),
-                                RoundedCornerShape(12.dp),
-                            )
-                            .semantics {
-                                contentDescription = "${templateLabel(template)} layout preview"
-                            },
-                    ) {
-                        val imageProvider = provider
-                        if (imageProvider != null) {
-                            Canvas(Modifier.fillMaxSize()) {
-                                drawIntoCanvas { canvas ->
-                                    CollagePainter.draw(
-                                        canvas = canvas.nativeCanvas,
-                                        width = size.width.toInt(),
-                                        height = size.height.toInt(),
-                                        layout = layouts.getValue(template),
-                                        style = homePreviewStyle,
-                                        provider = imageProvider,
-                                    )
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val previewSize = (maxWidth - 24.dp) / 4f
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                homeLayoutTemplates.forEach { template ->
+                    Column(Modifier.width(previewSize)) {
+                        Box(
+                            modifier = Modifier
+                                .width(previewSize)
+                                .height(previewSize)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Kadraj.InkSoft)
+                                .border(
+                                    1.dp,
+                                    Color.White.copy(alpha = 0.07f),
+                                    RoundedCornerShape(12.dp),
+                                )
+                                .semantics {
+                                    contentDescription = "${templateLabel(template)} layout preview"
+                                },
+                        ) {
+                            val imageProvider = provider
+                            if (imageProvider != null) {
+                                Canvas(Modifier.fillMaxSize()) {
+                                    drawIntoCanvas { canvas ->
+                                        CollagePainter.draw(
+                                            canvas = canvas.nativeCanvas,
+                                            width = size.width.toInt(),
+                                            height = size.height.toInt(),
+                                            layout = layouts.getValue(template),
+                                            style = homePreviewStyle,
+                                            provider = imageProvider,
+                                        )
+                                    }
                                 }
                             }
                         }
+                        Spacer(Modifier.height(4.dp))
+                        BasicText(
+                            text = templateLabel(template),
+                            style = Kadraj.Type.LabelSmall.copy(
+                                color = Kadraj.Muted,
+                                fontSize = 10.sp,
+                                letterSpacing = 0.2.sp,
+                            ),
+                        )
                     }
-                    Spacer(Modifier.height(4.dp))
-                    BasicText(
-                        text = templateLabel(template),
-                        style = Kadraj.Type.LabelSmall.copy(
-                            color = Kadraj.Muted,
-                            fontSize = 10.sp,
-                            letterSpacing = 0.2.sp,
-                        ),
-                    )
                 }
+                Spacer(Modifier.width(20.dp))
             }
-            Spacer(Modifier.width(20.dp))
         }
     }
 }
