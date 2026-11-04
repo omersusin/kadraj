@@ -77,9 +77,9 @@ private val demoImageSpecs = listOf(
 )
 
 private val demoImageResources = listOf(
-    R.drawable.demo_portrait,
-    R.drawable.demo_architecture,
-    R.drawable.demo_coffee,
+    R.drawable.demo_window,
+    R.drawable.demo_loggia,
+    R.drawable.demo_still_life,
 )
 
 private val demoCollageConfig = CollageConfig(

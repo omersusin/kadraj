@@ -9,6 +9,8 @@ A photo-first rebuild with a calmer visual language, faster access to the tools 
 - **No more clipped controls** — every panel scrolls, so tone, strength, caption, and frame options stay reachable on smaller screens.
 - **Automatic scroll-into-view** — the selected template, ratio, palette, photo, and look scroll into the visible strip.
 - **Visual template previews** — each layout chip shows the actual arrangement before you apply it.
+- **Original demo artwork** — the sample collage and layout previews now use three original illustrated scenes (a sunlit window, a seaside loggia, and a morning still life) instead of stock photography.
+- **Up to 12 photos** — the system picker can cap a single selection pass at 10 on some devices; the editor keeps the remaining slots visible and adds the rest in a second pass.
 - **Safer navigation** — a back button and system back open a confirmation sheet instead of silently clearing the project. The old “new collage” action is now guarded as well.
 - **Cleaner home and help** — a compact, photo-led start screen and a concise Help & info sheet replace the marketing-style pages.
 - **Faster-feeling motion** — springy sheet sizing, restrained fades, tactile chips, and a quieter stage halo.

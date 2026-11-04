@@ -75,9 +75,9 @@ fun KadrajApp(
         }
         val demoUris = withContext(Dispatchers.IO) {
             listOf(
-                R.drawable.demo_portrait to "portrait.jpg",
-                R.drawable.demo_architecture to "architecture.jpg",
-                R.drawable.demo_coffee to "coffee.jpg",
+                R.drawable.demo_window to "window.jpg",
+                R.drawable.demo_loggia to "loggia.jpg",
+                R.drawable.demo_still_life to "still-life.jpg",
             ).mapNotNull { (resource, name) ->
                 runCatching {
                     val file = File(context.cacheDir, "demo_$name")

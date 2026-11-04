@@ -57,11 +57,13 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 > The APK is signed for the `com.omersusin.kadraj` package. Future releases use
 > the same signing key, so updates install without losing data.
 
-## Demo photography
+## Demo artwork
 
-The start-screen collage is rendered from three sample photographs bundled from
-[Unsplash](https://unsplash.com/license). They are illustrative only; user
-photos are never uploaded or included in the app.
+The start-screen collage and built-in layout previews use three original
+illustrated scenes made for Kadraj: a sunlit window, a seaside loggia, and a
+morning still life. They share the app's ink, peach, and sage palette and
+contain no third-party stock photography. The demo art is illustrative only;
+user photos are never uploaded or included in the app.
 
 ## Development
 
