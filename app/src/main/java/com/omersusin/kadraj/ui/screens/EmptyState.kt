@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -462,7 +461,7 @@ private fun HomeLayouts(bitmaps: List<Bitmap>?) {
             )
             Spacer(Modifier.weight(1f))
             BasicText(
-                text = "Six ways",
+                text = "Six ways  ›",
                 style = Kadraj.Type.LabelSmall.copy(
                     color = Kadraj.MutedDim,
                     fontSize = 9.5.sp,
@@ -471,74 +470,57 @@ private fun HomeLayouts(bitmaps: List<Bitmap>?) {
             )
         }
         Spacer(Modifier.height(9.dp))
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .drawWithContent {
-                    drawContent()
-                    drawRect(
-                        brush = Brush.horizontalGradient(
-                            colorStops = arrayOf(
-                                0f to Color.Transparent,
-                                0.95f to Color.Transparent,
-                                1f to Kadraj.Ink,
-                            ),
-                        ),
-                    )
-                },
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                homeLayoutTemplates.forEach { template ->
-                    Column(Modifier.width(76.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .width(76.dp)
-                                .height(76.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Kadraj.InkSoft)
-                                .border(
-                                    1.dp,
-                                    Color.White.copy(alpha = 0.07f),
-                                    RoundedCornerShape(12.dp),
-                                )
-                                .semantics {
-                                    contentDescription = "${templateLabel(template)} layout preview"
-                                },
-                        ) {
-                            val imageProvider = provider
-                            if (imageProvider != null) {
-                                Canvas(Modifier.fillMaxSize()) {
-                                    drawIntoCanvas { canvas ->
-                                        CollagePainter.draw(
-                                            canvas = canvas.nativeCanvas,
-                                            width = size.width.toInt(),
-                                            height = size.height.toInt(),
-                                            layout = layouts.getValue(template),
-                                            style = homePreviewStyle,
-                                            provider = imageProvider,
-                                        )
-                                    }
+            homeLayoutTemplates.forEach { template ->
+                Column(Modifier.width(82.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .width(82.dp)
+                            .height(82.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Kadraj.InkSoft)
+                            .border(
+                                1.dp,
+                                Color.White.copy(alpha = 0.07f),
+                                RoundedCornerShape(12.dp),
+                            )
+                            .semantics {
+                                contentDescription = "${templateLabel(template)} layout preview"
+                            },
+                    ) {
+                        val imageProvider = provider
+                        if (imageProvider != null) {
+                            Canvas(Modifier.fillMaxSize()) {
+                                drawIntoCanvas { canvas ->
+                                    CollagePainter.draw(
+                                        canvas = canvas.nativeCanvas,
+                                        width = size.width.toInt(),
+                                        height = size.height.toInt(),
+                                        layout = layouts.getValue(template),
+                                        style = homePreviewStyle,
+                                        provider = imageProvider,
+                                    )
                                 }
                             }
                         }
-                        Spacer(Modifier.height(4.dp))
-                        BasicText(
-                            text = templateLabel(template),
-                            style = Kadraj.Type.LabelSmall.copy(
-                                color = Kadraj.Muted,
-                                fontSize = 10.sp,
-                                letterSpacing = 0.2.sp,
-                            ),
-                        )
                     }
+                    Spacer(Modifier.height(4.dp))
+                    BasicText(
+                        text = templateLabel(template),
+                        style = Kadraj.Type.LabelSmall.copy(
+                            color = Kadraj.Muted,
+                            fontSize = 10.sp,
+                            letterSpacing = 0.2.sp,
+                        ),
+                    )
                 }
-                Spacer(Modifier.width(20.dp))
             }
+            Spacer(Modifier.width(20.dp))
         }
     }
 }
