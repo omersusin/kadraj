@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -133,7 +134,8 @@ fun CollageStage(
         Canvas(
             Modifier
                 .fillMaxSize()
-                .graphicsLayer { alpha = 0.3f },
+                .blur(22.dp)
+                .graphicsLayer { alpha = 0.28f },
         ) {
             var ambientWidth = size.width
             var ambientHeight = ambientWidth / safeAspect

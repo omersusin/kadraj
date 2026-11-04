@@ -102,10 +102,10 @@ private val demoCollageStyle = CollageStyle(
 private val homeLayoutTemplates = listOf(
     Template.AUTO,
     Template.GRID,
-    Template.HERO,
-    Template.PILE,
-    Template.FLOW,
     Template.STRIP,
+    Template.PILE,
+    Template.HERO,
+    Template.FLOW,
 )
 
 private val homePreviewStyle = CollageStyle(
@@ -477,11 +477,11 @@ private fun HomeLayouts(bitmaps: List<Bitmap>?) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             homeLayoutTemplates.forEach { template ->
-                Column(Modifier.width(82.dp)) {
+                Column(Modifier.width(76.dp)) {
                     Box(
                         modifier = Modifier
-                            .width(82.dp)
-                            .height(82.dp)
+                            .width(76.dp)
+                            .height(76.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(Kadraj.InkSoft)
                             .border(

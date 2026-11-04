@@ -564,7 +564,14 @@ private fun EditorDock(
 
 @Composable
 private fun LayoutControls(viewModel: EditorViewModel) {
-    val templates = Template.entries
+    val templates = listOf(
+        Template.AUTO,
+        Template.GRID,
+        Template.STRIP,
+        Template.PILE,
+        Template.HERO,
+        Template.FLOW,
+    )
     val aspects = AspectPreset.entries
     val images = viewModel.images
     val imageSpecs = remember(images) { images.map { ImageSpec(it.id, it.aspect) } }
