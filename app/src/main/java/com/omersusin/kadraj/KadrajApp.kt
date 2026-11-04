@@ -59,6 +59,7 @@ import kotlinx.coroutines.withContext
 fun KadrajApp(
     viewModel: EditorViewModel = viewModel(),
     startWithDemo: Boolean = false,
+    initialTab: String? = null,
 ) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
     var showExport by rememberSaveable { mutableStateOf(false) }
@@ -183,6 +184,7 @@ fun KadrajApp(
                 onExport = openExport,
                 onInfo = { showInfo = true },
                 onCloseProject = { showCloseConfirm = true },
+                initialTab = initialTab,
                 modifier = Modifier.fillMaxSize(),
             )
         }

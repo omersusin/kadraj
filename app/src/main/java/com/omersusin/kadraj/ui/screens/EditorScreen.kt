@@ -129,9 +129,16 @@ fun EditorScreen(
     onExport: () -> Unit,
     onInfo: () -> Unit,
     onCloseProject: () -> Unit,
+    initialTab: String? = null,
     modifier: Modifier = Modifier,
 ) {
-    var tab by rememberSaveable { mutableStateOf(EditorTab.Layout) }
+    var tab by rememberSaveable {
+        mutableStateOf(
+            initialTab?.let { value ->
+                EditorTab.entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+            } ?: EditorTab.Layout,
+        )
+    }
     var guides by rememberSaveable { mutableStateOf(false) }
     var dockExpanded by rememberSaveable { mutableStateOf(true) }
 

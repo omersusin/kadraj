@@ -52,6 +52,18 @@ jobs:
             adb shell am start -W -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true
             sleep 15
             adb exec-out screencap -p > editor.png
+            adb shell am force-stop com.omersusin.kadraj.debug
+            adb shell am start -W -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true --es demoTab Style
+            sleep 12
+            adb exec-out screencap -p > style.png
+            adb shell am force-stop com.omersusin.kadraj.debug
+            adb shell am start -W -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true --es demoTab Photo
+            sleep 12
+            adb exec-out screencap -p > photo.png
+            adb shell am force-stop com.omersusin.kadraj.debug
+            adb shell am start -W -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true --es demoTab Text
+            sleep 12
+            adb exec-out screencap -p > text.png
             adb shell dumpsys activity activities > activity.txt || true
             adb logcat -d -t 400 > logcat.txt || true
 
@@ -62,6 +74,9 @@ jobs:
           path: |
             home.png
             editor.png
+            style.png
+            photo.png
+            text.png
             activity.txt
             logcat.txt
           if-no-files-found: error

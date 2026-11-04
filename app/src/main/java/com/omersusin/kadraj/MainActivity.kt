@@ -23,6 +23,7 @@ class MainActivity : ComponentActivity() {
                 KadrajApp(
                     startWithDemo = BuildConfig.DEBUG &&
                         intent.getBooleanExtra("demoProject", false),
+                    initialTab = intent.getStringExtra("demoTab"),
                 )
             }
         }
