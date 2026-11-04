@@ -393,8 +393,9 @@ fun CollagePreview(
     images: List<CollageImage>,
     loader: ImageLoader,
     modifier: Modifier = Modifier,
+    showBorder: Boolean = true,
+    previews: PreviewLoadStates = rememberPreviewLoadStates(loader, images),
 ) {
-    val previews = rememberPreviewLoadStates(loader, images)
     val revision = previews.revision.value
     val imageKey = remember(images) { images.map { it.id to it.uri } }
     val uriById = remember(imageKey) { imageKey.toMap() }
@@ -443,11 +444,18 @@ fun CollagePreview(
             canvasWidth = canvasHeight * safeAspect
         }
         if (canvasWidth > 0.dp && canvasHeight > 0.dp) {
+            val previewShape = RoundedCornerShape(5.dp)
             Canvas(
                 modifier = Modifier
                     .size(canvasWidth, canvasHeight)
-                    .clip(RoundedCornerShape(5.dp))
-                    .border(1.dp, Kadraj.Line, RoundedCornerShape(5.dp)),
+                    .clip(previewShape)
+                    .then(
+                        if (showBorder) {
+                            Modifier.border(1.dp, Kadraj.Line, previewShape)
+                        } else {
+                            Modifier
+                        },
+                    ),
             ) {
                 @Suppress("UNUSED_EXPRESSION")
                 revision

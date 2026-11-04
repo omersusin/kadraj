@@ -266,14 +266,15 @@ fun TemplateChip(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    preview: (@Composable () -> Unit)? = null,
 ) {
     val haptics = LocalHapticFeedback.current
     val shape = RoundedCornerShape(14.dp)
     val content = if (selected) Kadraj.Paper else Kadraj.Muted
     Column(
         modifier = modifier
-            .width(72.dp)
-            .height(70.dp)
+            .width(76.dp)
+            .height(80.dp)
             .clip(shape)
             .background(
                 if (selected) {
@@ -294,10 +295,14 @@ fun TemplateChip(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        TemplateMiniature(
-            template = template,
-            tint = if (selected) Kadraj.Peach else Kadraj.MutedDim,
-        )
+        if (preview != null) {
+            preview()
+        } else {
+            TemplateMiniature(
+                template = template,
+                tint = if (selected) Kadraj.Peach else Kadraj.MutedDim,
+            )
+        }
         Spacer(Modifier.height(6.dp))
         BasicText(
             text = templateLabel(template),

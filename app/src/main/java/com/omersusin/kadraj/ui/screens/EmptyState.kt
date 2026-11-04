@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -64,6 +65,7 @@ import com.omersusin.kadraj.ui.components.GlyphIcon
 import com.omersusin.kadraj.ui.components.KadrajButton
 import com.omersusin.kadraj.ui.components.Wordmark
 import com.omersusin.kadraj.ui.components.pressable
+import com.omersusin.kadraj.ui.components.templateLabel
 import com.omersusin.kadraj.ui.theme.Kadraj
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -97,6 +99,25 @@ private val demoCollageStyle = CollageStyle(
     texture = false,
 )
 
+private val homeLayoutTemplates = listOf(
+    Template.AUTO,
+    Template.GRID,
+    Template.FLOW,
+    Template.HERO,
+    Template.STRIP,
+    Template.PILE,
+)
+
+private val homePreviewStyle = CollageStyle(
+    palette = Palettes.Paper,
+    gap = 0.009f,
+    margin = 0.015f,
+    radius = 0.02f,
+    mat = 0f,
+    shadow = false,
+    texture = true,
+)
+
 @Composable
 fun EmptyState(
     onPickImages: () -> Unit,
@@ -108,6 +129,14 @@ fun EmptyState(
     onRedo: () -> Unit = {},
 ) {
     val haptics = LocalHapticFeedback.current
+    val context = LocalContext.current
+    val heroBitmaps by produceState<List<Bitmap>?>(initialValue = null) {
+        value = withContext(Dispatchers.IO) {
+            demoImageResources.mapNotNull { resource ->
+                BitmapFactory.decodeResource(context.resources, resource)
+            }
+        }
+    }
 
     BoxWithConstraints(
         modifier = modifier.fillMaxSize(),
@@ -121,6 +150,7 @@ fun EmptyState(
                 .navigationBarsPadding(),
         ) {
             PhotoHero(
+                bitmaps = heroBitmaps,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),
@@ -172,6 +202,9 @@ fun EmptyState(
 
                 Spacer(Modifier.height(if (compact) 18.dp else 24.dp))
                 FeatureRow()
+
+                Spacer(Modifier.height(if (compact) 20.dp else 26.dp))
+                HomeLayouts(bitmaps = heroBitmaps)
 
                 if (canUndo || canRedo) {
                     Spacer(Modifier.height(14.dp))
@@ -237,17 +270,10 @@ fun EmptyState(
 
 @Composable
 private fun PhotoHero(
+    bitmaps: List<Bitmap>?,
     modifier: Modifier = Modifier,
     onInfo: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val bitmaps by produceState<List<Bitmap>?>(initialValue = null) {
-        value = withContext(Dispatchers.IO) {
-            demoImageResources.mapNotNull { resource ->
-                BitmapFactory.decodeResource(context.resources, resource)
-            }
-        }
-    }
     val layout = remember(demoImageSpecs) {
         LayoutEngine.compose(demoImageSpecs, demoCollageConfig)
     }
@@ -387,6 +413,113 @@ private fun PhotoHero(
                     letterSpacing = (-0.7).sp,
                 ),
             )
+        }
+    }
+}
+
+@Composable
+private fun HomeLayouts(bitmaps: List<Bitmap>?) {
+    val layouts = remember {
+        homeLayoutTemplates.associateWith { template ->
+            LayoutEngine.compose(
+                images = demoImageSpecs,
+                config = CollageConfig(
+                    template = template,
+                    aspect = when (template) {
+                        Template.AUTO, Template.FLOW -> AspectPreset.AUTO
+                        else -> AspectPreset.SQUARE
+                    },
+                    gap = homePreviewStyle.gap,
+                    margin = homePreviewStyle.margin,
+                ),
+            )
+        }
+    }
+    val provider = remember(bitmaps) {
+        bitmaps
+            ?.takeIf { it.size == demoImageSpecs.size }
+            ?.let { photos ->
+                ImageProvider { imageId, _, _ ->
+                    photos.getOrNull((imageId - 1L).toInt())?.let { bitmap ->
+                        ProvidedImage(bitmap)
+                    }
+                }
+            }
+    }
+
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            BasicText(
+                text = "Built-in layouts",
+                style = Kadraj.Type.Title.copy(
+                    color = Kadraj.Paper,
+                    fontSize = 16.sp,
+                ),
+            )
+            Spacer(Modifier.weight(1f))
+            BasicText(
+                text = "Six ways",
+                style = Kadraj.Type.LabelSmall.copy(
+                    color = Kadraj.MutedDim,
+                    fontSize = 9.5.sp,
+                    letterSpacing = 0.4.sp,
+                ),
+            )
+        }
+        Spacer(Modifier.height(9.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            homeLayoutTemplates.forEach { template ->
+                Column(Modifier.width(82.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .width(82.dp)
+                            .height(82.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Kadraj.InkSoft)
+                            .border(
+                                1.dp,
+                                Color.White.copy(alpha = 0.07f),
+                                RoundedCornerShape(12.dp),
+                            )
+                            .semantics {
+                                contentDescription = "${templateLabel(template)} layout preview"
+                            },
+                    ) {
+                        val imageProvider = provider
+                        if (imageProvider != null) {
+                            Canvas(Modifier.fillMaxSize()) {
+                                drawIntoCanvas { canvas ->
+                                    CollagePainter.draw(
+                                        canvas = canvas.nativeCanvas,
+                                        width = size.width.toInt(),
+                                        height = size.height.toInt(),
+                                        layout = layouts.getValue(template),
+                                        style = homePreviewStyle,
+                                        provider = imageProvider,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    BasicText(
+                        text = templateLabel(template),
+                        style = Kadraj.Type.LabelSmall.copy(
+                            color = Kadraj.Muted,
+                            fontSize = 10.sp,
+                            letterSpacing = 0.2.sp,
+                        ),
+                    )
+                }
+            }
         }
     }
 }

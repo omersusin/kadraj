@@ -78,7 +78,10 @@ import com.omersusin.kadraj.collage.CaptionAlignment
 import com.omersusin.kadraj.collage.CaptionFont
 import com.omersusin.kadraj.collage.CaptionPlacement
 import com.omersusin.kadraj.collage.CaptionTone
+import com.omersusin.kadraj.collage.CollageConfig
 import com.omersusin.kadraj.collage.FitMode
+import com.omersusin.kadraj.collage.ImageSpec
+import com.omersusin.kadraj.collage.LayoutEngine
 import com.omersusin.kadraj.collage.Palette
 import com.omersusin.kadraj.collage.Palettes
 import com.omersusin.kadraj.collage.PhotoLook
@@ -86,6 +89,7 @@ import com.omersusin.kadraj.collage.Template
 import com.omersusin.kadraj.ui.components.AddImageTile
 import com.omersusin.kadraj.ui.components.ChoiceChip
 import com.omersusin.kadraj.ui.components.CircleIconButton
+import com.omersusin.kadraj.ui.components.CollagePreview
 import com.omersusin.kadraj.ui.components.CollageStage
 import com.omersusin.kadraj.ui.components.DockTab
 import com.omersusin.kadraj.ui.components.Glyph
@@ -99,6 +103,7 @@ import com.omersusin.kadraj.ui.components.Wordmark
 import com.omersusin.kadraj.ui.components.aspectLabel
 import com.omersusin.kadraj.ui.components.pressable
 import com.omersusin.kadraj.ui.components.ratioLabel
+import com.omersusin.kadraj.ui.components.rememberPreviewLoadStates
 import com.omersusin.kadraj.ui.components.templateLabel
 import com.omersusin.kadraj.ui.theme.Kadraj
 import java.util.Locale
@@ -561,6 +566,37 @@ private fun EditorDock(
 private fun LayoutControls(viewModel: EditorViewModel) {
     val templates = Template.entries
     val aspects = AspectPreset.entries
+    val images = viewModel.images
+    val imageSpecs = remember(images) { images.map { ImageSpec(it.id, it.aspect) } }
+    val templatePreviews = rememberPreviewLoadStates(viewModel.imageLoader, images)
+    val previewStyle = remember(viewModel.style.palette) {
+        viewModel.style.copy(
+            palette = viewModel.style.palette,
+            margin = 0.015f,
+            gap = 0.009f,
+            radius = 0.02f,
+            mat = 0f,
+            shadow = false,
+            texture = true,
+            caption = viewModel.style.caption.copy(text = ""),
+        )
+    }
+    val previewLayouts = remember(imageSpecs, previewStyle.gap, previewStyle.margin) {
+        templates.associateWith { template ->
+            LayoutEngine.compose(
+                images = imageSpecs,
+                config = CollageConfig(
+                    template = template,
+                    aspect = when (template) {
+                        Template.AUTO, Template.FLOW -> AspectPreset.AUTO
+                        else -> AspectPreset.CLASSIC
+                    },
+                    gap = previewStyle.gap,
+                    margin = previewStyle.margin,
+                ),
+            )
+        }
+    }
 
     Column(Modifier.padding(top = 12.dp, bottom = 14.dp)) {
         Row(
@@ -603,6 +639,17 @@ private fun LayoutControls(viewModel: EditorViewModel) {
                 template = template,
                 selected = viewModel.template == template,
                 onClick = { viewModel.updateTemplate(template) },
+                preview = {
+                    CollagePreview(
+                        layout = previewLayouts.getValue(template),
+                        style = previewStyle,
+                        images = images,
+                        loader = viewModel.imageLoader,
+                        modifier = Modifier.width(60.dp).height(40.dp),
+                        showBorder = false,
+                        previews = templatePreviews,
+                    )
+                },
             )
         }
         Spacer(Modifier.height(13.dp))
