@@ -102,10 +102,10 @@ private val demoCollageStyle = CollageStyle(
 private val homeLayoutTemplates = listOf(
     Template.AUTO,
     Template.GRID,
-    Template.FLOW,
     Template.HERO,
-    Template.STRIP,
     Template.PILE,
+    Template.FLOW,
+    Template.STRIP,
 )
 
 private val homePreviewStyle = CollageStyle(
