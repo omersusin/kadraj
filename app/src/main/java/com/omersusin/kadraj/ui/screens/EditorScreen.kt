@@ -79,6 +79,8 @@ import com.omersusin.kadraj.collage.CaptionFont
 import com.omersusin.kadraj.collage.CaptionPlacement
 import com.omersusin.kadraj.collage.CaptionTone
 import com.omersusin.kadraj.collage.CollageConfig
+import com.omersusin.kadraj.collage.CompositionPreset
+import com.omersusin.kadraj.collage.CompositionPresets
 import com.omersusin.kadraj.collage.FitMode
 import com.omersusin.kadraj.collage.ImageSpec
 import com.omersusin.kadraj.collage.LayoutEngine
