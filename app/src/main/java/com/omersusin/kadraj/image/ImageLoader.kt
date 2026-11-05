@@ -111,27 +111,12 @@ class ImageLoader(
     private fun decode(uri: Uri, maxDimension: Int): Bitmap? {
         return try {
             ImageDecoder.decodeBitmap(ImageDecoder.createSource(resolver, uri)) { decoder, info, _ ->
-                val longest = max(info.size.width, info.size.height)
-                var sample = 1
-                while (longest / (sample * 2) >= maxDimension) {
-                    sample *= 2
-                }
-                decoder.setTargetSampleSize(sample)
-                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                decoder.isMutableRequired = false
+                configureTarget(decoder, info, maxDimension)
             }
         } catch (_: OutOfMemoryError) {
             try {
                 ImageDecoder.decodeBitmap(ImageDecoder.createSource(resolver, uri)) { decoder, info, _ ->
-                    val longest = max(info.size.width, info.size.height)
-                    var sample = 1
-                    val fallback = (maxDimension / 2).coerceAtLeast(64)
-                    while (longest / (sample * 2) >= fallback) {
-                        sample *= 2
-                    }
-                    decoder.setTargetSampleSize(sample)
-                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                    decoder.isMutableRequired = false
+                    configureTarget(decoder, info, (maxDimension / 2).coerceAtLeast(64))
                 }
             } catch (_: Exception) {
                 null
@@ -141,6 +126,26 @@ class ImageLoader(
         } catch (_: Exception) {
             null
         }
+    }
+
+    private fun configureTarget(
+        decoder: ImageDecoder,
+        info: ImageDecoder.ImageInfo,
+        maxDimension: Int,
+    ) {
+        val longest = max(info.size.width, info.size.height)
+        val target = maxDimension.coerceIn(64, 4096)
+        if (longest > target) {
+            val scale = target.toFloat() / longest.toFloat()
+            decoder.setTargetSize(
+                (info.size.width * scale).toInt().coerceAtLeast(1),
+                (info.size.height * scale).toInt().coerceAtLeast(1),
+            )
+        } else {
+            decoder.setTargetSize(info.size.width, info.size.height)
+        }
+        decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+        decoder.isMutableRequired = false
     }
 
     private fun key(uri: Uri, maxDimension: Int): String = "$uri@$maxDimension"
