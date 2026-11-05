@@ -67,6 +67,10 @@ class LayoutEngineTest {
         assertEquals(Template.GRID, LayoutEngine.resolveAutoTemplate(images(desktop, desktop)))
         assertEquals(Template.FLOW, LayoutEngine.resolveAutoTemplate(images(phone, desktop)))
         assertEquals(Template.FLOW, LayoutEngine.resolveAutoTemplate(images(phone, desktop, portraitPhoto)))
+        assertEquals(
+            Template.GRID,
+            LayoutEngine.resolveAutoTemplate(images(*List(30) { if (it % 2 == 0) phone else desktop }.toFloatArray())),
+        )
     }
 
     @Test

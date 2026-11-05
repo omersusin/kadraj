@@ -36,6 +36,7 @@ object LayoutEngine {
         if (images.size <= 1) return Template.GRID
         val profile = images.orientationProfile()
         return when {
+            images.size > 12 -> Template.GRID
             profile.mixed -> Template.FLOW
             images.size <= 4 -> Template.GRID
             else -> Template.FLOW
@@ -145,7 +146,14 @@ object LayoutEngine {
 
         val profile = images.orientationProfile()
         val preferred = preferredAspect(profile)
-        val maxColumns = min(3, count)
+        val maxColumns = min(
+            when {
+                count <= 12 -> 3
+                count <= 20 -> 4
+                else -> 5
+            },
+            count,
+        )
         val minColumns = if (count == 2) 2 else 1
 
         var best: FlowCandidate? = null

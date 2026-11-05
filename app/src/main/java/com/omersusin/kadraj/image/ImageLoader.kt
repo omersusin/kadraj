@@ -25,7 +25,7 @@ class ImageLoader(
 
     init {
         val maxMemory = Runtime.getRuntime().maxMemory()
-        val cacheSize = (maxMemory / 4L).coerceIn(32L * 1024L * 1024L, 96L * 1024L * 1024L)
+        val cacheSize = (maxMemory / 4L).coerceIn(40L * 1024L * 1024L, 96L * 1024L * 1024L)
         cache = object : LruCache<String, Bitmap>(cacheSize.toInt()) {
             override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
         }

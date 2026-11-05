@@ -44,8 +44,8 @@ const val COLLAGE_PREVIEW_DIMENSION = 1024
 
 fun previewDimensionFor(imageCount: Int): Int = when {
     imageCount <= 12 -> COLLAGE_PREVIEW_DIMENSION
-    imageCount <= 24 -> 768
-    else -> 640
+    imageCount <= 20 -> 768
+    else -> 512
 }
 
 class PreviewLoadStates internal constructor(
