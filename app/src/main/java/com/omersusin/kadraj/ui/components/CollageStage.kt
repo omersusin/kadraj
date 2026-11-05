@@ -63,6 +63,7 @@ fun CollageStage(
     onToggleFit: (Long) -> Unit,
     modifier: Modifier = Modifier,
     guides: Boolean = false,
+    showOriginal: Boolean = false,
 ) {
     val previews = rememberPreviewLoadStates(loader, images)
     val revision = previews.revision.value
@@ -105,7 +106,38 @@ fun CollageStage(
                 contrast = it.contrast,
                 saturation = it.saturation,
                 warmth = it.warmth,
+                fade = it.fade,
+                vignette = it.vignette,
+                grain = it.grain,
+                quarterTurns = it.quarterTurns,
             )
+        }
+    }
+    val effectiveStates = remember(imageStates, showOriginal) {
+        if (!showOriginal) {
+            imageStates
+        } else {
+            imageStates.mapValues { (_, state) ->
+                state.copy(
+                    fit = com.omersusin.kadraj.collage.FitMode.COVER,
+                    focusX = 0.5f,
+                    focusY = 0.5f,
+                    look = com.omersusin.kadraj.collage.PhotoLook.ORIGINAL,
+                    lookAmount = 1f,
+                    zoom = 1f,
+                    tilt = 0f,
+                    flipX = false,
+                    flipY = false,
+                    brightness = 0f,
+                    contrast = 0f,
+                    saturation = 0f,
+                    warmth = 0f,
+                    fade = 0f,
+                    vignette = 0f,
+                    grain = 0f,
+                    quarterTurns = 0,
+                )
+            }
         }
     }
     val provider = remember(uriById, previewDimension) {
@@ -163,7 +195,7 @@ fun CollageStage(
                     layout = layout,
                     style = style,
                     provider = provider,
-                    imageStates = imageStates,
+                    imageStates = effectiveStates,
                     selectedId = null,
                 )
                 native.restoreToCount(checkpoint)
@@ -322,8 +354,8 @@ fun CollageStage(
                             layout = layout,
                             style = style,
                             provider = provider,
-                            imageStates = imageStates,
-                            selectedId = selectedId,
+                            imageStates = effectiveStates,
+                            selectedId = if (showOriginal) null else selectedId,
                             selectionColor = 0xFFFF9E73.toInt(),
                             captionTypeface = captionTypeface,
                         )
@@ -434,6 +466,10 @@ fun CollagePreview(
                 contrast = it.contrast,
                 saturation = it.saturation,
                 warmth = it.warmth,
+                fade = it.fade,
+                vignette = it.vignette,
+                grain = it.grain,
+                quarterTurns = it.quarterTurns,
             )
         }
     }

@@ -15,6 +15,9 @@ import com.omersusin.kadraj.collage.CaptionStyle
 import com.omersusin.kadraj.collage.CaptionTone
 import com.omersusin.kadraj.collage.CollageConfig
 import com.omersusin.kadraj.collage.CollageStyle
+import com.omersusin.kadraj.collage.CompositionPreset
+import com.omersusin.kadraj.collage.CompositionPresets
+import com.omersusin.kadraj.collage.suggestTone
 import com.omersusin.kadraj.collage.FitMode
 import com.omersusin.kadraj.collage.ImageSpec
 import com.omersusin.kadraj.collage.LayoutEngine
@@ -31,6 +34,7 @@ import com.omersusin.kadraj.image.ImageLoader
 import com.omersusin.kadraj.render.ImageRenderState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Random
@@ -50,6 +54,8 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     var selectedId: Long? by mutableStateOf(null)
         private set
     var isImporting: Boolean by mutableStateOf(false)
+        private set
+    var isEnhancing: Boolean by mutableStateOf(false)
         private set
     var notice: UiNotice? by mutableStateOf(null)
         private set
@@ -73,6 +79,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     private val redoStack = ArrayDeque<EditorSnapshot>()
     private var lastHistoryKey: String? = null
     private var lastHistoryAt = 0L
+    private var exportJob: Job? = null
 
     val selectedImage: CollageImage?
         get() = selectedId?.let { id -> images.firstOrNull { it.id == id } }
@@ -211,6 +218,26 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun smartCrop(id: Long) {
+        val image = images.firstOrNull { it.id == id } ?: return
+        viewModelScope.launch {
+            val analysis = withContext(Dispatchers.IO) { loader.analyze(image.uri) }
+            if (analysis == null) {
+                showNotice("Couldn't find a focus point. Try another photo.")
+                return@launch
+            }
+            recordHistory()
+            images = images.map {
+                if (it.id == id) {
+                    it.copy(focusX = analysis.focusX, focusY = analysis.focusY)
+                } else {
+                    it
+                }
+            }
+            showNotice("Smart crop centred on the subject.")
+        }
+    }
+
     fun setLook(id: Long, look: PhotoLook) {
         val image = images.firstOrNull { it.id == id } ?: return
         if (image.look == look) return
@@ -258,6 +285,38 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun setFade(id: Long, value: Float) {
+        if (images.none { it.id == id }) return
+        recordHistory("fade-$id")
+        images = images.map {
+            if (it.id == id) it.copy(fade = value.coerceIn(0f, 1f)) else it
+        }
+    }
+
+    fun setVignette(id: Long, value: Float) {
+        if (images.none { it.id == id }) return
+        recordHistory("vignette-$id")
+        images = images.map {
+            if (it.id == id) it.copy(vignette = value.coerceIn(0f, 1f)) else it
+        }
+    }
+
+    fun setGrain(id: Long, value: Float) {
+        if (images.none { it.id == id }) return
+        recordHistory("grain-$id")
+        images = images.map {
+            if (it.id == id) it.copy(grain = value.coerceIn(0f, 1f)) else it
+        }
+    }
+
+    fun rotatePhoto(id: Long) {
+        if (images.none { it.id == id }) return
+        recordHistory()
+        images = images.map {
+            if (it.id == id) it.copy(quarterTurns = (it.quarterTurns + 1) % 4) else it
+        }
+    }
+
     fun resetTone(id: Long) {
         val image = images.firstOrNull { it.id == id } ?: return
         if (image.brightness == 0f &&
@@ -295,25 +354,43 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                 contrast = source.contrast,
                 saturation = source.saturation,
                 warmth = source.warmth,
+                fade = source.fade,
+                vignette = source.vignette,
+                grain = source.grain,
+                quarterTurns = source.quarterTurns,
             )
         }
         showNotice("This treatment now runs through every photo.")
     }
 
     fun autoEnhance() {
-        if (images.isEmpty()) return
-        recordHistory()
-        images = images.map { image ->
-            image.copy(
-                look = if (image.look == PhotoLook.ORIGINAL) PhotoLook.FILM else image.look,
-                lookAmount = if (image.look == PhotoLook.ORIGINAL) 0.42f else image.lookAmount,
-                brightness = (image.brightness + 0.04f).coerceIn(-1f, 1f),
-                contrast = (image.contrast + 0.10f).coerceIn(-1f, 1f),
-                saturation = (image.saturation + 0.08f).coerceIn(-1f, 1f),
-                warmth = (image.warmth + 0.12f).coerceIn(-1f, 1f),
-            )
+        if (images.isEmpty() || isEnhancing) return
+        isEnhancing = true
+        viewModelScope.launch {
+            val analyses = withContext(Dispatchers.IO) {
+                images.mapNotNull { image ->
+                    loader.analyze(image.uri)?.let { image.id to it }
+                }.toMap()
+            }
+            if (analyses.isEmpty()) {
+                isEnhancing = false
+                showNotice("Couldn't analyse those photos. Try again.")
+                return@launch
+            }
+            recordHistory()
+            images = images.map { image ->
+                val analysis = analyses[image.id] ?: return@map image
+                val tone = suggestTone(analysis)
+                image.copy(
+                    brightness = (image.brightness + tone.brightness).coerceIn(-1f, 1f),
+                    contrast = (image.contrast + tone.contrast).coerceIn(-1f, 1f),
+                    saturation = (image.saturation + tone.saturation).coerceIn(-1f, 1f),
+                    warmth = (image.warmth + tone.warmth).coerceIn(-1f, 1f),
+                )
+            }
+            isEnhancing = false
+            showNotice("Smart enhance balanced ${analyses.size} photos.")
         }
-        showNotice("A little more life, in every frame.")
     }
 
     fun setZoom(id: Long, zoom: Float) {
@@ -360,12 +437,36 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     contrast = 0f,
                     saturation = 0f,
                     warmth = 0f,
+                    fade = 0f,
+                    vignette = 0f,
+                    grain = 0f,
+                    quarterTurns = 0,
                 )
             } else {
                 it
             }
         }
         showNotice("Photo adjustments reset.")
+    }
+
+    fun applyPreset(preset: CompositionPreset) {
+        if (preset.matches(style, template, aspect)) return
+        recordHistory()
+        template = preset.template
+        aspect = preset.aspect
+        style = preset.style(style.caption)
+        showNotice("${preset.name} composition applied.")
+    }
+
+    fun activePreset(): CompositionPreset? =
+        CompositionPresets.all.firstOrNull { it.matches(style, template, aspect) }
+
+    fun surpriseComposition() {
+        val choices = CompositionPresets.all
+        if (choices.isEmpty()) return
+        val next = choices.filterNot { it.matches(style, template, aspect) }
+            .ifEmpty { choices }
+        applyPreset(next[random.nextInt(next.size)])
     }
 
     fun updateTemplate(value: Template) {
@@ -511,7 +612,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         val states = imageStates()
         val uris = images.associate { it.id to it.uri }
         exportState = ExportState.Rendering
-        viewModelScope.launch {
+        exportJob = viewModelScope.launch {
             try {
                 val result = exporter.export(
                     layout = layout,
@@ -530,6 +631,15 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     "Couldn't export. Try a smaller size or JPEG.",
                 )
             }
+        }
+    }
+
+    fun cancelExport() {
+        exportJob?.cancel()
+        exportJob = null
+        if (exportState is ExportState.Rendering) {
+            exportState = ExportState.Idle
+            showNotice("Export cancelled.")
         }
     }
 
@@ -581,10 +691,16 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                 contrast = it.contrast,
                 saturation = it.saturation,
                 warmth = it.warmth,
+                fade = it.fade,
+                vignette = it.vignette,
+                grain = it.grain,
+                quarterTurns = it.quarterTurns,
             )
         }
 
     fun newProject() {
+        exportJob?.cancel()
+        exportJob = null
         images = emptyList()
         template = Template.AUTO
         aspect = AspectPreset.AUTO

@@ -74,6 +74,7 @@ fun ExportSheet(
     val dimensions = remember(layout.aspect, viewModel.exportSize) {
         exportDimensions(layout.aspect, viewModel.exportSize.longSide)
     }
+    val haptics = LocalHapticFeedback.current
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -260,6 +261,22 @@ fun ExportSheet(
                         text = "Rendering",
                         style = Kadraj.Type.Button.copy(
                             color = Kadraj.PaperDim,
+                            letterSpacing = 0.2.sp,
+                        ),
+                    )
+                    Spacer(Modifier.weight(1f))
+                    BasicText(
+                        text = "Cancel",
+                        modifier = Modifier
+                            .clip(Kadraj.Shape.Pill)
+                            .pressable {
+                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                viewModel.cancelExport()
+                            }
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                        style = Kadraj.Type.LabelSmall.copy(
+                            color = Kadraj.Peach,
+                            fontSize = 10.sp,
                             letterSpacing = 0.2.sp,
                         ),
                     )

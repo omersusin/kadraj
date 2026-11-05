@@ -128,6 +128,20 @@ fun InfoSheet(
     )
     Spacer(Modifier.height(16.dp))
     InfoTip(
+        glyph = Glyph.Sparkle,
+        title = "Let it read the light",
+        body = "Smart enhance samples each photo and balances brightness, contrast, color, " +
+            "and warmth. Smart crop finds the busiest part of the frame and centres the crop.",
+    )
+    Spacer(Modifier.height(16.dp))
+    InfoTip(
+        glyph = Glyph.Eye,
+        title = "Check the original",
+        body = "The eye button on the stage shows the untouched photo treatment, so you can " +
+            "compare before and after without losing your place.",
+    )
+    Spacer(Modifier.height(16.dp))
+    InfoTip(
         glyph = Glyph.Lock,
         title = "Private by design",
         body = "Palettes, captions, and 4K output finish on your device. No account, " +

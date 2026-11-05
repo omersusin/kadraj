@@ -30,6 +30,8 @@ enum class Glyph {
     Share,
     Info,
     Settings,
+    Eye,
+    EyeOff,
     Grid,
     Flow,
     Hero,
@@ -53,6 +55,7 @@ enum class Glyph {
     Copy,
     FlipHorizontal,
     FlipVertical,
+    Rotate,
     Reset,
     AlignLeft,
     AlignCenter,
@@ -194,6 +197,19 @@ private fun DrawScope.drawGlyph(glyph: Glyph, color: Color, strokeWidth: Float) 
             drawCircle(color, 8.5f * scale, point(12f, 12f), style = stroke)
             line(12f, 10.5f, 12f, 17f)
             drawCircle(color, 1.05f * scale, point(12f, 7.2f))
+        }
+        Glyph.Eye, Glyph.EyeOff -> {
+            path {
+                moveTo(x(2.5f), y(12f))
+                quadraticBezierTo(x(7.5f), y(4.5f), x(12f), y(4.5f))
+                quadraticBezierTo(x(16.5f), y(4.5f), x(21.5f), y(12f))
+                quadraticBezierTo(x(16.5f), y(19.5f), x(12f), y(19.5f))
+                quadraticBezierTo(x(7.5f), y(19.5f), x(2.5f), y(12f))
+            }
+            drawCircle(color, 2.8f * scale, point(12f, 12f), style = stroke)
+            if (glyph == Glyph.EyeOff) {
+                line(4f, 4f, 20f, 20f)
+            }
         }
         Glyph.Settings -> {
             drawCircle(color, 6.8f * scale, point(12f, 12f), style = stroke)
@@ -454,6 +470,22 @@ private fun DrawScope.drawGlyph(glyph: Glyph, color: Color, strokeWidth: Float) 
                 lineTo(x(12f), y(15f))
                 lineTo(x(17f), y(20.5f))
                 close()
+            }
+        }
+        Glyph.Rotate -> {
+            drawArc(
+                color = color,
+                startAngle = -105f,
+                sweepAngle = 300f,
+                useCenter = false,
+                topLeft = point(4f, 4f),
+                size = Size(16f * scale, 16f * scale),
+                style = stroke,
+            )
+            path {
+                moveTo(x(17.4f), y(2.6f))
+                lineTo(x(21f), y(6.3f))
+                lineTo(x(16.8f), y(8.4f))
             }
         }
         Glyph.Reset -> {

@@ -57,6 +57,10 @@ data class ImageRenderState(
     val contrast: Float = 0f,
     val saturation: Float = 0f,
     val warmth: Float = 0f,
+    val fade: Float = 0f,
+    val vignette: Float = 0f,
+    val grain: Float = 0f,
+    val quarterTurns: Int = 0,
 )
 
 fun interface ImageProvider {
@@ -72,6 +76,7 @@ object CollagePainter {
         val contrast: Int,
         val saturation: Int,
         val warmth: Int,
+        val fade: Int,
     )
     private val filterCache = ConcurrentHashMap<FilterKey, ColorMatrixColorFilter>()
     private val identity = floatArrayOf(
@@ -273,7 +278,22 @@ object CollagePainter {
         val focusY = state.focusY.coerceIn(0f, 1f)
         val zoom = state.zoom.coerceIn(1f, 3f)
         val tilt = state.tilt.coerceIn(-12f, 12f)
-        val cover = if (abs(tilt) > 0.01f) tiltCoverScale(rect.width(), rect.height(), tilt) else 1f
+        val turns = ((state.quarterTurns % 4) + 4) % 4
+        val target = if (turns % 2 == 1) {
+            RectF(
+                rect.centerX() - rect.height() / 2f,
+                rect.centerY() - rect.width() / 2f,
+                rect.centerX() + rect.height() / 2f,
+                rect.centerY() + rect.width() / 2f,
+            )
+        } else {
+            RectF(rect)
+        }
+        val cover = if (abs(tilt) > 0.01f) {
+            tiltCoverScale(target.width(), target.height(), tilt)
+        } else {
+            1f
+        }
         val scale = zoom * cover
         val previousFilter = paint.colorFilter
         val filter = photoFilter(state)
@@ -288,9 +308,14 @@ object CollagePainter {
             }
 
             canvas.save()
-            if (abs(scale - 1f) > 0.001f || abs(tilt) > 0.01f || state.flipX || state.flipY) {
+            if (abs(scale - 1f) > 0.001f ||
+                abs(tilt) > 0.01f ||
+                turns != 0 ||
+                state.flipX ||
+                state.flipY
+            ) {
                 canvas.translate(rect.centerX(), rect.centerY())
-                canvas.rotate(tilt)
+                canvas.rotate(tilt + turns * 90f)
                 canvas.scale(
                     if (state.flipX) -scale else scale,
                     if (state.flipY) -scale else scale,
@@ -299,11 +324,11 @@ object CollagePainter {
             }
 
             if (fitMode == FitMode.FIT) {
-                val fitScale = min(rect.width() / bitmap.width, rect.height() / bitmap.height)
+                val fitScale = min(target.width() / bitmap.width, target.height() / bitmap.height)
                 val dstWidth = bitmap.width * fitScale
                 val dstHeight = bitmap.height * fitScale
-                val left = rect.left + (rect.width() - dstWidth) / 2f
-                val top = rect.top + (rect.height() - dstHeight) / 2f
+                val left = target.left + (target.width() - dstWidth) / 2f
+                val top = target.top + (target.height() - dstHeight) / 2f
                 canvas.drawBitmap(
                     bitmap,
                     Rect(0, 0, bitmap.width, bitmap.height),
@@ -312,7 +337,7 @@ object CollagePainter {
                 )
             } else {
                 val sourceAspect = bitmap.width.toFloat() / bitmap.height.toFloat()
-                val destinationAspect = rect.width() / rect.height()
+                val destinationAspect = target.width() / target.height()
                 val src: Rect
                 if (sourceAspect > destinationAspect) {
                     val sourceWidth = bitmap.height * destinationAspect
@@ -334,13 +359,47 @@ object CollagePainter {
                     )
                 }
                 if (src.width() > 0 && src.height() > 0) {
-                    canvas.drawBitmap(bitmap, src, rect, paint)
+                    canvas.drawBitmap(bitmap, src, target, paint)
                 }
             }
             canvas.restore()
+            drawPhotoFinish(canvas, rect, state)
         } finally {
             paint.colorFilter = previousFilter
             if (provided.recycleAfterUse) bitmap.recycle()
+        }
+    }
+
+    private fun drawPhotoFinish(
+        canvas: Canvas,
+        rect: RectF,
+        state: ImageRenderState,
+    ) {
+        val vignette = state.vignette.coerceIn(0f, 1f)
+        if (vignette > 0f) {
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                shader = RadialGradient(
+                    rect.centerX(),
+                    rect.centerY(),
+                    max(rect.width(), rect.height()) * 0.72f,
+                    intArrayOf(
+                        Color.TRANSPARENT,
+                        Color.argb((vignette * 175f).roundToInt(), 0, 0, 0),
+                    ),
+                    floatArrayOf(0.32f, 1f),
+                    Shader.TileMode.CLAMP,
+                )
+            }
+            canvas.drawRect(rect, paint)
+        }
+
+        val grainAmount = state.grain.coerceIn(0f, 1f)
+        if (grainAmount > 0f) {
+            val paint = Paint().apply {
+                alpha = (grainAmount * 118f).roundToInt()
+                shader = BitmapShader(grain, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+            }
+            canvas.drawRect(rect, paint)
         }
     }
 
@@ -449,14 +508,16 @@ object CollagePainter {
         val contrast = (state.contrast.coerceIn(-1f, 1f) * 48f).roundToInt()
         val saturation = (state.saturation.coerceIn(-1f, 1f) * 48f).roundToInt()
         val warmth = (state.warmth.coerceIn(-1f, 1f) * 48f).roundToInt()
+        val fade = (state.fade.coerceIn(0f, 1f) * 48f).roundToInt()
         val neutral = strength == 0 &&
             brightness == 0 &&
             contrast == 0 &&
             saturation == 0 &&
-            warmth == 0
+            warmth == 0 &&
+            fade == 0
         if (neutral) return null
 
-        val key = FilterKey(look, strength, brightness, contrast, saturation, warmth)
+        val key = FilterKey(look, strength, brightness, contrast, saturation, warmth, fade)
         return filterCache.getOrPut(key) {
             val target = targetMatrix(look).array
             val mix = strength / 48f
@@ -483,6 +544,16 @@ object CollagePainter {
                         warmthAmount * 20f,
                         warmthAmount * 4f,
                         -warmthAmount * 18f,
+                    ),
+                )
+            }
+
+            if (fade > 0) {
+                val fadeAmount = fade / 48f
+                matrix.postConcat(
+                    colorContrast(
+                        scale = 1f - fadeAmount * 0.2f,
+                        offset = fadeAmount * 30f,
                     ),
                 )
             }

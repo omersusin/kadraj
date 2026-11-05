@@ -12,10 +12,14 @@ Android 10 and up · About 3 MB
 Most collage apps squeeze every photo into the same square. Kadraj first studies the dominant orientation and the mix of ratios in your selection, then builds the composition around the images themselves. Phone screenshots stay tall, desktop captures stretch wide, and mixed sets find their own rhythm.
 
 - **Three appearance themes** — Cinema, Paper, and Contact, selectable in Settings and remembered between launches.
+- **Composition presets** — Studio, Gallery, Zine, Noir, Postcard, and Bento are one-tap starting points that combine a layout, ratio, palette, and material treatment.
 - **Smart ratio analysis** — portrait, landscape, and mixed selections are treated differently.
 - **Six layouts** — Auto, Grid, Flow, Hero, Strip, and Stack.
 - **Nine output ratios plus Auto** — 1:1, 3:4, 4:5, 9:16, 2:3, 3:2, 16:9, 16:10, and 2:1.
 - **Per-photo looks** — Original, Warm, Cool, Mono, Fade, Vivid, and Film with adjustable strength.
+- **Smart enhance** — an on-device histogram pass balances light, contrast, color, and warmth for every photo.
+- **Smart crop** — an edge-and-chroma pass finds the visual centre of a photo and moves the crop there.
+- **Finish controls** — fade, vignette, per-photo grain, and 90° rotation, with a one-tap original preview.
 - **Tone adjustments** — light, contrast, color, and warmth for every photo, with one-tap Auto Enhance and Sync to All.
 - **Frame controls** — drag to set the crop, zoom, tilt, flip horizontally or vertically, duplicate, or reset a photo.
 - **Composition guides** — a rule-of-thirds overlay with center mark, toggled from the preview.
@@ -24,7 +28,7 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 - **Compact control deck** — a collapsible, scrollable bottom sheet keeps the composition in view; the active tab, template, palette, photo, and look stay in reach.
 - **Ten palettes** — Paper, Night, Clay, Sage, Mist, Rose, Ivory, Olive, Sunset, and Lagoon.
 - **Fine tuning** — spacing, margin, corners, mat, shadow, grain, and a one-tap style randomizer.
-- **On-device output** — JPEG or PNG at Auto, 2K, or 4K; saved to the `Kadraj` album in Photos.
+- **On-device output** — JPEG or PNG at Auto, 2K, or 4K; saved to the `Kadraj` album in Photos. Long renders can be cancelled from the export sheet.
 - **Safe project flow** — leave or start over with an explicit confirmation, so a finished edit is never lost by accident.
 - **No account, no cloud** — no internet permission; your photos never leave the device.
 

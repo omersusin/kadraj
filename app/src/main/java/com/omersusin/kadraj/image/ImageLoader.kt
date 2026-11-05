@@ -9,7 +9,9 @@ import android.net.Uri
 import android.util.LruCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.omersusin.kadraj.collage.ToneAnalysis
 import kotlin.math.max
+import kotlin.math.sqrt
 
 data class ImageInfo(
     val width: Int,
@@ -102,6 +104,84 @@ class ImageLoader(
             cache.put(cacheKey, bitmap)
             bitmap
         }
+
+    suspend fun analyze(uri: Uri): ToneAnalysis? = withContext(Dispatchers.IO) {
+        val bitmap = preview(uri, 112) ?: return@withContext null
+        if (bitmap.width <= 0 || bitmap.height <= 0) return@withContext null
+        val pixels = IntArray(bitmap.width * bitmap.height)
+        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+        var sum = 0.0
+        var sumSq = 0.0
+        var saturation = 0.0
+        var warmth = 0.0
+        var focusWeight = 0.0
+        var focusX = 0.0
+        var focusY = 0.0
+        var count = 0
+        val step = max(1, minOf(bitmap.width, bitmap.height) / 72)
+        var y = 0
+        while (y < bitmap.height) {
+            var x = 0
+            while (x < bitmap.width) {
+                val color = pixels[y * bitmap.width + x]
+                val r = (color shr 16) and 0xFF
+                val g = (color shr 8) and 0xFF
+                val b = color and 0xFF
+                val luminance = (0.2126f * r + 0.7152f * g + 0.0722f * b) / 255f
+                val high = maxOf(r, maxOf(g, b))
+                val low = minOf(r, minOf(g, b))
+                val chroma = if (high == 0) 0f else (high - low).toFloat() / high
+                sum += luminance.toDouble()
+                sumSq += (luminance * luminance).toDouble()
+                saturation += chroma.toDouble()
+                warmth += (r - b).toDouble() / 255.0
+
+                val rightIndex = (y * bitmap.width + (x + step).coerceAtMost(bitmap.width - 1))
+                val belowIndex = ((y + step).coerceAtMost(bitmap.height - 1)) * bitmap.width + x
+                val rightLuma = (((pixels[rightIndex] shr 16) and 0xFF) * 0.2126f +
+                    ((pixels[rightIndex] shr 8) and 0xFF) * 0.7152f +
+                    (pixels[rightIndex] and 0xFF) * 0.0722f) / 255f
+                val belowLuma = (((pixels[belowIndex] shr 16) and 0xFF) * 0.2126f +
+                    ((pixels[belowIndex] shr 8) and 0xFF) * 0.7152f +
+                    (pixels[belowIndex] and 0xFF) * 0.0722f) / 255f
+                val edge = kotlin.math.abs(luminance - rightLuma) +
+                    kotlin.math.abs(luminance - belowLuma)
+                val nx = x.toFloat() / bitmap.width
+                val ny = y.toFloat() / bitmap.height
+                val centerDistance = sqrt(
+                    (nx - 0.5f) * (nx - 0.5f) + (ny - 0.5f) * (ny - 0.5f),
+                ).toDouble()
+                val weight = (edge * 2.4f + chroma * 1.15f + 0.01f) *
+                    (1f - 0.32f * centerDistance.toFloat()).coerceAtLeast(0.35f)
+                focusX += (nx * weight).toDouble()
+                focusY += (ny * weight).toDouble()
+                focusWeight += weight.toDouble()
+
+                count++
+                x += step
+            }
+            y += step
+        }
+        if (count == 0) return@withContext null
+        val mean = sum / count
+        val variance = (sumSq / count - mean * mean).coerceAtLeast(0.0)
+        ToneAnalysis(
+            luminance = mean.toFloat(),
+            contrast = sqrt(variance).toFloat(),
+            saturation = (saturation / count).toFloat(),
+            warmth = (warmth / count).toFloat(),
+            focusX = if (focusWeight > 0.0) {
+                (focusX / focusWeight).toFloat().coerceIn(0.12f, 0.88f)
+            } else {
+                0.5f
+            },
+            focusY = if (focusWeight > 0.0) {
+                (focusY / focusWeight).toFloat().coerceIn(0.12f, 0.88f)
+            } else {
+                0.5f
+            },
+        )
+    }
 
     fun decodeForExport(uri: Uri, neededDimension: Int): Bitmap? {
         val target = neededDimension.coerceIn(96, 4096)

@@ -14,6 +14,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -140,6 +141,7 @@ fun EditorScreen(
         )
     }
     var guides by rememberSaveable { mutableStateOf(false) }
+    var previewOriginal by rememberSaveable { mutableStateOf(false) }
     var dockExpanded by rememberSaveable { mutableStateOf(true) }
 
     val images = viewModel.images
@@ -192,15 +194,18 @@ fun EditorScreen(
                     selectedId = viewModel.selectedId,
                     loader = viewModel.imageLoader,
                     onSelect = { id ->
-                        viewModel.selectImage(id)
-                        if (id != null) {
-                            tab = EditorTab.Photo
-                            dockExpanded = true
+                        if (!previewOriginal) {
+                            viewModel.selectImage(id)
+                            if (id != null) {
+                                tab = EditorTab.Photo
+                                dockExpanded = true
+                            }
                         }
                     },
                     onFocus = viewModel::updateFocus,
                     onToggleFit = viewModel::toggleFit,
-                    guides = guides,
+                    guides = guides && !previewOriginal,
+                    showOriginal = previewOriginal,
                     modifier = Modifier.fillMaxSize(),
                 )
 
@@ -212,30 +217,55 @@ fun EditorScreen(
                         .padding(10.dp),
                 )
 
-                CircleIconButton(
-                    glyph = Glyph.Grid,
-                    onClick = { guides = !guides },
+                Row(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(10.dp),
-                    size = 32.dp,
-                    tint = if (guides) Kadraj.Peach else Kadraj.Muted,
-                    background = if (guides) {
-                        Kadraj.Peach.copy(alpha = 0.16f)
-                    } else {
-                        Kadraj.Ink.copy(alpha = 0.72f)
-                    },
-                    border = if (guides) {
-                        Kadraj.Peach.copy(alpha = 0.55f)
-                    } else {
-                        Kadraj.Line
-                    },
-                    contentDescription = if (guides) {
-                        "Hide composition guides"
-                    } else {
-                        "Show composition guides"
-                    },
-                )
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    CircleIconButton(
+                        glyph = if (previewOriginal) Glyph.Eye else Glyph.EyeOff,
+                        onClick = { previewOriginal = !previewOriginal },
+                        size = 32.dp,
+                        tint = if (previewOriginal) Kadraj.Peach else Kadraj.Muted,
+                        background = if (previewOriginal) {
+                            Kadraj.Peach.copy(alpha = 0.16f)
+                        } else {
+                            Kadraj.Ink.copy(alpha = 0.72f)
+                        },
+                        border = if (previewOriginal) {
+                            Kadraj.Peach.copy(alpha = 0.55f)
+                        } else {
+                            Kadraj.Line
+                        },
+                        contentDescription = if (previewOriginal) {
+                            "Show edits"
+                        } else {
+                            "Preview original photo treatment"
+                        },
+                    )
+                    CircleIconButton(
+                        glyph = Glyph.Grid,
+                        onClick = { guides = !guides },
+                        size = 32.dp,
+                        tint = if (guides) Kadraj.Peach else Kadraj.Muted,
+                        background = if (guides) {
+                            Kadraj.Peach.copy(alpha = 0.16f)
+                        } else {
+                            Kadraj.Ink.copy(alpha = 0.72f)
+                        },
+                        border = if (guides) {
+                            Kadraj.Peach.copy(alpha = 0.55f)
+                        } else {
+                            Kadraj.Line
+                        },
+                        contentDescription = if (guides) {
+                            "Hide composition guides"
+                        } else {
+                            "Show composition guides"
+                        },
+                    )
+                }
             }
 
             EditorDock(
@@ -748,7 +778,50 @@ private fun StyleControls(viewModel: EditorViewModel) {
                 contentDescription = "Reset style",
             )
         }
-        Spacer(Modifier.height(9.dp))
+        Spacer(Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            BasicText(
+                text = "Composition",
+                style = Kadraj.Type.Title.copy(color = Kadraj.Paper),
+            )
+            Spacer(Modifier.width(8.dp))
+            BasicText(
+                text = viewModel.activePreset()?.name ?: "Custom",
+                style = Kadraj.Type.LabelSmall.copy(
+                    color = Kadraj.Peach,
+                    fontSize = 10.sp,
+                    letterSpacing = 0.3.sp,
+                ),
+            )
+            Spacer(Modifier.weight(1f))
+            CircleIconButton(
+                glyph = Glyph.Sparkle,
+                onClick = viewModel::surpriseComposition,
+                size = 30.dp,
+                tint = Kadraj.Peach,
+                background = Kadraj.Peach.copy(alpha = 0.12f),
+                border = Kadraj.Peach.copy(alpha = 0.25f),
+                contentDescription = "Surprise composition",
+            )
+        }
+        Spacer(Modifier.height(7.dp))
+        val presets = CompositionPresets.all
+        AutoScrollRow(
+            entries = presets,
+            selectedIndex = presets.indexOfFirst { it.id == viewModel.activePreset()?.id },
+            key = { it.id },
+            modifier = Modifier.padding(horizontal = 16.dp),
+        ) { preset ->
+            CompositionPresetChip(
+                preset = preset,
+                selected = viewModel.activePreset()?.id == preset.id,
+                onClick = { viewModel.applyPreset(preset) },
+            )
+        }
+        Spacer(Modifier.height(12.dp))
         AutoScrollRow(
             entries = palettes,
             selectedIndex = selectedPalette,
@@ -1015,8 +1088,9 @@ private fun PhotoControls(
                     ) {
                         MiniAction(
                             glyph = Glyph.Sparkle,
-                            label = "Auto all",
+                            label = if (viewModel.isEnhancing) "Balancing…" else "Smart all",
                             onClick = viewModel::autoEnhance,
+                            enabled = !viewModel.isEnhancing,
                         )
                         if (images.size > 1) {
                             MiniAction(
@@ -1057,6 +1131,12 @@ private fun PhotoControls(
                             onValueChange = { viewModel.setWarmth(selectedImage.id, it) },
                             valueLabel = signedPercent(selectedImage.warmth),
                         )
+                        KadrajSlider(
+                            label = "Fade",
+                            value = selectedImage.fade,
+                            valueRange = 0f..1f,
+                            onValueChange = { viewModel.setFade(selectedImage.id, it) },
+                        )
                     }
                     Spacer(Modifier.height(7.dp))
                     Row(
@@ -1086,8 +1166,9 @@ private fun PhotoControls(
                         Spacer(Modifier.width(7.dp))
                         MiniAction(
                             glyph = Glyph.Sparkle,
-                            label = "Auto all",
+                            label = if (viewModel.isEnhancing) "Balancing…" else "Smart all",
                             onClick = viewModel::autoEnhance,
+                            enabled = !viewModel.isEnhancing,
                             highlighted = true,
                         )
                     }
@@ -1108,6 +1189,18 @@ private fun PhotoControls(
                             onValueChange = { viewModel.setTilt(selectedImage.id, it) },
                             valueLabel = "${selectedImage.tilt.roundToInt()}\u00B0",
                         )
+                        KadrajSlider(
+                            label = "Vignette",
+                            value = selectedImage.vignette,
+                            valueRange = 0f..1f,
+                            onValueChange = { viewModel.setVignette(selectedImage.id, it) },
+                        )
+                        KadrajSlider(
+                            label = "Grain",
+                            value = selectedImage.grain,
+                            valueRange = 0f..1f,
+                            onValueChange = { viewModel.setGrain(selectedImage.id, it) },
+                        )
                     }
                     Spacer(Modifier.height(7.dp))
                     Row(
@@ -1115,6 +1208,24 @@ private fun PhotoControls(
                         horizontalArrangement = Arrangement.spacedBy(7.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        CircleIconButton(
+                            glyph = Glyph.Fit,
+                            onClick = { viewModel.smartCrop(selectedImage.id) },
+                            size = 32.dp,
+                            tint = Kadraj.Peach,
+                            background = Kadraj.Peach.copy(alpha = 0.1f),
+                            border = Kadraj.Peach.copy(alpha = 0.2f),
+                            contentDescription = "Smart crop",
+                        )
+                        CircleIconButton(
+                            glyph = Glyph.Rotate,
+                            onClick = { viewModel.rotatePhoto(selectedImage.id) },
+                            size = 32.dp,
+                            tint = Kadraj.Paper,
+                            background = Kadraj.InkSoft,
+                            border = Kadraj.Line,
+                            contentDescription = "Rotate 90 degrees",
+                        )
                         CircleIconButton(
                             glyph = Glyph.FlipHorizontal,
                             onClick = { viewModel.toggleFlipHorizontal(selectedImage.id) },
@@ -1160,7 +1271,7 @@ private fun PhotoControls(
                 text = when (panel) {
                     PhotoPanel.Look -> "Pick a look, then dial in its strength."
                     PhotoPanel.Adjust -> "Small corrections, applied to this photo only."
-                    PhotoPanel.Frame -> "Drag the canvas to shift the crop. Double-tap to fill or fit."
+                    PhotoPanel.Frame -> "Drag to shift the crop. Double-tap to fill or fit. Rotate in 90° steps."
                 },
                 modifier = Modifier.padding(horizontal = 16.dp),
                 style = Kadraj.Type.BodySmall.copy(
@@ -1468,6 +1579,94 @@ private fun FitOption(
 }
 
 @Composable
+private fun CompositionPresetChip(
+    preset: CompositionPreset,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val haptics = LocalHapticFeedback.current
+    val shape = Kadraj.Shape.Card
+    val colors = preset.style().palette.colors.map { Color(it) }
+    Column(
+        modifier = Modifier
+            .width(100.dp)
+            .height(94.dp)
+            .clip(shape)
+            .background(
+                if (selected) Kadraj.Peach.copy(alpha = 0.1f) else Kadraj.InkLift.copy(alpha = 0.5f),
+            )
+            .border(
+                width = 1.dp,
+                color = if (selected) Kadraj.Peach.copy(alpha = 0.6f) else Kadraj.Line,
+                shape = shape,
+            )
+            .pressable {
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            }
+            .padding(5.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .clip(Kadraj.Shape.Preview)
+                .background(Brush.linearGradient(colors)),
+        ) {
+            Canvas(Modifier.fillMaxSize()) {
+                val stroke = 1.dp.toPx()
+                val third = size.width / 3f
+                drawLine(
+                    color = Color.White.copy(alpha = 0.38f),
+                    start = androidx.compose.ui.geometry.Offset(third, 0f),
+                    end = androidx.compose.ui.geometry.Offset(third, size.height),
+                    strokeWidth = stroke,
+                )
+                drawLine(
+                    color = Color.White.copy(alpha = 0.38f),
+                    start = androidx.compose.ui.geometry.Offset(third * 2f, 0f),
+                    end = androidx.compose.ui.geometry.Offset(third * 2f, size.height),
+                    strokeWidth = stroke,
+                )
+                drawLine(
+                    color = Color.White.copy(alpha = 0.38f),
+                    start = androidx.compose.ui.geometry.Offset(0f, size.height * 0.55f),
+                    end = androidx.compose.ui.geometry.Offset(size.width, size.height * 0.55f),
+                    strokeWidth = stroke,
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(5.dp)
+                    .width(14.dp)
+                    .height(3.dp)
+                    .background(Color(preset.style().palette.accent)),
+            )
+        }
+        Spacer(Modifier.height(5.dp))
+        BasicText(
+            text = preset.name,
+            style = Kadraj.Type.Title.copy(
+                color = if (selected) Kadraj.Peach else Kadraj.Paper,
+                fontSize = 12.5.sp,
+                lineHeight = 15.sp,
+            ),
+        )
+        BasicText(
+            text = preset.tagline,
+            style = Kadraj.Type.LabelSmall.copy(
+                color = Kadraj.MutedDim,
+                fontSize = 7.5.sp,
+                lineHeight = 10.sp,
+                letterSpacing = 0.1.sp,
+            ),
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
 private fun PaletteSwatch(
     palette: Palette,
     selected: Boolean,
@@ -1530,6 +1729,7 @@ private fun MiniAction(
     label: String,
     onClick: () -> Unit,
     highlighted: Boolean = false,
+    enabled: Boolean = true,
 ) {
     val haptics = LocalHapticFeedback.current
     val shape = Kadraj.Shape.Pill
@@ -1551,7 +1751,8 @@ private fun MiniAction(
                 if (highlighted) Kadraj.TerracottaSoft.copy(alpha = 0.55f) else Kadraj.Line,
                 shape,
             )
-            .pressable {
+            .graphicsLayer { alpha = if (enabled) 1f else 0.45f }
+            .pressable(enabled = enabled) {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             }
