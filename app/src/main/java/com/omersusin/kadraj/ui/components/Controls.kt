@@ -126,14 +126,19 @@ fun KadrajButton(
             listOf(Kadraj.Peach, Kadraj.TerracottaSoft),
         )
         ButtonTone.Paper -> Brush.horizontalGradient(
-            listOf(Color.White, Kadraj.Paper),
+            if (Kadraj.isPaper) {
+                listOf(Kadraj.InkRaised, Kadraj.InkSoft)
+            } else {
+                listOf(Color.White, Kadraj.Paper)
+            },
         )
         ButtonTone.Quiet -> Brush.horizontalGradient(
             listOf(Kadraj.InkLift, Kadraj.InkSoft),
         )
     }
     val contentColor = when (tone) {
-        ButtonTone.Accent, ButtonTone.Paper -> Kadraj.Ink
+        ButtonTone.Accent -> Kadraj.Ink
+        ButtonTone.Paper -> if (Kadraj.isPaper) Kadraj.Paper else Kadraj.Ink
         ButtonTone.Quiet -> Kadraj.Paper
     }
     val borderColor = when (tone) {
