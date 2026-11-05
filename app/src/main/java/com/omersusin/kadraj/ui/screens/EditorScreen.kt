@@ -316,13 +316,13 @@ private fun EditorTopBar(
         }
         Spacer(Modifier.width(4.dp))
         CircleIconButton(
-            glyph = Glyph.Info,
+            glyph = Glyph.Settings,
             onClick = onInfo,
             size = 32.dp,
             tint = Kadraj.Muted,
             background = Color.Transparent,
             border = Kadraj.Line,
-            contentDescription = "Help and info",
+            contentDescription = "Settings and info",
         )
         Spacer(Modifier.width(7.dp))
         ExportPill(onClick = onExport)
@@ -384,7 +384,7 @@ private fun ExportPill(onClick: () -> Unit) {
         modifier = Modifier
             .height(36.dp)
             .shadow(
-                elevation = 10.dp,
+                elevation = if (Kadraj.isPaper || Kadraj.isContact) 0.dp else 10.dp,
                 shape = shape,
                 clip = false,
                 ambientColor = Kadraj.Terracotta.copy(alpha = 0.35f),
@@ -440,7 +440,7 @@ private fun EditorDock(
             .padding(horizontal = 10.dp)
             .padding(bottom = 8.dp)
             .shadow(
-                elevation = 20.dp,
+                elevation = if (Kadraj.isPaper || Kadraj.isContact) 0.dp else 20.dp,
                 shape = shape,
                 clip = false,
                 ambientColor = Color.Black,

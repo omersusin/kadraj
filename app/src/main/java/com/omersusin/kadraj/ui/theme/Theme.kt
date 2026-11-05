@@ -692,7 +692,6 @@ fun KadrajTheme(
             isAppearanceLightStatusBars = mode == ThemeMode.PAPER
             isAppearanceLightNavigationBars = mode == ThemeMode.PAPER
         }
-        @Suppress("DEPRECATION")
         activity.window.navigationBarColor = android.graphics.Color.TRANSPARENT
     }
 

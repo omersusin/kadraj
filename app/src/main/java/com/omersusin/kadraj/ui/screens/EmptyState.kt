@@ -374,7 +374,7 @@ private fun PhotoHero(
             Wordmark(onPhoto = true)
             Spacer(Modifier.weight(1f))
             CircleIconButton(
-                glyph = Glyph.Info,
+                glyph = Glyph.Settings,
                 onClick = onInfo,
                 size = 35.dp,
                 tint = Kadraj.FixedPaper,

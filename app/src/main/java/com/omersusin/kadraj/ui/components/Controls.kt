@@ -146,7 +146,13 @@ fun KadrajButton(
         modifier = modifier
             .height(52.dp)
             .shadow(
-                elevation = if (tone == ButtonTone.Accent) 12.dp else 0.dp,
+                elevation = if (
+                    tone == ButtonTone.Accent && !Kadraj.isPaper && !Kadraj.isContact
+                ) {
+                    12.dp
+                } else {
+                    0.dp
+                },
                 shape = shape,
                 clip = false,
                 ambientColor = Kadraj.Terracotta.copy(alpha = 0.35f),
@@ -175,7 +181,7 @@ fun KadrajButton(
                 )
             }
             BasicText(
-                text = label,
+                text = if (Kadraj.isContact) label.uppercase(Locale.ROOT) else label,
                 style = Kadraj.Type.Button.copy(color = contentColor),
             )
             if (trailingGlyph != null) {
@@ -447,7 +453,7 @@ fun DockTab(
         )
         Spacer(Modifier.height(4.dp))
         BasicText(
-            text = label,
+            text = if (Kadraj.isContact) label.uppercase(Locale.ROOT) else label,
             style = Kadraj.Type.LabelSmall.copy(
                 color = if (selected) Kadraj.Ink else Kadraj.Muted,
                 fontSize = 10.sp,
@@ -693,7 +699,7 @@ fun ModalSheet(
                         .fillMaxWidth()
                         .widthIn(max = 620.dp)
                         .shadow(
-                            elevation = 28.dp,
+                            elevation = if (Kadraj.isPaper || Kadraj.isContact) 0.dp else 28.dp,
                             shape = Kadraj.Shape.Sheet,
                             clip = false,
                             ambientColor = Color.Black,

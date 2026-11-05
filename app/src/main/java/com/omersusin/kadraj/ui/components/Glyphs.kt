@@ -29,6 +29,7 @@ enum class Glyph {
     Download,
     Share,
     Info,
+    Settings,
     Grid,
     Flow,
     Hero,
@@ -193,6 +194,18 @@ private fun DrawScope.drawGlyph(glyph: Glyph, color: Color, strokeWidth: Float) 
             drawCircle(color, 8.5f * scale, point(12f, 12f), style = stroke)
             line(12f, 10.5f, 12f, 17f)
             drawCircle(color, 1.05f * scale, point(12f, 7.2f))
+        }
+        Glyph.Settings -> {
+            drawCircle(color, 6.8f * scale, point(12f, 12f), style = stroke)
+            drawCircle(color, 2.8f * scale, point(12f, 12f), style = stroke)
+            line(12f, 3.5f, 12f, 6.2f)
+            line(12f, 17.8f, 12f, 20.5f)
+            line(3.5f, 12f, 6.2f, 12f)
+            line(17.8f, 12f, 20.5f, 12f)
+            line(6f, 6f, 8f, 8f)
+            line(16f, 16f, 18f, 18f)
+            line(18f, 6f, 16f, 8f)
+            line(8f, 16f, 6f, 18f)
         }
         Glyph.Grid -> {
             roundRect(3.5f, 3.5f, 7f, 7f, 1.4f)
