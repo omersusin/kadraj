@@ -283,6 +283,7 @@ fun EditorScreen(
                 viewModel = viewModel,
                 selectedImage = selectedImage,
                 onPickImages = onPickImages,
+                initialPhotoPanel = initialPhotoPanel,
             )
         }
     }
@@ -466,6 +467,7 @@ private fun EditorDock(
     viewModel: EditorViewModel,
     selectedImage: CollageImage?,
     onPickImages: () -> Unit,
+    initialPhotoPanel: String? = null,
 ) {
     val shape = Kadraj.Shape.Dock
     Column(
