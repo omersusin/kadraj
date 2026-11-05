@@ -56,25 +56,32 @@ object LayoutEngine {
         val canvas = Canvas.of(choice.baseAspect, config.margin, config.gap)
         val count = images.size
         val rows = choice.rows
+        val gap = min(
+            canvas.gap,
+            min(
+                canvas.availableWidth / (choice.cols * 2f),
+                canvas.availableHeight / (rows * 2f),
+            ),
+        )
         val fullRows = count / choice.cols
         val remainder = count % choice.cols
-        val rowHeight = (canvas.availableHeight - canvas.gap * (rows - 1)) / rows
+        val rowHeight = (canvas.availableHeight - gap * (rows - 1)) / rows
         scalarCheck(rowHeight)
 
         val cells = ArrayList<CollageCell>(count)
         var index = 0
         for (row in 0 until rows) {
             val inRow = if (row < fullRows) choice.cols else remainder
-            val cellWidth = (canvas.availableWidth - canvas.gap * (inRow - 1)) / inRow
+            val cellWidth = (canvas.availableWidth - gap * (inRow - 1)) / inRow
             scalarCheck(cellWidth)
-            val y = canvas.top + row * (rowHeight + canvas.gap)
+            val y = canvas.top + row * (rowHeight + gap)
             var x = canvas.left
             repeat(inRow) {
                 val image = images[index]
                 val rect = NRect(x, y, x + cellWidth, y + rowHeight)
                     .normalizedBy(canvas.width, canvas.height)
                 cells += CollageCell(image.id, rect)
-                x += cellWidth + canvas.gap
+                x += cellWidth + gap
                 index++
             }
         }
@@ -383,21 +390,28 @@ object LayoutEngine {
     ) {
         if (images.isEmpty()) return
         val rows = ceil(images.size.toFloat() / columns).toInt()
-        val rowHeight = (bottom - top - gap * (rows - 1)) / rows
+        val cellGap = min(
+            gap,
+            min(
+                (bottom - top) / (rows * 2f),
+                (right - left) / (columns * 2f),
+            ),
+        )
+        val rowHeight = (bottom - top - cellGap * (rows - 1)) / rows
         scalarCheck(rowHeight)
         var index = 0
         for (row in 0 until rows) {
             val remaining = images.size - index
             val inRow = min(columns, remaining)
-            val cellWidth = (right - left - gap * (inRow - 1)) / inRow
+            val cellWidth = (right - left - cellGap * (inRow - 1)) / inRow
             scalarCheck(cellWidth)
-            val y = top + row * (rowHeight + gap)
+            val y = top + row * (rowHeight + cellGap)
             var x = left
             repeat(inRow) {
                 val rect = NRect(x, y, x + cellWidth, y + rowHeight)
                     .normalizedBy(canvasWidth, canvasHeight)
                 cells += CollageCell(images[index].id, rect)
-                x += cellWidth + gap
+                x += cellWidth + cellGap
                 index++
             }
         }
@@ -426,8 +440,13 @@ object LayoutEngine {
 
         val canvas = Canvas.of(baseAspect, config.margin, config.gap)
         val cells = ArrayList<CollageCell>(count)
+        val gap = if (horizontal) {
+            min(canvas.gap, canvas.availableWidth / (count * 2f))
+        } else {
+            min(canvas.gap, canvas.availableHeight / (count * 2f))
+        }
         if (horizontal) {
-            val cellWidth = (canvas.availableWidth - canvas.gap * (count - 1)) / count
+            val cellWidth = (canvas.availableWidth - gap * (count - 1)) / count
             scalarCheck(cellWidth)
             var x = canvas.left
             images.forEach { image ->
@@ -438,10 +457,10 @@ object LayoutEngine {
                     canvas.bottom,
                 ).normalizedBy(canvas.width, canvas.height)
                 cells += CollageCell(image.id, rect)
-                x += cellWidth + canvas.gap
+                x += cellWidth + gap
             }
         } else {
-            val cellHeight = (canvas.availableHeight - canvas.gap * (count - 1)) / count
+            val cellHeight = (canvas.availableHeight - gap * (count - 1)) / count
             scalarCheck(cellHeight)
             var y = canvas.top
             images.forEach { image ->
@@ -452,7 +471,7 @@ object LayoutEngine {
                     y + cellHeight,
                 ).normalizedBy(canvas.width, canvas.height)
                 cells += CollageCell(image.id, rect)
-                y += cellHeight + canvas.gap
+                y += cellHeight + gap
             }
         }
         return LayoutResult(canvas.width / canvas.height, cells)
