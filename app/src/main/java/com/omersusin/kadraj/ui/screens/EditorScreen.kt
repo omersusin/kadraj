@@ -761,13 +761,13 @@ private fun StyleControls(viewModel: EditorViewModel) {
             )
             Spacer(Modifier.weight(1f))
             CircleIconButton(
-                glyph = Glyph.Sparkle,
+                glyph = Glyph.Shuffle,
                 onClick = viewModel::randomizeStyle,
                 size = 30.dp,
                 tint = Kadraj.Peach,
                 background = Kadraj.Peach.copy(alpha = 0.12f),
                 border = Kadraj.Peach.copy(alpha = 0.25f),
-                contentDescription = "Surprise me",
+                contentDescription = "Surprise style",
             )
             Spacer(Modifier.width(7.dp))
             CircleIconButton(

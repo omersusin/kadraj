@@ -60,6 +60,12 @@ jobs:
             adb shell am start -W -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true --es demoTab Photo
             sleep 12
             adb exec-out screencap -p > photo.png
+            adb shell input tap 330 1605
+            sleep 3
+            adb exec-out screencap -p > photo-adjust.png
+            adb shell input tap 540 1605
+            sleep 3
+            adb exec-out screencap -p > photo-frame.png
             adb shell am force-stop com.omersusin.kadraj.debug
             adb shell am start -W -n com.omersusin.kadraj.debug/com.omersusin.kadraj.MainActivity --ez demoProject true --ei demoPhotoCount 30 --es demoTab Photo
             sleep 20
@@ -100,6 +106,8 @@ jobs:
             editor.png
             style.png
             photo.png
+            photo-adjust.png
+            photo-frame.png
             photo30.png
             text.png
             settings.png
