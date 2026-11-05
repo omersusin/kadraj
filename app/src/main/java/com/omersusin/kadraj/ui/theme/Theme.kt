@@ -683,19 +683,26 @@ fun KadrajTheme(
 ) {
     val spec = remember(mode) { themeSpec(mode) }
     activeSpec = spec
+    SystemBarsAppearance(darkIcons = mode == ThemeMode.PAPER)
+    content()
+}
+
+@Composable
+fun SystemBarsAppearance(
+    darkIcons: Boolean,
+    darkNavigationIcons: Boolean = darkIcons,
+) {
     val view = LocalView.current
     val context = LocalContext.current
 
     SideEffect {
         val activity = context.findActivity() ?: return@SideEffect
         WindowCompat.getInsetsController(activity.window, view).apply {
-            isAppearanceLightStatusBars = mode == ThemeMode.PAPER
-            isAppearanceLightNavigationBars = mode == ThemeMode.PAPER
+            isAppearanceLightStatusBars = darkIcons
+            isAppearanceLightNavigationBars = darkNavigationIcons
         }
         activity.window.navigationBarColor = android.graphics.Color.TRANSPARENT
     }
-
-    content()
 }
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {

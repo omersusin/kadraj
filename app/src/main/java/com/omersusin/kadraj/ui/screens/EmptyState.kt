@@ -67,6 +67,7 @@ import com.omersusin.kadraj.ui.components.Wordmark
 import com.omersusin.kadraj.ui.components.pressable
 import com.omersusin.kadraj.ui.components.templateLabel
 import com.omersusin.kadraj.ui.theme.Kadraj
+import com.omersusin.kadraj.ui.theme.SystemBarsAppearance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -130,6 +131,11 @@ fun EmptyState(
 ) {
     val haptics = LocalHapticFeedback.current
     val context = LocalContext.current
+    val pageScroll = rememberScrollState()
+    SystemBarsAppearance(
+        darkIcons = false,
+        darkNavigationIcons = Kadraj.isPaper,
+    )
     val heroBitmaps by produceState<List<Bitmap>?>(initialValue = null) {
         value = withContext(Dispatchers.IO) {
             demoImageResources.mapNotNull { resource ->
@@ -146,7 +152,7 @@ fun EmptyState(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(pageScroll)
                 .navigationBarsPadding(),
         ) {
             PhotoHero(
@@ -402,7 +408,7 @@ private fun PhotoHero(
             BasicText(
                 text = if (Kadraj.isContact) "ONE COMPOSITION." else "One composition.",
                 style = Kadraj.Type.Display.copy(
-                    color = Kadraj.FixedPeach,
+                    color = if (Kadraj.isPaper) Kadraj.FixedPeach else Kadraj.Peach,
                     fontSize = 30.sp,
                     lineHeight = 32.sp,
                     letterSpacing = if (Kadraj.isContact) 0.2.sp else (-0.7).sp,

@@ -599,7 +599,9 @@ fun Wordmark(
             modifier = Modifier
                 .size(6.dp)
                 .clip(if (Kadraj.isContact) RoundedCornerShape(0.dp) else CircleShape)
-                .background(if (onPhoto) Kadraj.FixedPeach else Kadraj.Peach),
+                .background(
+                    if (onPhoto && !Kadraj.isContact) Kadraj.FixedPeach else Kadraj.Peach,
+                ),
         )
     }
 }

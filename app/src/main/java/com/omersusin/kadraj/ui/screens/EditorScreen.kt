@@ -41,7 +41,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -106,6 +105,7 @@ import com.omersusin.kadraj.ui.components.ratioLabel
 import com.omersusin.kadraj.ui.components.rememberPreviewLoadStates
 import com.omersusin.kadraj.ui.components.templateLabel
 import com.omersusin.kadraj.ui.theme.Kadraj
+import com.omersusin.kadraj.ui.theme.SystemBarsAppearance
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -144,6 +144,7 @@ fun EditorScreen(
 
     val images = viewModel.images
     val selectedImage = viewModel.selectedImage
+    SystemBarsAppearance(darkIcons = Kadraj.isPaper)
     val layoutKey = remember(images) { images.map { it.id to it.aspect } }
     val layout = remember(
         layoutKey,

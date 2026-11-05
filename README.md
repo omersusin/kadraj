@@ -28,6 +28,18 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 - **Safe project flow** — leave or start over with an explicit confirmation, so a finished edit is never lost by accident.
 - **No account, no cloud** — no internet permission; your photos never leave the device.
 
+## Themes
+
+Kadraj ships with three complete appearance themes. Open **Settings** (the gear on the start screen or in the editor) to switch at any time; the choice is remembered.
+
+| Theme | Character |
+| --- | --- |
+| **Cinema** | The default. A dark, photo-first stage with peach light and a floating control deck. |
+| **Paper** | Warm paper, Fraunces headlines, terracotta accents, square frames, and an editorial rhythm. |
+| **Contact** | A monochrome contact-sheet skin: hairline borders, monospace labels, a technical grid, and signal red. |
+
+Each theme changes the palette, type system, corner language, backdrop, and system-bar appearance — not just the accent color.
+
 ## Layouts
 
 | Layout | When to use it |
@@ -48,6 +60,7 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 4. Open the Photo tab for looks, tone adjustments, zoom, tilt, flips, duplication, or resets. Swipe the photo strip to move between images.
 5. Open the Text tab to add a caption, start from an idea, and tune its type and placement.
 6. Choose a size and format, save to Photos, and share directly if you like.
+7. Open Settings (the gear) to switch between Cinema, Paper, and Contact.
 
 ## Install
 
@@ -104,7 +117,7 @@ the `v*` format publish the APK to GitHub Releases.
 
 ## Typefaces
 
-Headlines are set in **Fraunces**; the interface uses **Manrope**. Both are
+Headlines are set in **Fraunces**; the interface uses **Manrope**. The Contact theme uses the system monospace face for labels and numbers. Both are
 licensed under the SIL Open Font License 1.1, with licenses in
 [`licenses/`](licenses/).
 

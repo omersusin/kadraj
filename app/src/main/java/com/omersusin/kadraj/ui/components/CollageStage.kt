@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -172,21 +171,33 @@ fun CollageStage(
         }
 
         Canvas(Modifier.fillMaxSize()) {
-            drawRect(
-                brush = Brush.verticalGradient(
-                    listOf(
-                        Kadraj.FixedInk.copy(alpha = 0.58f),
-                        Kadraj.FixedInk.copy(alpha = 0.36f),
-                        Kadraj.FixedInk.copy(alpha = 0.68f),
+            if (Kadraj.isPaper) {
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            Kadraj.InkRaised.copy(alpha = 0.92f),
+                            Kadraj.Ink.copy(alpha = 0.84f),
+                            Kadraj.InkDeep.copy(alpha = 0.94f),
+                        ),
                     ),
-                ),
-            )
+                )
+            } else {
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            Kadraj.FixedInk.copy(alpha = 0.58f),
+                            Kadraj.FixedInk.copy(alpha = 0.36f),
+                            Kadraj.FixedInk.copy(alpha = 0.68f),
+                        ),
+                    ),
+                )
+            }
             val center = Offset(size.width / 2f, size.height * 0.46f)
             val glowRadius = size.minDimension * 0.58f
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Kadraj.Peach.copy(alpha = 0.07f),
+                        Kadraj.Peach.copy(alpha = if (Kadraj.isPaper) 0.1f else 0.07f),
                         Color.Transparent,
                     ),
                     center = center,
@@ -202,7 +213,7 @@ fun CollageStage(
                 modifier = Modifier
                     .size(canvasWidth, canvasHeight)
                     .shadow(
-                        elevation = 28.dp,
+                        elevation = if (Kadraj.isPaper) 10.dp else 28.dp,
                         shape = shape,
                         clip = false,
                         ambientColor = Color.Black,
