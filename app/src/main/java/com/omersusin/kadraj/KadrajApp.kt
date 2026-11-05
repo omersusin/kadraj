@@ -59,6 +59,7 @@ import kotlinx.coroutines.withContext
 fun KadrajApp(
     viewModel: EditorViewModel = viewModel(),
     startWithDemo: Boolean = false,
+    demoPhotoCount: Int = 3,
     initialTab: String? = null,
 ) {
     var showInfo by rememberSaveable { mutableStateOf(false) }
@@ -69,18 +70,21 @@ fun KadrajApp(
     val images = viewModel.images
     val notice = viewModel.notice
 
-    LaunchedEffect(startWithDemo) {
+    LaunchedEffect(startWithDemo, demoPhotoCount) {
         if (!BuildConfig.DEBUG || !startWithDemo || images.isNotEmpty()) {
             return@LaunchedEffect
         }
+        val demoImages = listOf(
+            R.drawable.demo_window to "window.jpg",
+            R.drawable.demo_loggia to "loggia.jpg",
+            R.drawable.demo_still_life to "still-life.jpg",
+        )
+        val count = demoPhotoCount.coerceIn(1, EditorViewModel.MAX_IMAGES)
         val demoUris = withContext(Dispatchers.IO) {
-            listOf(
-                R.drawable.demo_window to "window.jpg",
-                R.drawable.demo_loggia to "loggia.jpg",
-                R.drawable.demo_still_life to "still-life.jpg",
-            ).mapNotNull { (resource, name) ->
+            (0 until count).mapNotNull { index ->
+                val (resource, name) = demoImages[index % demoImages.size]
                 runCatching {
-                    val file = File(context.cacheDir, "demo_$name")
+                    val file = File(context.cacheDir, "demo_${index}_$name")
                     context.resources.openRawResource(resource).use { input ->
                         file.outputStream().use { output -> input.copyTo(output) }
                     }

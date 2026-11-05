@@ -89,6 +89,7 @@ fun CollageStage(
         images.map { it.id to it.uri }
     }
     val uriById = remember(imageKey) { imageKey.toMap() }
+    val previewDimension = previewDimensionFor(images.size)
     val imageStates = remember(images) {
         images.associate {
             it.id to ImageRenderState(
@@ -108,10 +109,10 @@ fun CollageStage(
             )
         }
     }
-    val provider = remember(uriById) {
+    val provider = remember(uriById, previewDimension) {
         ImageProvider { imageId, _, _ ->
             uriById[imageId]?.let { uri ->
-                loader.cached(uri, COLLAGE_PREVIEW_DIMENSION)?.let { bitmap ->
+                loader.cached(uri, previewDimension)?.let { bitmap ->
                     ProvidedImage(bitmap, recycleAfterUse = false)
                 }
             }
@@ -401,6 +402,7 @@ fun CollagePreview(
     val revision = previews.revision.value
     val imageKey = remember(images) { images.map { it.id to it.uri } }
     val uriById = remember(imageKey) { imageKey.toMap() }
+    val previewDimension = previewDimensionFor(images.size)
     val context = LocalContext.current
     val captionTypeface = remember(context, style.caption.font) {
         CaptionTypefaces.load(context, style.caption.font)
@@ -424,10 +426,10 @@ fun CollagePreview(
             )
         }
     }
-    val provider = remember(uriById) {
+    val provider = remember(uriById, previewDimension) {
         ImageProvider { imageId, _, _ ->
             uriById[imageId]?.let { uri ->
-                loader.cached(uri, COLLAGE_PREVIEW_DIMENSION)?.let { bitmap ->
+                loader.cached(uri, previewDimension)?.let { bitmap ->
                     ProvidedImage(bitmap, recycleAfterUse = false)
                 }
             }

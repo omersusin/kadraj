@@ -89,11 +89,11 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
             return
         }
 
-        val unique = uris.distinctBy { it.toString() }
-        val selected = unique.take(remaining)
-        val truncated = unique.size > selected.size
         val already = images.map { it.uri.toString() }.toSet()
-        val candidates = selected.filterNot { it.toString() in already }
+        val unique = uris.distinctBy { it.toString() }
+            .filterNot { it.toString() in already }
+        val candidates = unique.take(remaining)
+        val truncated = unique.size > candidates.size
         if (candidates.isEmpty()) {
             showNotice(if (truncated) "Only $MAX_IMAGES images can be added." else "Those images are already in the collage.")
             return
@@ -124,7 +124,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                 added.isEmpty() -> showNotice("Couldn't open those images. Try another selection.")
                 added.size < candidates.size -> showNotice("Some images couldn't be opened.")
                 images.size >= MAX_IMAGES -> showNotice("Collage full · $MAX_IMAGES photos.")
-                truncated -> showNotice("Added the first $MAX_IMAGES images.")
+                truncated -> showNotice("Added ${added.size} of ${unique.size} selected photos · $MAX_IMAGES max.")
             }
         }
     }
@@ -657,7 +657,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     companion object {
-        const val MAX_IMAGES = 12
+        const val MAX_IMAGES = 30
         private const val HISTORY_LIMIT = 40
     }
 }

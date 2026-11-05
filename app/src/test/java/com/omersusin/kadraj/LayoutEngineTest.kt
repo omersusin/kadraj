@@ -108,8 +108,8 @@ class LayoutEngineTest {
     @Test
     fun `all templates and counts produce valid geometry`() {
         val aspectSets = listOf(
-            List(12) { phone },
-            List(12) { desktop },
+            List(30) { phone },
+            List(30) { desktop },
             listOf(phone, desktop, 1f, portraitPhoto, landscapePhoto, phone, desktop),
         )
         for (set in aspectSets) {
@@ -127,7 +127,7 @@ class LayoutEngineTest {
 
     @Test
     fun `extreme controls do not break geometry`() {
-        val source = images(*List(12) { if (it % 2 == 0) phone else desktop }.toFloatArray())
+        val source = images(*List(30) { if (it % 2 == 0) phone else desktop }.toFloatArray())
         for (template in Template.entries) {
             for (aspect in listOf(AspectPreset.AUTO, AspectPreset.FOUR_FIVE, AspectPreset.DESKTOP)) {
                 assertCore(

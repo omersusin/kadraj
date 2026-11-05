@@ -19,10 +19,15 @@ class MainActivity : ComponentActivity() {
             isAppearanceLightNavigationBars = false
         }
         setContent {
+            val demo = BuildConfig.DEBUG && intent.getBooleanExtra("demoProject", false)
             KadrajTheme {
                 KadrajApp(
-                    startWithDemo = BuildConfig.DEBUG &&
-                        intent.getBooleanExtra("demoProject", false),
+                    startWithDemo = demo,
+                    demoPhotoCount = if (demo) {
+                        intent.getIntExtra("demoPhotoCount", 3)
+                    } else {
+                        3
+                    },
                     initialTab = intent.getStringExtra("demoTab"),
                 )
             }

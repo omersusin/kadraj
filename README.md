@@ -40,7 +40,7 @@ Most collage apps squeeze every photo into the same square. Kadraj first studies
 
 ## How to use it
 
-1. Choose 1–12 images from your gallery. Some Android photo pickers cap a
+1. Choose 1–30 images from your gallery. Some Android photo pickers cap a
    single selection pass at 10; tap Add again for the rest.
 2. Pick a template and output ratio; visual template previews and real ratios make the choice immediate.
 3. Tap a photo to select it, then drag to move the crop.

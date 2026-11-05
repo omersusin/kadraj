@@ -42,6 +42,12 @@ import kotlinx.coroutines.withContext
 
 const val COLLAGE_PREVIEW_DIMENSION = 1024
 
+fun previewDimensionFor(imageCount: Int): Int = when {
+    imageCount <= 12 -> COLLAGE_PREVIEW_DIMENSION
+    imageCount <= 24 -> 768
+    else -> 640
+}
+
 class PreviewLoadStates internal constructor(
     val revision: State<Int>,
     val loading: State<Boolean>,
@@ -55,14 +61,15 @@ fun rememberPreviewLoadStates(
     val revision = remember { mutableIntStateOf(0) }
     val loading = remember { mutableStateOf(images.isNotEmpty()) }
     val key = remember(images) {
-        images.joinToString("|") { "${it.id}:${it.uri}" }
+        images.map { "${it.id}:${it.uri}" }.sorted().joinToString("|")
     }
+    val dimension = previewDimensionFor(images.size)
 
-    LaunchedEffect(key) {
+    LaunchedEffect(key, dimension) {
         loading.value = images.isNotEmpty()
         images.forEach { image ->
             withContext(Dispatchers.IO) {
-                loader.preview(image.uri, COLLAGE_PREVIEW_DIMENSION)
+                loader.preview(image.uri, dimension)
             }
             revision.intValue += 1
         }

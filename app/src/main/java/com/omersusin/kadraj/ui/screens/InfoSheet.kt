@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omersusin.kadraj.BuildConfig
+import com.omersusin.kadraj.EditorViewModel
 import com.omersusin.kadraj.ui.components.ButtonTone
 import com.omersusin.kadraj.ui.components.CircleIconButton
 import com.omersusin.kadraj.ui.components.Glyph
@@ -82,7 +83,7 @@ fun InfoSheet(
         horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         Pill("On-device")
-        Pill("12 photos")
+        Pill("${EditorViewModel.MAX_IMAGES} photos")
         Pill("7 looks")
         Pill("4K")
     }
