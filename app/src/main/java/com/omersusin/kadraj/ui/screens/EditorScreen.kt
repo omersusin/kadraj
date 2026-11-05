@@ -287,9 +287,9 @@ private fun EditorTopBar(
         Spacer(Modifier.width(6.dp))
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(50))
+                .clip(Kadraj.Shape.Pill)
                 .background(Kadraj.InkSoft.copy(alpha = 0.65f))
-                .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
+                .border(1.dp, Kadraj.Line, Kadraj.Shape.Pill)
                 .padding(horizontal = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -335,7 +335,7 @@ private fun StageMetaPill(
     photoCount: Int,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(50)
+    val shape = Kadraj.Shape.Pill
     Row(
         modifier = modifier
             .clip(shape)
@@ -379,7 +379,7 @@ private fun StageMetaPill(
 @Composable
 private fun ExportPill(onClick: () -> Unit) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(50)
+    val shape = Kadraj.Shape.Pill
     Row(
         modifier = Modifier
             .height(36.dp)
@@ -396,7 +396,7 @@ private fun ExportPill(onClick: () -> Unit) {
                     listOf(Kadraj.Peach, Kadraj.TerracottaSoft),
                 ),
             )
-            .border(1.dp, Color.White.copy(alpha = 0.18f), shape)
+            .border(1.dp, Kadraj.AccentBorder, shape)
             .pressable {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
@@ -433,7 +433,7 @@ private fun EditorDock(
     selectedImage: CollageImage?,
     onPickImages: () -> Unit,
 ) {
-    val shape = RoundedCornerShape(26.dp)
+    val shape = Kadraj.Shape.Dock
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -474,7 +474,7 @@ private fun EditorDock(
                 modifier = Modifier
                     .width(34.dp)
                     .height(4.dp)
-                    .clip(RoundedCornerShape(50))
+                    .clip(Kadraj.Shape.Pill)
                     .background(Kadraj.LineStrong),
             )
         }
@@ -848,7 +848,7 @@ private fun PhotoControls(
             Row(
                 modifier = Modifier
                     .height(34.dp)
-                    .clip(RoundedCornerShape(50))
+                    .clip(Kadraj.Shape.Pill)
                     .background(
                         if (remaining > 0) {
                             Kadraj.Peach.copy(alpha = 0.16f)
@@ -863,7 +863,7 @@ private fun PhotoControls(
                         } else {
                             Color.Transparent
                         },
-                        RoundedCornerShape(50),
+                        Kadraj.Shape.Pill,
                     )
                     .pressable(enabled = remaining > 0) {
                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -1172,9 +1172,9 @@ private fun PhotoControls(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
+                    .clip(Kadraj.Shape.Control)
                     .background(Kadraj.InkSoft)
-                    .border(1.dp, Kadraj.Line, RoundedCornerShape(14.dp))
+                    .border(1.dp, Kadraj.Line, Kadraj.Shape.Control)
                     .padding(14.dp),
             ) {
                 BasicText(
@@ -1232,9 +1232,9 @@ private fun TextControls(viewModel: EditorViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 44.dp, max = 68.dp)
-                .clip(RoundedCornerShape(13.dp))
+                .clip(Kadraj.Shape.Control)
                 .background(Kadraj.InkSoft)
-                .border(1.dp, Kadraj.Line, RoundedCornerShape(13.dp))
+                .border(1.dp, Kadraj.Line, Kadraj.Shape.Control)
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             textStyle = Kadraj.Type.Body.copy(
                 color = Kadraj.Paper,
@@ -1413,9 +1413,9 @@ private fun FitSwitch(
     Row(
         modifier = Modifier
             .height(30.dp)
-            .clip(RoundedCornerShape(50))
+            .clip(Kadraj.Shape.Pill)
             .background(Kadraj.InkSoft)
-            .border(1.dp, Kadraj.Line, RoundedCornerShape(50)),
+            .border(1.dp, Kadraj.Line, Kadraj.Shape.Pill),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         FitOption(
@@ -1438,7 +1438,7 @@ private fun FitOption(
     onClick: () -> Unit,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(50)
+    val shape = Kadraj.Shape.Pill
     Box(
         modifier = Modifier
             .height(30.dp)
@@ -1531,7 +1531,7 @@ private fun MiniAction(
     highlighted: Boolean = false,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(50)
+    val shape = Kadraj.Shape.Pill
     Row(
         modifier = Modifier
             .height(28.dp)

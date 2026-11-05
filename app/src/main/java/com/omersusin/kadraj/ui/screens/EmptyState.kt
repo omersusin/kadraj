@@ -282,19 +282,14 @@ private fun PhotoHero(
         animationSpec = tween(durationMillis = 700),
         label = "hero-reveal",
     )
-    val shape = RoundedCornerShape(
-        topStart = 0.dp,
-        topEnd = 0.dp,
-        bottomEnd = 28.dp,
-        bottomStart = 28.dp,
-    )
+    val shape = Kadraj.Shape.Hero
 
     Box(
         modifier = modifier
             .clip(shape)
             .background(Kadraj.InkDeep)
             .semantics {
-                contentDescription = "Sample Kadraj collage with a portrait, architecture and coffee"
+                contentDescription = "Sample Kadraj collage with a sunlit window, a seaside loggia and a still life"
             },
     ) {
         val photos = bitmaps
@@ -376,16 +371,16 @@ private fun PhotoHero(
                 .padding(start = 20.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Wordmark()
+            Wordmark(onPhoto = true)
             Spacer(Modifier.weight(1f))
             CircleIconButton(
                 glyph = Glyph.Info,
                 onClick = onInfo,
                 size = 35.dp,
-                tint = Kadraj.Paper,
+                tint = Kadraj.FixedPaper,
                 background = Color.Black.copy(alpha = 0.26f),
-                border = Color.White.copy(alpha = 0.2f),
-                contentDescription = "Help and info",
+                border = Kadraj.OnPhotoLine,
+                contentDescription = "Settings and info",
             )
         }
 
@@ -396,21 +391,21 @@ private fun PhotoHero(
                 .padding(horizontal = 20.dp, vertical = 22.dp),
         ) {
             BasicText(
-                text = "Mixed ratios.",
+                text = if (Kadraj.isContact) "MIXED RATIOS." else "Mixed ratios.",
                 style = Kadraj.Type.Display.copy(
-                    color = Kadraj.Paper,
+                    color = Kadraj.FixedPaper,
                     fontSize = 30.sp,
                     lineHeight = 32.sp,
-                    letterSpacing = (-0.7).sp,
+                    letterSpacing = if (Kadraj.isContact) 0.2.sp else (-0.7).sp,
                 ),
             )
             BasicText(
-                text = "One composition.",
+                text = if (Kadraj.isContact) "ONE COMPOSITION." else "One composition.",
                 style = Kadraj.Type.Display.copy(
-                    color = Kadraj.Peach,
+                    color = Kadraj.FixedPeach,
                     fontSize = 30.sp,
                     lineHeight = 32.sp,
-                    letterSpacing = (-0.7).sp,
+                    letterSpacing = if (Kadraj.isContact) 0.2.sp else (-0.7).sp,
                 ),
             )
         }
@@ -484,12 +479,12 @@ private fun HomeLayouts(bitmaps: List<Bitmap>?) {
                             modifier = Modifier
                                 .width(previewSize)
                                 .height(previewSize)
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(Kadraj.Shape.Preview)
                                 .background(Kadraj.InkSoft)
                                 .border(
                                     1.dp,
-                                    Color.White.copy(alpha = 0.07f),
-                                    RoundedCornerShape(12.dp),
+                                    Kadraj.Line,
+                                    Kadraj.Shape.Preview,
                                 )
                                 .semantics {
                                     contentDescription = "${templateLabel(template)} layout preview"
@@ -561,8 +556,8 @@ private fun HistoryAction(
 ) {
     Row(
         modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
+            .clip(Kadraj.Shape.Pill)
+            .border(1.dp, Kadraj.Line, Kadraj.Shape.Pill)
             .pressable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,

@@ -11,6 +11,7 @@ Android 10 and up · About 3 MB
 
 Most collage apps squeeze every photo into the same square. Kadraj first studies the dominant orientation and the mix of ratios in your selection, then builds the composition around the images themselves. Phone screenshots stay tall, desktop captures stretch wide, and mixed sets find their own rhythm.
 
+- **Three appearance themes** — Cinema, Paper, and Contact, selectable in Settings and remembered between launches.
 - **Smart ratio analysis** — portrait, landscape, and mixed selections are treated differently.
 - **Six layouts** — Auto, Grid, Flow, Hero, Strip, and Stack.
 - **Nine output ratios plus Auto** — 1:1, 3:4, 4:5, 9:16, 2:3, 3:2, 16:9, 16:10, and 2:1.
@@ -97,7 +98,7 @@ the `v*` format publish the APK to GitHub Releases.
 - Kotlin 2.0 and Jetpack Compose; no Material library.
 - A pure Kotlin layout engine with JVM unit tests.
 - Preview and export share the same renderer, including tone and look filters.
-- A photo-first interface with a neutral charcoal palette, one peach accent, compact collapsible controls, and subtle motion, without a Material dependency.
+- A photo-first interface with three appearance themes, compact collapsible controls, and subtle motion, without a Material dependency. Cinema is the default dark stage; Paper is a warm editorial skin; Contact is a monochrome contact-sheet skin.
 - R8 minification, resource shrinking, and a signed release configuration.
 - `minSdk 29`, `targetSdk 35`.
 

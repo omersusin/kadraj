@@ -107,7 +107,7 @@ fun ImageThumb(
 ) {
     val haptics = LocalHapticFeedback.current
     val bitmap = rememberThumbnail(loader, image.uri).value
-    val shape = RoundedCornerShape(12.dp)
+    val shape = Kadraj.Shape.Preview
     Box(
         modifier = modifier
             .size(56.dp)
@@ -163,7 +163,7 @@ fun AddImageTile(
     enabled: Boolean = true,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(12.dp)
+    val shape = Kadraj.Shape.Preview
     Column(
         modifier = modifier
             .size(58.dp)

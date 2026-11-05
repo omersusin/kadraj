@@ -120,7 +120,7 @@ fun KadrajButton(
     enabled: Boolean = true,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(16.dp)
+    val shape = Kadraj.Shape.Button
     val background = when (tone) {
         ButtonTone.Accent -> Brush.horizontalGradient(
             listOf(Kadraj.Peach, Kadraj.TerracottaSoft),
@@ -138,7 +138,7 @@ fun KadrajButton(
     }
     val borderColor = when (tone) {
         ButtonTone.Quiet -> Kadraj.LineStrong
-        else -> Color.White.copy(alpha = 0.16f)
+        else -> Kadraj.AccentBorder
     }
     val hapticType = HapticFeedbackType.TextHandleMove
 
@@ -213,9 +213,9 @@ fun CircleIconButton(
         modifier = modifier
             .size(size)
             .then(semanticsModifier)
-            .clip(CircleShape)
+            .clip(Kadraj.Shape.Icon)
             .background(background)
-            .border(1.dp, border, CircleShape)
+            .border(1.dp, border, Kadraj.Shape.Icon)
             .pressable(enabled = enabled) {
                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
@@ -239,7 +239,7 @@ fun ChoiceChip(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(50)
+    val shape = Kadraj.Shape.Pill
     val content = if (selected) Kadraj.Ink else Kadraj.PaperDim
     Box(
         modifier = modifier
@@ -269,7 +269,7 @@ fun TemplateChip(
     preview: (@Composable () -> Unit)? = null,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(14.dp)
+    val shape = Kadraj.Shape.Control
     val content = if (selected) Kadraj.Paper else Kadraj.Muted
     Column(
         modifier = modifier
@@ -376,7 +376,7 @@ fun ToggleChip(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(50)
+    val shape = Kadraj.Shape.Pill
     Row(
         modifier = modifier
             .height(32.dp)
@@ -423,7 +423,7 @@ fun DockTab(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(14.dp)
+    val shape = Kadraj.Shape.Control
     Column(
         modifier = modifier
             .height(50.dp)
@@ -569,21 +569,26 @@ fun Hairline(modifier: Modifier = Modifier, color: Color = Kadraj.Line) {
 }
 
 @Composable
-fun Wordmark(modifier: Modifier = Modifier) {
+fun Wordmark(
+    modifier: Modifier = Modifier,
+    onPhoto: Boolean = false,
+) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         BasicText(
-            text = "Kadraj",
-            style = Kadraj.Type.Wordmark.copy(color = Kadraj.Paper),
+            text = if (Kadraj.isContact) "KADRAJ" else "Kadraj",
+            style = Kadraj.Type.Wordmark.copy(
+                color = if (onPhoto) Kadraj.FixedPaper else Kadraj.Paper,
+            ),
         )
         Box(
             modifier = Modifier
                 .size(6.dp)
-                .clip(CircleShape)
-                .background(Kadraj.Peach),
+                .clip(if (Kadraj.isContact) RoundedCornerShape(0.dp) else CircleShape)
+                .background(if (onPhoto) Kadraj.FixedPeach else Kadraj.Peach),
         )
     }
 }
@@ -592,9 +597,9 @@ fun Wordmark(modifier: Modifier = Modifier) {
 fun NoticePill(message: String, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(17.dp))
+            .clip(Kadraj.Shape.Pill)
             .background(Kadraj.InkLift)
-            .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(17.dp))
+            .border(1.dp, Kadraj.LineStrong, Kadraj.Shape.Pill)
             .padding(horizontal = 14.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(9.dp),
@@ -689,12 +694,12 @@ fun ModalSheet(
                         .widthIn(max = 620.dp)
                         .shadow(
                             elevation = 28.dp,
-                            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                            shape = Kadraj.Shape.Sheet,
                             clip = false,
                             ambientColor = Color.Black,
                             spotColor = Color.Black,
                         )
-                        .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                        .clip(Kadraj.Shape.Sheet)
                         .background(
                             Brush.verticalGradient(
                                 listOf(Kadraj.InkRaised, Kadraj.Ink),
@@ -703,7 +708,7 @@ fun ModalSheet(
                         .border(
                             width = 1.dp,
                             color = Kadraj.Line,
-                            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                            shape = Kadraj.Shape.Sheet,
                         )
                         .pointerInput(Unit) { detectTapGestures { } }
                         .windowInsetsPadding(WindowInsets.navigationBars)
@@ -716,7 +721,7 @@ fun ModalSheet(
                             .align(Alignment.CenterHorizontally)
                             .width(36.dp)
                             .height(4.dp)
-                            .clip(RoundedCornerShape(50))
+                            .clip(Kadraj.Shape.Pill)
                             .background(Kadraj.LineStrong),
                     )
                     Spacer(Modifier.height(22.dp))

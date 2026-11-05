@@ -118,7 +118,7 @@ fun CollageStage(
             }
         }
     }
-    val shape = RoundedCornerShape(8.dp)
+    val shape = Kadraj.Shape.Stage
 
     BoxWithConstraints(
         modifier = modifier,
@@ -175,9 +175,9 @@ fun CollageStage(
             drawRect(
                 brush = Brush.verticalGradient(
                     listOf(
-                        Kadraj.Ink.copy(alpha = 0.58f),
-                        Kadraj.Ink.copy(alpha = 0.36f),
-                        Kadraj.Ink.copy(alpha = 0.68f),
+                        Kadraj.FixedInk.copy(alpha = 0.58f),
+                        Kadraj.FixedInk.copy(alpha = 0.36f),
+                        Kadraj.FixedInk.copy(alpha = 0.68f),
                     ),
                 ),
             )
@@ -210,7 +210,7 @@ fun CollageStage(
                     )
                     .clip(shape)
                     .background(Color.Black)
-                    .border(1.dp, Kadraj.Line, shape)
+                    .border(1.dp, Kadraj.OnPhotoLine, shape)
                     .semantics { contentDescription = "Collage preview" },
             ) {
                 Canvas(
@@ -366,9 +366,9 @@ fun CollageStage(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .padding(top = 10.dp)
-                            .clip(RoundedCornerShape(50))
+                            .clip(Kadraj.Shape.Pill)
                             .background(Kadraj.Ink.copy(alpha = 0.9f))
-                            .border(1.dp, Kadraj.Line, RoundedCornerShape(50))
+                            .border(1.dp, Kadraj.Line, Kadraj.Shape.Pill)
                             .padding(horizontal = 12.dp, vertical = 7.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -448,7 +448,7 @@ fun CollagePreview(
             canvasWidth = canvasHeight * safeAspect
         }
         if (canvasWidth > 0.dp && canvasHeight > 0.dp) {
-            val previewShape = RoundedCornerShape(5.dp)
+            val previewShape = Kadraj.Shape.Preview
             Canvas(
                 modifier = Modifier
                     .size(canvasWidth, canvasHeight)

@@ -50,6 +50,7 @@ import com.omersusin.kadraj.ui.screens.EmptyState
 import com.omersusin.kadraj.ui.screens.ExportSheet
 import com.omersusin.kadraj.ui.screens.InfoSheet
 import com.omersusin.kadraj.ui.theme.Kadraj
+import com.omersusin.kadraj.ui.theme.ThemeMode
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -61,8 +62,11 @@ fun KadrajApp(
     startWithDemo: Boolean = false,
     demoPhotoCount: Int = 3,
     initialTab: String? = null,
+    startWithSettings: Boolean = false,
+    themeMode: ThemeMode = ThemeMode.CINEMA,
+    onThemeChange: (ThemeMode) -> Unit = {},
 ) {
-    var showInfo by rememberSaveable { mutableStateOf(false) }
+    var showInfo by rememberSaveable { mutableStateOf(startWithSettings) }
     var showExport by rememberSaveable { mutableStateOf(false) }
     var showCloseConfirm by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
@@ -220,6 +224,8 @@ fun KadrajApp(
                 hasImages = images.isNotEmpty(),
                 onClose = { showInfo = false },
                 onNewProject = startNewProject,
+                themeMode = themeMode,
+                onThemeChange = onThemeChange,
             )
         }
 

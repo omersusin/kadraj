@@ -158,14 +158,14 @@ fun ExportSheet(
                     .height(146.dp)
                     .shadow(
                         elevation = 16.dp,
-                        shape = RoundedCornerShape(16.dp),
+                        shape = Kadraj.Shape.Card,
                         clip = false,
                         ambientColor = Color.Black,
                         spotColor = Color.Black,
                     )
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(Kadraj.Shape.Card)
                     .background(Kadraj.Ink)
-                    .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(16.dp))
+                    .border(1.dp, Kadraj.LineStrong, Kadraj.Shape.Card)
                     .padding(10.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -249,9 +249,9 @@ fun ExportSheet(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(Kadraj.Shape.Card)
                         .background(Kadraj.InkSoft)
-                        .border(1.dp, Kadraj.LineStrong, RoundedCornerShape(16.dp)),
+                        .border(1.dp, Kadraj.LineStrong, Kadraj.Shape.Card),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -287,7 +287,7 @@ private fun ExportOption(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(13.dp)
+    val shape = Kadraj.Shape.Control
     Column(
         modifier = modifier
             .height(56.dp)
@@ -411,7 +411,7 @@ private fun ExportSuccess(
         Spacer(Modifier.height(17.dp))
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(50))
+                .clip(Kadraj.Shape.Pill)
                 .pressable {
                     haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onNewProject()

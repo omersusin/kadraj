@@ -1,10 +1,14 @@
-# Kadraj v1.4.0
+# Kadraj v1.5.0
 
-A larger canvas for bigger stories, with the calmer visual language introduced in v1.3.0.
+Three rooms for the same story. Kadraj now ships with three complete appearance themes, selectable in Settings.
 
 ## Highlights
 
-- **Up to 30 photos** — Kadraj now holds 30 images in one collage. The system picker can still cap a single selection pass at 10 on some devices; the editor keeps the remaining slots visible and adds the rest in another pass.
+- **Three themes, one studio** — choose **Cinema**, **Paper**, or **Contact** in Settings. The choice applies instantly, survives restarts, and changes palette, typography, corner language, system bars, and backdrop.
+- **Cinema is the new default** — the dark, photo-first stage with peach light stays closest to Kadraj's original identity.
+- **Paper** — warm paper, Fraunces headlines, terracotta accents, square frames, and an editorial rhythm for daylight work.
+- **Contact** — monochrome contact-sheet styling, monospace labels, hairline borders, a technical grid, and signal red.
+- **Up to 30 photos** — larger sets keep the same fast local workflow, with adaptive previews and a 4K export path.
 
 ## Everything else
 
@@ -20,7 +24,7 @@ A larger canvas for bigger stories, with the calmer visual language introduced i
 
 ## Install
 
-1. Download `kadraj-v1.4.0.apk`.
+1. Download `kadraj-v1.5.0.apk`.
 2. Allow app installs from this source in Android settings.
 3. Open the APK and install.
 
