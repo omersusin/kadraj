@@ -5,7 +5,7 @@
 Kadraj reads the shape of your images. Phone captures, desktop captures, and mixed selections each get a layout that understands their ratios. Negative space, rhythm, and framing follow from there. Everything stays on your device.
 
 [**Download the Android APK**](https://github.com/omersusin/kadraj/releases/latest) ·
-Android 10 and up · About 2 MB
+Android 10 and up · About 3 MB
 
 ## Why Kadraj?
 
