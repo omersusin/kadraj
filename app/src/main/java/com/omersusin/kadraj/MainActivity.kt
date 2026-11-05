@@ -45,6 +45,11 @@ class MainActivity : ComponentActivity() {
                         3
                     },
                     initialTab = intent.getStringExtra("demoTab"),
+                    initialPhotoPanel = if (BuildConfig.DEBUG) {
+                        intent.getStringExtra("demoPhotoPanel")
+                    } else {
+                        null
+                    },
                     startWithSettings = BuildConfig.DEBUG &&
                         intent.getBooleanExtra("demoSettings", false),
                     themeMode = themeMode,

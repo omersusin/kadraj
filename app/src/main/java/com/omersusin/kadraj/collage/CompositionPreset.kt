@@ -68,7 +68,7 @@ object CompositionPresets {
     val Gallery = CompositionPreset(
         id = "gallery",
         name = "Gallery",
-        tagline = "One lead frame, generous white",
+        tagline = "Lead frame, white space",
         template = Template.HERO,
         aspect = AspectPreset.CLASSIC,
         paletteId = "paper",
@@ -83,7 +83,7 @@ object CompositionPresets {
     val Zine = CompositionPreset(
         id = "zine",
         name = "Zine",
-        tagline = "Loose stack, printed edge",
+        tagline = "Loose stack, print edge",
         template = Template.PILE,
         aspect = AspectPreset.FOUR_FIVE,
         paletteId = "clay",
@@ -98,7 +98,7 @@ object CompositionPresets {
     val Noir = CompositionPreset(
         id = "noir",
         name = "Noir",
-        tagline = "Tall columns, quiet contrast",
+        tagline = "Tall columns, quiet",
         template = Template.FLOW,
         aspect = AspectPreset.AUTO,
         paletteId = "night",
@@ -128,7 +128,7 @@ object CompositionPresets {
     val Bento = CompositionPreset(
         id = "bento",
         name = "Bento",
-        tagline = "Square rhythm, clean gaps",
+        tagline = "Square rhythm, clean",
         template = Template.GRID,
         aspect = AspectPreset.SQUARE,
         paletteId = "mist",

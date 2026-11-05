@@ -62,6 +62,7 @@ fun KadrajApp(
     startWithDemo: Boolean = false,
     demoPhotoCount: Int = 3,
     initialTab: String? = null,
+    initialPhotoPanel: String? = null,
     startWithSettings: Boolean = false,
     themeMode: ThemeMode = ThemeMode.CINEMA,
     onThemeChange: (ThemeMode) -> Unit = {},
@@ -193,6 +194,7 @@ fun KadrajApp(
                 onInfo = { showInfo = true },
                 onCloseProject = { showCloseConfirm = true },
                 initialTab = initialTab,
+                initialPhotoPanel = initialPhotoPanel,
                 modifier = Modifier.fillMaxSize(),
             )
         }

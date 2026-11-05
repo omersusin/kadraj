@@ -133,6 +133,7 @@ fun EditorScreen(
     onInfo: () -> Unit,
     onCloseProject: () -> Unit,
     initialTab: String? = null,
+    initialPhotoPanel: String? = null,
     modifier: Modifier = Modifier,
 ) {
     var tab by rememberSaveable {
@@ -593,6 +594,7 @@ private fun EditorDock(
                             viewModel = viewModel,
                             selectedImage = selectedImage,
                             onPickImages = onPickImages,
+                            initialPanelName = initialPhotoPanel,
                         )
                         EditorTab.Text -> TextControls(viewModel)
                     }
@@ -883,11 +885,18 @@ private fun PhotoControls(
     viewModel: EditorViewModel,
     selectedImage: CollageImage?,
     onPickImages: () -> Unit,
+    initialPanelName: String? = null,
 ) {
     val haptics = LocalHapticFeedback.current
     val images = viewModel.images
     val index = selectedImage?.let { images.indexOfFirst { item -> item.id == it.id } } ?: -1
-    var panel by rememberSaveable { mutableStateOf(PhotoPanel.Look) }
+    var panel by rememberSaveable {
+        mutableStateOf(
+            initialPanelName?.let { value ->
+                PhotoPanel.entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+            } ?: PhotoPanel.Look,
+        )
+    }
     val thumbState = rememberLazyListState()
 
     LaunchedEffect(index) {
